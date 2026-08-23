@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -47,6 +48,38 @@ class Settings(BaseSettings):
     pairing_token_ttl_seconds: int = 15 * 60
 
     cors_allow_origins: list[str] = ["http://localhost:5173"]
+
+    @model_validator(mode="after")
+    def _fail_closed_in_production(self):
+        """Refuse to start in production unless explicit, non-dev secrets and
+        endpoints are supplied. Dev defaults are allowed only in dev/test."""
+        if self.env != "production":
+            return self
+
+        localhost_refs = ["localhost", "127.0.0.1", "0.0.0.0"]
+        problems: list[str] = []
+
+        if any(h in self.database_url for h in localhost_refs):
+            problems.append("database_url points at localhost")
+        if any(h in self.redis_url for h in localhost_refs):
+            problems.append("redis_url points at localhost")
+        if self.oidc_issuer.startswith("http://localhost"):
+            problems.append("oidc_issuer points at localhost")
+        if self.oidc_client_secret in ("dev-secret-change-me", ""):
+            problems.append("oidc_client_secret is unset/placeholder")
+        if self.session_secret_key in ("dev-only-change-me-in-every-real-deployment", ""):
+            problems.append("session_secret_key is unset/placeholder")
+        if self.s3_secret_key == "acadiahq-dev-secret":
+            problems.append("s3_secret_key is the dev default")
+        if len(self.session_secret_key) < 32:
+            problems.append("session_secret_key too short (<32 chars)")
+
+        if problems:
+            raise ValueError(
+                "ACADIAHQ_ENV=production but config is not fail-closed; "
+                "refusing to start. Resolve: " + "; ".join(problems)
+            )
+        return self
 
 
 @lru_cache
