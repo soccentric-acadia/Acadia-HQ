@@ -16,10 +16,13 @@ DATABASE_URL ?= postgresql+asyncpg://acadiahq:acadiahq@localhost:5432/acadiahq
 TEST_DATABASE_URL ?= postgresql+asyncpg://acadiahq:acadiahq@localhost:5432/acadiahq_test
 S3_ENDPOINT_URL ?= http://localhost:9000
 
-.PHONY: help doctor install db-up db-down migrate seed run stop logs \
+.PHONY: help doctor install db-up db-down migrate seed run stop logs e2e-enroll \
         test test-api test-gateway test-web lint lint-api lint-gateway lint-web \
         build clean
 
+
+e2e-enroll: ## X5-012: end-to-end device enrollment (Rust agent vs real gateway; needs docker+cargo)
+	@bash agent-gateway/tests/e2e_device_enroll.sh
 
 doctor: ## check prerequisites (docker compose v2, python3 3.12+, node 22/24)
 	@command -v docker >/dev/null || { echo "docker not found"; exit 1; }
