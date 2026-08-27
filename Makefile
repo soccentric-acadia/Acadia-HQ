@@ -21,10 +21,13 @@ S3_ENDPOINT_URL ?= http://localhost:9000
         build clean
 
 
-doctor: ## check prerequisites (docker, python3, node)
+doctor: ## check prerequisites (docker compose v2, python3 3.12+, node 22/24)
 	@command -v docker >/dev/null || { echo "docker not found"; exit 1; }
+	@docker compose version >/dev/null 2>&1 || { echo "docker compose v2 plugin not found"; exit 1; }
 	@command -v python3 >/dev/null || { echo "python3 not found"; exit 1; }
+	@python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 12) else 1)' || { echo "python3 >= 3.12 required (api/agent-gateway target 3.12)"; exit 1; }
 	@command -v node >/dev/null || { echo "node not found"; exit 1; }
+	@node -e 'const s=require("./web/package.json").engines.node; const ok=require("semver").satisfies(process.version.slice(1),s).valueOf(); if(!ok){console.error("node "+process.version+" does not satisfy web engines "+s);process.exit(1);}' 2>/dev/null || echo "note: could not check web engines (semver unavailable) — node $$(node --version)"
 	@echo "all prerequisites found"
 
 $(VENV)/bin/activate:
