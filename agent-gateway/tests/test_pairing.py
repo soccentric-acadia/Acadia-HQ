@@ -131,3 +131,100 @@ async def test_disabled_device_heartbeat_is_rejected(gateway_stub, db_session):
         async for _ in gateway_stub.Connect(frames()):
             pass
     assert exc_info.value.code() == grpc.StatusCode.UNAUTHENTICATED
+
+
+async def test_credential_revoked_midstream_ends_the_session(gateway_stub, db_session):
+    """X5-005: the gateway validates the credential on EVERY frame, so a
+    rotation/revocation takes effect immediately — the live session is torn
+    down on the next frame instead of surviving until reconnect (contract
+    doc/hq-pairing-contract.md §Enrollment/§Revocation)."""
+    import asyncio
+    from datetime import UTC, datetime
+
+    from app.models.device_credential import DeviceCredential
+
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+
+    revocation_done = asyncio.Event()
+
+    async def frames():
+        # First heartbeat: valid, keeps the stream open.
+        yield AgentFrame(
+            heartbeat=Heartbeat(
+                device_id=str(device.id),
+                credential_token=credential,
+                sent_at_unix_ms=int(time.time() * 1000),
+            )
+        )
+        # The gateway's HeartbeatAck arrives; the test revokes the credential
+        # (simulating rotate_credential), then this second heartbeat must not
+        # produce a response — the session must end.
+        await revocation_done.wait()
+        yield AgentFrame(
+            heartbeat=Heartbeat(
+                device_id=str(device.id),
+                credential_token=credential,
+                sent_at_unix_ms=int(time.time() * 1000),
+            )
+        )
+
+    responses = []
+    async for response in gateway_stub.Connect(frames()):
+        responses.append(response)
+        assert response.HasField("heartbeat_ack"), "first frame must be acked"
+        # Revoke exactly like the rotation endpoint does.
+        now = datetime.now(UTC)
+        await db_session.execute(
+            DeviceCredential.__table__.update()
+            .where(
+                DeviceCredential.device_id == device.id,
+                DeviceCredential.revoked_at.is_(None),
+            )
+            .values(revoked_at=now)
+        )
+        device.pairing_state = PairingState.pending
+        await db_session.commit()
+        revocation_done.set()
+
+    # The stream must end after the revoked frame — no second response.
+    assert len(responses) == 1, f"gateway leaked frames after revocation: {responses}"
+
+
+async def test_revoked_credential_cannot_reconnect(gateway_stub, db_session):
+    """X5-006 (device side): after a rotation revokes the old credential, a
+    reconnect attempt with it fails UNAUTHENTICATED — the device must re-enroll
+    with the fresh pairing token."""
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+
+    # Rotation equivalent: revoke all credentials + park the device.
+    from datetime import UTC, datetime
+
+    from app.models.device_credential import DeviceCredential
+
+    now = datetime.now(UTC)
+    await db_session.execute(
+        DeviceCredential.__table__.update()
+        .where(
+            DeviceCredential.device_id == device.id,
+            DeviceCredential.revoked_at.is_(None),
+        )
+        .values(revoked_at=now)
+    )
+    device.pairing_state = PairingState.pending
+    await db_session.commit()
+
+    async def frames():
+        yield AgentFrame(
+            heartbeat=Heartbeat(
+                device_id=str(device.id),
+                credential_token=credential,
+                sent_at_unix_ms=int(time.time() * 1000),
+            )
+        )
+
+    with pytest.raises(grpc.aio.AioRpcError) as exc_info:
+        async for _ in gateway_stub.Connect(frames()):
+            pass
+    assert exc_info.value.code() == grpc.StatusCode.UNAUTHENTICATED
