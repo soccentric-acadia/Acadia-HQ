@@ -134,6 +134,9 @@ clean: ## remove venv, node_modules, caches, dist, run logs
 # Targets are self-documenting: text after `## ` on a target line is picked up
 # by `make help` automatically, so the listing can never drift from the rules.
 .PHONY: help
+version: ## Print the project version (CONV-004)
+	@grep -m1 '^version' api/pyproject.toml | sed 's/.*"\(.*\)"/\1/'
+
 help: ## Show this help
 	@printf '\n  \033[1m%s\033[0m\n' 'Acadia-HQ'
 	@printf '  Usage: make <target> [VAR=value ...]\n'
