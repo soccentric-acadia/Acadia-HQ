@@ -1,5 +1,7 @@
 # Acadia HQ
 
+[![CI](https://github.com/soccentric-acadia/Acadia-HQ/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/soccentric-acadia/Acadia-HQ/actions/workflows/ci.yml)
+
 Cloud fleet-management app for Acadia devices — view devices remotely, manage
 pairing/authorization, and run fleet operations (telemetry, faults/alarms, logs, OTA updates,
 backup/restore, provisioning, factory reset, disable, location).
