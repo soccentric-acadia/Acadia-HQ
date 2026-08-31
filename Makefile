@@ -16,9 +16,8 @@ DATABASE_URL ?= postgresql+asyncpg://acadiahq:acadiahq@localhost:5432/acadiahq
 TEST_DATABASE_URL ?= postgresql+asyncpg://acadiahq:acadiahq@localhost:5432/acadiahq_test
 S3_ENDPOINT_URL ?= http://localhost:9000
 
-.PHONY: help doctor install db-up db-down migrate seed run stop logs e2e-enroll \
-        test test-api test-gateway test-web lint lint-api lint-gateway lint-web \
-        build clean
+.PHONY: help doctor install db-up db-down migrate seed run stop logs e2e-enroll test test-api test-gateway test-web lint lint-api lint-gateway lint-web build clean
+
 
 
 e2e-enroll: ## X5-012: end-to-end device enrollment (Rust agent vs real gateway; needs docker+cargo)
@@ -126,12 +125,24 @@ lint-gateway:
 lint-web:
 	cd web && npm run lint && npx vue-tsc --noEmit
 
-build: ## build the web frontend for production
-	cd web && npm run build
+build: docker-build ## Build web frontend + backend images (Docker — fleet default)
 
 clean: ## remove venv, node_modules, caches, dist, run logs
 	rm -rf $(VENV) $(RUN_DIR) web/node_modules web/dist web/.eslintcache
 	find . -name __pycache__ -o -name "*.egg-info" -o -name .ruff_cache -o -name .pytest_cache | xargs rm -rf
+
+# ── Docker (fleet-standard build) ────────────────────────────────────────────
+# `make build` produces the production container images. See docker/.
+
+.PHONY: docker-build docker-build-backend docker-build-web
+
+IMAGE_HQ := acadiahq
+
+docker-build: docker-build-backend docker-build-web ## Build backend + web Docker images
+docker-build-backend:
+	$(MAKE) -C docker build IMAGE=$(IMAGE_HQ)
+docker-build-web:
+	$(MAKE) -C docker build-web IMAGE=$(IMAGE_HQ)
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 # Targets are self-documenting: text after `## ` on a target line is picked up
