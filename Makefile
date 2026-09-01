@@ -139,10 +139,12 @@ clean: ## remove venv, node_modules, caches, dist, run logs
 IMAGE_HQ := acadiahq
 
 docker-build: docker-build-backend docker-build-web ## Build backend + web Docker images
+# Invoke the sub-Makefile with -f (not -C) so its paths
+# (docker/Dockerfile, context '.') resolve against the repo root.
 docker-build-backend:
-	$(MAKE) -C docker build IMAGE=$(IMAGE_HQ)
+	$(MAKE) -f docker/Makefile build IMAGE=$(IMAGE_HQ)
 docker-build-web:
-	$(MAKE) -C docker build-web IMAGE=$(IMAGE_HQ)
+	$(MAKE) -f docker/Makefile build-web IMAGE=$(IMAGE_HQ)
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 # Targets are self-documenting: text after `## ` on a target line is picked up

@@ -11,7 +11,6 @@ spin one up on 55432).
 
 import os
 import subprocess
-import sys
 
 import pytest
 from alembic.autogenerate import compare_metadata
@@ -41,9 +40,10 @@ def test_migrations_match_models():
         engine = create_async_engine(url)
         try:
             async with engine.begin() as conn:
-                await conn.execute(
-                    _text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
-                )
+                # Two separate statements: asyncpg's prepared statements
+                # reject multi-command SQL, so this cannot be one string.
+                await conn.execute(_text("DROP SCHEMA public CASCADE"))
+                await conn.execute(_text("CREATE SCHEMA public"))
         finally:
             await engine.dispose()
 
@@ -53,11 +53,15 @@ def test_migrations_match_models():
     venv_bin = os.path.join(REPO_ROOT, ".venv", "bin")
     alembic = os.path.join(venv_bin, "alembic") if os.path.exists(
         os.path.join(venv_bin, "alembic")) else "alembic"
+    # Point alembic's env (which reads ACADIAHQ_DATABASE_URL) at the test DB
+    # so the migrations apply to the database we just reset, not the dev one.
+    env = dict(os.environ, ACADIAHQ_DATABASE_URL=url)
     result = subprocess.run(
         [alembic, "-c", os.path.join(REPO_ROOT, "alembic.ini"), "upgrade", "head"],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
+        env=env,
     )
     if result.returncode != 0:
         pytest.fail(
