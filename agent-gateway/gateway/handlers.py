@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.alarm import Alarm, AlarmRule
 from app.models.backup import Backup
 from app.models.device import Device
-from app.models.enums import AlarmState, FaultSeverity
+from app.models.enums import AlarmState, CommandState, FaultSeverity
 from app.models.fault import Fault
 from app.models.log_bundle import LogBundle
 from app.models.telemetry import TelemetrySample
@@ -193,6 +193,7 @@ async def handle_command_ack(
         pending.correlation_id = correlation_id or command_id
         pending.result_code = code or ("OK" if success else "INTERNAL")
         pending.result_error = None if success else error
+        pending.state = CommandState.succeeded if success else CommandState.failed
         pending.retryable = retryable
         pending.completed_at = datetime.now(UTC)
         pending.lease_until = None

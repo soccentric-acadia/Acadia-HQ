@@ -22,7 +22,7 @@ from sqlalchemy import select
 
 from app.db.base import get_session_factory
 from app.models.device import Device
-from app.models.enums import CommandKind, PairingState
+from app.models.enums import CommandKind, CommandState, PairingState
 from app.models.pending_command import PendingCommand
 from acadiahq.agent_pb2 import (
     ApplyUpdate,
@@ -154,6 +154,7 @@ class AgentLinkServicer(_AgentLinkServicer):
                         continue
                     operation_name, build_kind = operation
                     row.delivered_at = datetime.now(UTC)
+                    row.state = CommandState.delivering
                     row.lease_until = datetime.now(UTC) + timedelta(seconds=30)
                     row.attempt_count += 1
                     await queue.put(

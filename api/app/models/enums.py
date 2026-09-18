@@ -61,3 +61,11 @@ class CommandKind(str, enum.Enum):
     restore = "restore"
     factory_reset = "factory_reset"
     apply_update = "apply_update"
+
+
+class CommandState(str, enum.Enum):
+    queued = "queued"
+    delivering = "delivering"
+    succeeded = "succeeded"
+    failed = "failed"
+    expired = "expired"

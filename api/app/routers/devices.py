@@ -108,15 +108,9 @@ async def get_command_status(
     ).scalar_one_or_none()
     if command is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "command not found")
-    if command.completed_at is not None:
-        state = "succeeded" if command.result_error is None else "failed"
-    elif command.lease_until is not None:
-        state = "delivering"
-    else:
-        state = "queued"
     return {
         "command_id": command.command_id,
-        "state": state,
+        "state": command.state.value,
         "attempt_count": command.attempt_count,
         "correlation_id": command.correlation_id or command.command_id,
         "code": command.result_code,

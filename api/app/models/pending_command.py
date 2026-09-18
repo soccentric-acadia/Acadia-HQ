@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.models.enums import CommandKind
+from app.models.enums import CommandKind, CommandState
 from app.models.mixins import TimestampMixin, UUIDPKMixin
 
 
@@ -28,6 +28,9 @@ class PendingCommand(Base, UUIDPKMixin, TimestampMixin):
     # "update:{rollout_id}" / "restore:{backup_id}" encoding.
     command_id: Mapped[str] = mapped_column(unique=True, index=True)
     kind: Mapped[CommandKind] = mapped_column(Enum(CommandKind, name="command_kind"))
+    state: Mapped[CommandState] = mapped_column(
+        Enum(CommandState, name="command_state"), default=CommandState.queued, index=True
+    )
     payload: Mapped[dict] = mapped_column(JSONB, default=dict)
     delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     attempt_count: Mapped[int] = mapped_column(default=0)
