@@ -3,8 +3,10 @@ import time
 from sqlalchemy import select
 
 from app.models.alarm import Alarm, AlarmRule
+from app.models.enums import CommandKind, CommandState
 from app.models.fault import Fault
 from app.models.log_bundle import LogBundle
+from app.models.pending_command import PendingCommand
 from app.models.telemetry import TelemetrySample
 from acadiahq.agent_pb2 import (
     AgentFrame,
@@ -145,3 +147,109 @@ async def test_log_upload_request_returns_signed_url_and_creates_bundle(gateway_
     ).scalars().all()
     assert len(bundles) == 1
     assert bundles[0].size_bytes == 2048
+
+
+async def test_fault_and_telemetry_are_ingested_while_command_is_in_flight(
+    gateway_stub, db_session
+):
+    """The command stream must not block independent device observations."""
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+    command = PendingCommand(
+        device_id=device.id,
+        command_id="backup:in-flight",
+        kind=CommandKind.take_backup_now,
+        state=CommandState.queued,
+        correlation_id="corr-in-flight",
+    )
+    db_session.add(command)
+    await db_session.commit()
+
+    from acadiahq.agent_pb2 import CommandAck
+
+    async def frames():
+        yield AgentFrame(heartbeat=_hb(str(device.id), credential))
+        yield AgentFrame(
+            telemetry_batch=TelemetryBatch(
+                samples=[
+                    PbTelemetrySample(
+                        metric="cpu_pct",
+                        value=91.0,
+                        recorded_at_unix_ms=int(time.time() * 1000),
+                    )
+                ]
+            )
+        )
+        yield AgentFrame(
+            fault_event=FaultEvent(
+                code="BACKUP_BUSY",
+                severity=FaultEvent.WARN,
+                message="backup still running",
+                kind=FaultEvent.RAISED,
+                at_unix_ms=int(time.time() * 1000),
+            )
+        )
+        yield AgentFrame(
+            command_ack=CommandAck(
+                command_id=command.command_id,
+                success=True,
+                correlation_id=command.correlation_id,
+                code="OK",
+                operation="backup",
+                daemon="configuration",
+            )
+        )
+
+    async for _ in gateway_stub.Connect(frames()):
+        pass
+
+    samples = (
+        await db_session.execute(
+            select(TelemetrySample).where(TelemetrySample.device_id == device.id)
+        )
+    ).scalars().all()
+    faults = (
+        await db_session.execute(select(Fault).where(Fault.device_id == device.id))
+    ).scalars().all()
+    await db_session.refresh(command)
+    assert [(sample.metric, sample.value) for sample in samples] == [("cpu_pct", 91.0)]
+    assert [(fault.code, fault.severity.value) for fault in faults] == [("BACKUP_BUSY", "warn")]
+    assert command.state == CommandState.succeeded
+    assert command.result_code == "OK"
+
+
+async def test_duplicate_command_ack_is_terminal_and_does_not_retry(gateway_stub, db_session):
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+    command = PendingCommand(
+        device_id=device.id,
+        command_id="backup:duplicate-ack",
+        kind=CommandKind.take_backup_now,
+        state=CommandState.delivering,
+        attempt_count=1,
+        correlation_id="corr-duplicate",
+    )
+    db_session.add(command)
+    await db_session.commit()
+
+    from acadiahq.agent_pb2 import CommandAck
+
+    async def frames():
+        yield AgentFrame(heartbeat=_hb(str(device.id), credential))
+        for _ in range(2):
+            yield AgentFrame(
+                command_ack=CommandAck(
+                    command_id=command.command_id,
+                    success=True,
+                    correlation_id=command.correlation_id,
+                    code="OK",
+                )
+            )
+
+    async for _ in gateway_stub.Connect(frames()):
+        pass
+
+    await db_session.refresh(command)
+    assert command.state == CommandState.succeeded
+    assert command.attempt_count == 1
+    assert command.retryable is False
