@@ -24,6 +24,8 @@ from app.db.base import get_session_factory
 from app.models.device import Device
 from app.models.enums import CommandKind, CommandState, PairingState
 from app.models.pending_command import PendingCommand
+from app.services import audit
+from app.config import get_settings
 from acadiahq.agent_pb2 import (
     ApplyUpdate,
     Command,
@@ -87,8 +89,13 @@ class AgentLinkServicer(_AgentLinkServicer):
                     grpc.StatusCode.UNAUTHENTICATED, "invalid credential or device disabled"
                 )
                 return
+            became_online = not device.online
             device.online = True
             device.last_seen_at = datetime.now(UTC)
+            if became_online:
+                await audit.record_system(
+                    session, device, "device.online", payload={"reason": "connect"}
+                )
             await session.commit()
 
         settings = get_gateway_settings()
@@ -108,7 +115,15 @@ class AgentLinkServicer(_AgentLinkServicer):
                 yield out
         finally:
             dispatcher_task.cancel()
-            manager.unregister(device_id)
+            manager.unregister(device_id, queue)
+            async with session_factory() as session:
+                device = await session.get(Device, device_id)
+                if device is not None and not manager.is_connected(device_id) and device.online:
+                    device.online = False
+                    await audit.record_system(
+                        session, device, "device.offline", payload={"reason": "stream_closed"}
+                    )
+                    await session.commit()
 
     async def _dispatch_pending_commands(self, device_id, queue, session_factory):
         """Claim durable API commands and deliver them to this live session.
@@ -182,11 +197,19 @@ class AgentLinkServicer(_AgentLinkServicer):
                     operation = operations.get(row.kind)
                     if operation is None:
                         logger.error("unsupported pending command kind %s", row.kind)
+                        row.state = CommandState.failed
+                        row.result_code = "UNIMPLEMENTED"
+                        row.result_error = f"unsupported command kind: {row.kind.value}"
+                        row.retryable = False
+                        row.completed_at = now
+                        row.lease_until = None
                         continue
                     operation_name, build_kind = operation
                     row.delivered_at = datetime.now(UTC)
                     row.state = CommandState.delivering
-                    row.lease_until = datetime.now(UTC) + timedelta(seconds=30)
+                    row.lease_until = datetime.now(UTC) + timedelta(
+                        seconds=get_settings().command_lease_seconds
+                    )
                     row.attempt_count += 1
                     await queue.put(
                         ServerFrame(
@@ -259,12 +282,22 @@ class AgentLinkServicer(_AgentLinkServicer):
                 and frame.heartbeat.protocol_version != SUPPORTED_PROTOCOL_VERSION
             ):
                 return False
+            became_online = not device.online
             device.online = True
             device.last_seen_at = datetime.now(UTC)
+            if became_online:
+                await audit.record_system(
+                    session, device, "device.online", payload={"reason": "heartbeat"}
+                )
             return None
         if frame.HasField("telemetry_batch"):
+            became_online = not device.online
             device.online = True
             device.last_seen_at = datetime.now(UTC)
+            if became_online:
+                await audit.record_system(
+                    session, device, "device.online", payload={"reason": "telemetry"}
+                )
             await handlers.handle_telemetry_batch(session, device, frame.telemetry_batch)
             return None
         if frame.HasField("fault_event"):

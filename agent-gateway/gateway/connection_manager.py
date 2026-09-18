@@ -18,8 +18,10 @@ class ConnectionManager:
         self._queues[device_id] = queue
         return queue
 
-    def unregister(self, device_id: str) -> None:
-        self._queues.pop(device_id, None)
+    def unregister(self, device_id: str, queue: asyncio.Queue | None = None) -> None:
+        """Remove only this connection; a newer reconnect must win."""
+        if queue is None or self._queues.get(device_id) is queue:
+            self._queues.pop(device_id, None)
 
     def is_connected(self, device_id: str) -> bool:
         return device_id in self._queues

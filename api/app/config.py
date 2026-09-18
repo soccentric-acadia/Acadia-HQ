@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     # Pairing tokens.
     pairing_token_ttl_seconds: int = 15 * 60
     command_ttl_seconds: int = 60 * 60
+    command_lease_seconds: int = 30
+    command_max_attempts: int = 3
 
     cors_allow_origins: list[str] = ["http://localhost:5173"]
 
