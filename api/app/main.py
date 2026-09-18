@@ -11,6 +11,7 @@ from app.routers import (
     alarms,
     audit_log,
     auth,
+    configuration,
     devices,
     faults,
     logs,
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router)
     app.include_router(devices.router)
     app.include_router(operations.router)
+    app.include_router(configuration.router)
     app.include_router(users.router)
     app.include_router(audit_log.router)
     app.include_router(telemetry.router)

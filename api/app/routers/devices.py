@@ -108,7 +108,7 @@ async def get_command_status(
     ).scalar_one_or_none()
     if command is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "command not found")
-    return {
+    response = {
         "command_id": command.command_id,
         "state": command.state.value,
         "attempt_count": command.attempt_count,
@@ -120,6 +120,9 @@ async def get_command_status(
         "expires_at": command.expires_at,
         "retryable": command.retryable,
     }
+    if command.kind.value.startswith("configuration_"):
+        response["integration_status"] = "awaiting_configuration_contract"
+    return response
 
 
 @router.get("/{device_id}/health")

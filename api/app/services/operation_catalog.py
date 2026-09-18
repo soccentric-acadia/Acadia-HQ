@@ -25,4 +25,18 @@ OPERATIONS = (
         "command_kind": "apply_update",
         "description": "Install a signed device update artifact.",
     },
+    {
+        "name": "configuration.read",
+        "daemon": "configuration",
+        "command_kind": "configuration_read",
+        "description": "Read device configuration (requires Configuration contract).",
+        "integration_status": "awaiting_configuration_contract",
+    },
+    {
+        "name": "configuration.write",
+        "daemon": "configuration",
+        "command_kind": "configuration_write",
+        "description": "Apply signed device configuration (requires Configuration contract).",
+        "integration_status": "awaiting_configuration_contract",
+    },
 )

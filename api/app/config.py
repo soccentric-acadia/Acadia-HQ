@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     session_secret_key: str = "dev-only-change-me-in-every-real-deployment"
     session_algorithm: str = "HS256"
     session_ttl_seconds: int = 60 * 60 * 8
+    configuration_signing_key: str = "dev-configuration-signing-key-change-me"
 
     # Object storage (S3-compatible; MinIO in local dev).
     s3_endpoint_url: str = "http://localhost:9000"
@@ -76,6 +77,10 @@ class Settings(BaseSettings):
             problems.append("s3_secret_key is the dev default")
         if len(self.session_secret_key) < 32:
             problems.append("session_secret_key too short (<32 chars)")
+        if self.configuration_signing_key in ("", "dev-configuration-signing-key-change-me"):
+            problems.append("configuration_signing_key is unset/placeholder")
+        if len(self.configuration_signing_key) < 32:
+            problems.append("configuration_signing_key too short (<32 chars)")
 
         if problems:
             raise ValueError(

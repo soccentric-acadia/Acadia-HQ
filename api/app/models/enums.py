@@ -61,6 +61,8 @@ class CommandKind(str, enum.Enum):
     restore = "restore"
     factory_reset = "factory_reset"
     apply_update = "apply_update"
+    configuration_read = "configuration_read"
+    configuration_write = "configuration_write"
 
 
 class CommandState(str, enum.Enum):

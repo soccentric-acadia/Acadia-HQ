@@ -1,8 +1,12 @@
 from datetime import datetime, timedelta, UTC
 
+from sqlalchemy import select
+
 from app.models.alarm import Alarm, AlarmRule
 from app.models.device import Device
 from app.models.enums import AlarmState, FaultSeverity, UserRole
+from app.models.audit_log import AuditLog
+from app.models.pending_command import PendingCommand
 from app.models.fault import Fault
 from app.models.log_bundle import LogBundle
 from app.models.telemetry import TelemetrySample
@@ -169,3 +173,51 @@ async def test_device_health_explains_offline_state(client, db_session):
     assert body["status"] == "offline"
     assert body["score"] == 50
     assert body["factors"][0]["name"] == "presence"
+
+
+async def test_configuration_read_is_durable_signed_and_explicitly_blocked(
+    client, db_session
+):
+    tenant = await make_tenant(db_session)
+    viewer = await make_user(db_session, tenant, UserRole.viewer)
+    device = await _device(db_session, tenant)
+    login_as(client, viewer)
+
+    response = await client.get(f"/devices/{device.id}/configuration")
+    assert response.status_code == 202
+    body = response.json()
+    assert body["status"] == "queued"
+    assert body["integration_status"] == "awaiting_configuration_contract"
+    assert len(body["signature"]) == 64
+
+    command = await db_session.get(PendingCommand, body["command_id"])
+    assert command is not None
+    assert command.kind.value == "configuration_read"
+    assert command.correlation_id == body["correlation_id"]
+    audit_row = (
+        (await db_session.execute(
+            select(AuditLog).where(AuditLog.target_device_id == device.id)
+        ))
+        .scalars()
+        .first()
+    )
+    assert audit_row is not None
+    assert audit_row.payload["correlation_id"] == body["correlation_id"]
+
+
+async def test_configuration_write_requires_operator_and_queues_signed_values(
+    client, db_session
+):
+    tenant = await make_tenant(db_session)
+    operator = await make_user(db_session, tenant, UserRole.operator)
+    device = await _device(db_session, tenant)
+    login_as(client, operator)
+
+    response = await client.put(
+        f"/devices/{device.id}/configuration", json={"values": {"mode": "safe"}}
+    )
+    assert response.status_code == 202
+    body = response.json()
+    command = await db_session.get(PendingCommand, body["command_id"])
+    assert command.payload["values"] == {"mode": "safe"}
+    assert command.payload["signature"] == body["signature"]
