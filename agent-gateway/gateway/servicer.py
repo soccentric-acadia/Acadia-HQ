@@ -15,14 +15,26 @@ IMPLEMENTATION_PLAN §2.2's "checked on each frame."
 
 import asyncio
 import logging
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 
 import grpc
+from sqlalchemy import select
 
 from app.db.base import get_session_factory
 from app.models.device import Device
-from app.models.enums import PairingState
-from acadiahq.agent_pb2 import HeartbeatAck, PairingResult, ServerFrame, SignedUploadUrl
+from app.models.enums import CommandKind, PairingState
+from app.models.pending_command import PendingCommand
+from acadiahq.agent_pb2 import (
+    ApplyUpdate,
+    Command,
+    FactoryReset,
+    HeartbeatAck,
+    PairingResult,
+    Restore,
+    ServerFrame,
+    SignedUploadUrl,
+    TakeBackupNow,
+)
 from acadiahq.agent_pb2_grpc import AgentLinkServicer as _AgentLinkServicer
 
 from gateway import handlers
@@ -71,6 +83,9 @@ class AgentLinkServicer(_AgentLinkServicer):
 
         settings = get_gateway_settings()
         queue = manager.register(device_id)
+        dispatcher_task = asyncio.create_task(
+            self._dispatch_pending_commands(device_id, queue, session_factory)
+        )
         try:
             yield ServerFrame(
                 heartbeat_ack=HeartbeatAck(
@@ -81,7 +96,80 @@ class AgentLinkServicer(_AgentLinkServicer):
             async for out in self._pump(request_iterator, queue, device_id, session_factory):
                 yield out
         finally:
+            dispatcher_task.cancel()
             manager.unregister(device_id)
+
+    async def _dispatch_pending_commands(self, device_id, queue, session_factory):
+        """Claim durable API commands and deliver them to this live session.
+
+        The API and gateway are separate processes, so the database row is
+        the handoff. ``delivered_at`` is the lease marker; command results
+        remain durable even if the stream disappears after delivery.
+        """
+        operations = {
+            CommandKind.take_backup_now: (
+                "backup",
+                lambda payload: dict(take_backup_now=TakeBackupNow()),
+            ),
+            CommandKind.restore: (
+                "restore",
+                lambda payload: dict(
+                    restore=Restore(backup_download_url=payload.get("backup_download_url", ""))
+                ),
+            ),
+            CommandKind.factory_reset: (
+                "factory_reset",
+                lambda payload: dict(factory_reset=FactoryReset()),
+            ),
+            CommandKind.apply_update: (
+                "apply_update",
+                lambda payload: dict(
+                    apply_update=ApplyUpdate(
+                        artifact_id=payload.get("artifact_id", ""),
+                        artifact_download_url=payload.get("artifact_download_url", ""),
+                        checksum_sha256=payload.get("checksum_sha256", ""),
+                    )
+                ),
+            ),
+        }
+        while True:
+            async with session_factory() as session:
+                rows = (
+                    await session.execute(
+                        select(PendingCommand)
+                        .where(
+                            PendingCommand.device_id == device_id,
+                            PendingCommand.completed_at.is_(None),
+                            (PendingCommand.lease_until.is_(None))
+                            | (PendingCommand.lease_until < datetime.now(UTC)),
+                        )
+                        .order_by(PendingCommand.created_at)
+                        .limit(32)
+                    )
+                ).scalars().all()
+                for row in rows:
+                    operation = operations.get(row.kind)
+                    if operation is None:
+                        logger.error("unsupported pending command kind %s", row.kind)
+                        continue
+                    operation_name, build_kind = operation
+                    row.delivered_at = datetime.now(UTC)
+                    row.lease_until = datetime.now(UTC) + timedelta(seconds=30)
+                    row.attempt_count += 1
+                    await queue.put(
+                        ServerFrame(
+                            command=Command(
+                                command_id=row.command_id,
+                                operation=operation_name,
+                                daemon="configuration",
+                                correlation_id=row.command_id,
+                                idempotency_key=row.command_id,
+                                **build_kind(row.payload or {}),
+                            )
+                        )
+                    )
+                await session.commit()
+            await asyncio.sleep(1)
 
     async def _pump(self, request_iterator, queue, device_id, session_factory):
         """Interleave inbound device frames with outbound queued commands."""
@@ -159,7 +247,17 @@ class AgentLinkServicer(_AgentLinkServicer):
         if frame.HasField("command_ack"):
             ack = frame.command_ack
             await handlers.handle_command_ack(
-                session, device, ack.command_id, ack.success, ack.error
+                session,
+                device,
+                ack.command_id,
+                ack.success,
+                ack.error,
+                correlation_id=ack.correlation_id,
+                code=ack.code,
+                daemon=ack.daemon,
+                operation=ack.operation,
+                json_payload=ack.json_payload,
+                retryable=ack.retryable,
             )
             return None
         return None

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -30,3 +30,11 @@ class PendingCommand(Base, UUIDPKMixin, TimestampMixin):
     kind: Mapped[CommandKind] = mapped_column(Enum(CommandKind, name="command_kind"))
     payload: Mapped[dict] = mapped_column(JSONB, default=dict)
     delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    attempt_count: Mapped[int] = mapped_column(default=0)
+    lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    correlation_id: Mapped[str | None] = mapped_column(String(), nullable=True, index=True)
+    result_code: Mapped[str | None] = mapped_column(String(), nullable=True)
+    result_error: Mapped[str | None] = mapped_column(Text(), nullable=True)
+    result_payload: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    retryable: Mapped[bool | None] = mapped_column(Boolean(), nullable=True)

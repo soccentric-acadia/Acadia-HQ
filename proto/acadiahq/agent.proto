@@ -104,6 +104,14 @@ message CommandAck {
   string command_id = 1;
   bool success = 2;
   string error = 3;
+  string daemon = 4;
+  string operation = 5;
+  string code = 6;
+  string json_payload = 7;
+  string correlation_id = 8;
+  uint64 accepted_at_mono_ns = 9;
+  uint64 completed_at_mono_ns = 10;
+  bool retryable = 11;
 }
 
 // ---- gateway -> device ----
@@ -140,6 +148,16 @@ message Command {
     FactoryReset factory_reset = 4;
     ApplyUpdate apply_update = 5;
   }
+  // Canonical operation fields. Legacy typed fields above remain readable
+  // during the migration window and are normalized by the agent.
+  string operation = 6;
+  string daemon = 7;
+  string json_args = 8;
+  string actor = 9;
+  uint32 deadline_ms = 10;
+  string idempotency_key = 11;
+  string correlation_id = 12;
+  string required_confirmation = 13;
 }
 
 message TakeBackupNow {}

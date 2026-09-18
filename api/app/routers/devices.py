@@ -11,6 +11,7 @@ from app.db.deps import get_db
 from app.models.device import Device
 from app.models.device_credential import DeviceCredential
 from app.models.enums import CredentialKind, PairingState, UserRole
+from app.models.pending_command import PendingCommand
 from app.schemas.common import Page
 from app.schemas.device import (
     DeviceCreate,
@@ -85,6 +86,44 @@ async def get_device(
     if device is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "device not found")
     return DeviceOut.model_validate(device)
+
+
+@router.get("/{device_id}/commands/{command_id}")
+async def get_command_status(
+    device_id: UUID,
+    command_id: str,
+    db: AsyncSession = Depends(get_db),
+    ctx: TenantContext = Depends(require_role(UserRole.viewer)),
+):
+    """Return durable delivery and terminal-result state for one command."""
+    repo = TenantRepo(db, ctx)
+    await repo.get_or_404(Device, device_id)
+    command = (
+        await db.execute(
+            select(PendingCommand).where(
+                PendingCommand.device_id == device_id,
+                PendingCommand.command_id == command_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if command is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "command not found")
+    if command.completed_at is not None:
+        state = "succeeded" if command.result_error is None else "failed"
+    elif command.lease_until is not None:
+        state = "delivering"
+    else:
+        state = "queued"
+    return {
+        "command_id": command.command_id,
+        "state": state,
+        "attempt_count": command.attempt_count,
+        "correlation_id": command.correlation_id or command.command_id,
+        "code": command.result_code,
+        "error": command.result_error,
+        "payload": command.result_payload,
+        "completed_at": command.completed_at,
+    }
 
 
 @router.post("", response_model=DeviceCreateOut, status_code=status.HTTP_201_CREATED)

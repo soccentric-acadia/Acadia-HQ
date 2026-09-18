@@ -166,8 +166,44 @@ async def handle_fault_event(session: AsyncSession, device: Device, event: Fault
 
 
 async def handle_command_ack(
-    session: AsyncSession, device: Device, command_id: str, success: bool, error: str
+    session: AsyncSession,
+    device: Device,
+    command_id: str,
+    success: bool,
+    error: str,
+    *,
+    correlation_id: str = "",
+    code: str = "",
+    daemon: str = "",
+    operation: str = "",
+    json_payload: str = "",
+    retryable: bool = False,
 ) -> None:
+    from app.models.pending_command import PendingCommand
+
+    pending = (
+        await session.execute(
+            select(PendingCommand).where(
+                PendingCommand.device_id == device.id,
+                PendingCommand.command_id == command_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if pending is not None:
+        pending.correlation_id = correlation_id or command_id
+        pending.result_code = code or ("OK" if success else "INTERNAL")
+        pending.result_error = None if success else error
+        pending.retryable = retryable
+        pending.completed_at = datetime.now(UTC)
+        pending.lease_until = None
+        if json_payload:
+            try:
+                import json
+
+                pending.result_payload = json.loads(json_payload)
+            except json.JSONDecodeError:
+                pending.result_payload = {"raw": json_payload}
+
     if command_id.startswith("update:"):
         rollout_id = uuid.UUID(command_id.split(":", 2)[1])
         row = await session.get(
