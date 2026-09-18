@@ -7,7 +7,18 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.middleware.request_id import RequestIDMiddleware
-from app.routers import alarms, audit_log, auth, devices, faults, logs, telemetry, users, ws
+from app.routers import (
+    alarms,
+    audit_log,
+    auth,
+    devices,
+    faults,
+    logs,
+    operations,
+    telemetry,
+    users,
+    ws,
+)
 from app.services.device_status_broadcast import poll_loop
 
 
@@ -44,6 +55,7 @@ def create_app() -> FastAPI:
 
     app.include_router(auth.router)
     app.include_router(devices.router)
+    app.include_router(operations.router)
     app.include_router(users.router)
     app.include_router(audit_log.router)
     app.include_router(telemetry.router)
