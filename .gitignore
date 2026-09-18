@@ -9,3 +9,7 @@ __pycache__/
 .vite/
 dist/
 build/
+
+# Per-task working artifacts.
+Plan.md
+Task.md
