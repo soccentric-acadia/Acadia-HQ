@@ -154,3 +154,18 @@ async def test_log_bundle_list_and_download_url(client, db_session):
     resp = await client.get(f"/devices/{device.id}/logs/{bundle.id}/download")
     assert resp.status_code == 200
     assert resp.json()["download_url"]
+
+
+async def test_device_health_explains_offline_state(client, db_session):
+    tenant = await make_tenant(db_session)
+    admin = await make_user(db_session, tenant, UserRole.admin)
+    device = await _device(db_session, tenant)
+
+    login_as(client, admin)
+    resp = await client.get(f"/devices/{device.id}/health")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["status"] == "offline"
+    assert body["score"] == 50
+    assert body["factors"][0]["name"] == "presence"

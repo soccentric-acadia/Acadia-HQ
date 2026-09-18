@@ -7,11 +7,12 @@ import asyncio
 import logging
 from datetime import datetime, timedelta, UTC
 
-from sqlalchemy import update
+from sqlalchemy import select
 
 from app.config import get_settings
 from app.db.base import get_session_factory
 from app.models.device import Device
+from app.services import audit
 
 from gateway.config import get_gateway_settings
 
@@ -25,13 +26,18 @@ async def sweep_once() -> int:
     )
     session_factory = get_session_factory()
     async with session_factory() as session:
-        result = await session.execute(
-            update(Device)
-            .where(Device.online.is_(True), Device.last_seen_at < deadline)
-            .values(online=False)
-        )
+        devices = (
+            await session.execute(
+                select(Device).where(Device.online.is_(True), Device.last_seen_at < deadline)
+            )
+        ).scalars().all()
+        for device in devices:
+            device.online = False
+            await audit.record_system(
+                session, device, "device.offline", payload={"reason": "heartbeat_timeout"}
+            )
         await session.commit()
-        return result.rowcount or 0
+        return len(devices)
 
 
 async def run_forever(stop_event: asyncio.Event | None = None) -> None:

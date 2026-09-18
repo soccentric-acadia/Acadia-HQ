@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.audit_log import AuditLog
+from app.models.device import Device
 from app.services.tenant_repo import TenantContext
 
 
@@ -25,6 +26,25 @@ async def record(
             actor_user_id=ctx.user_id,
             action=action,
             target_device_id=target_device_id,
+            payload=payload or {},
+        )
+    )
+
+
+async def record_system(
+    session: AsyncSession,
+    device: Device,
+    action: str,
+    *,
+    payload: dict | None = None,
+) -> None:
+    """Record a device-originated lifecycle event without a human actor."""
+    session.add(
+        AuditLog(
+            tenant_id=device.tenant_id,
+            actor_user_id=None,
+            action=action,
+            target_device_id=device.id,
             payload=payload or {},
         )
     )

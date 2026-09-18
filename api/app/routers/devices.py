@@ -117,6 +117,62 @@ async def get_command_status(
         "error": command.result_error,
         "payload": command.result_payload,
         "completed_at": command.completed_at,
+        "expires_at": command.expires_at,
+        "retryable": command.retryable,
+    }
+
+
+@router.get("/{device_id}/health")
+async def get_device_health(
+    device_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    ctx: TenantContext = Depends(require_role(UserRole.viewer)),
+):
+    """Return an explainable, fleet-facing health summary for a device."""
+    repo = TenantRepo(db, ctx)
+    device = await repo.get_or_404(Device, device_id)
+    if device is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "device not found")
+
+    now = datetime.now(UTC)
+    settings = get_settings()
+    factors: list[dict] = []
+    score = 100
+    if not device.online:
+        factors.append({"name": "presence", "status": "offline", "penalty": 50})
+        score -= 50
+    elif device.last_seen_at is None:
+        factors.append({"name": "heartbeat", "status": "unknown", "penalty": 20})
+        score -= 20
+    else:
+        age = max(0, (now - device.last_seen_at).total_seconds())
+        threshold = settings.heartbeat_interval_s * settings.heartbeat_missed_threshold
+        if age > threshold:
+            factors.append({"name": "heartbeat", "status": "stale", "penalty": 30})
+            score -= 30
+        else:
+            factors.append({"name": "heartbeat", "status": "fresh", "penalty": 0})
+
+    pending = (
+        await db.execute(
+            select(func.count())
+            .select_from(PendingCommand)
+            .where(
+                PendingCommand.device_id == device_id,
+                PendingCommand.completed_at.is_(None),
+            )
+        )
+    ).scalar_one()
+    if pending:
+        factors.append({"name": "commands", "status": "pending", "count": pending, "penalty": 0})
+
+    return {
+        "device_id": device.id,
+        "score": max(0, min(100, score)),
+        "status": "healthy" if score >= 80 else "degraded" if score >= 50 else "offline",
+        "online": device.online,
+        "last_seen_at": device.last_seen_at,
+        "factors": factors,
     }
 
 

@@ -1,7 +1,10 @@
 from datetime import datetime, timedelta, UTC
 
+from sqlalchemy import select
+
 from app.models.device import Device
 from app.models.enums import PairingState
+from app.models.audit_log import AuditLog
 
 from gateway.stale_sweep import sweep_once
 from tests.factories import make_tenant
@@ -34,6 +37,15 @@ async def test_sweep_flips_stale_online_device_to_offline(db_session):
     await db_session.refresh(fresh)
     assert stale.online is False
     assert fresh.online is True
+    audit = (
+        await db_session.execute(
+            select(AuditLog).where(
+                AuditLog.target_device_id == stale.id,
+                AuditLog.action == "device.offline",
+            )
+        )
+    ).scalar_one()
+    assert audit.payload["reason"] == "heartbeat_timeout"
 
 
 async def test_sweep_leaves_already_offline_devices_alone(db_session):
