@@ -35,6 +35,9 @@ class PendingCommand(Base, UUIDPKMixin, TimestampMixin):
     delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     attempt_count: Mapped[int] = mapped_column(default=0)
     lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, index=True
+    )
     correlation_id: Mapped[str | None] = mapped_column(String(), nullable=True, index=True)
     result_code: Mapped[str | None] = mapped_column(String(), nullable=True)
     result_error: Mapped[str | None] = mapped_column(Text(), nullable=True)

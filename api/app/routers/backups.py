@@ -1,10 +1,12 @@
 from uuid import UUID, uuid4
+from datetime import datetime, timedelta, UTC
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import require_role
+from app.config import get_settings
 from app.db.deps import get_db
 from app.models.backup import Backup
 from app.models.enums import CommandKind, UserRole
@@ -54,9 +56,13 @@ async def take_backup_now(
     await get_tenant_device_or_404(db, ctx, device_id)
 
     command_id = f"backup:{uuid4()}"
+    expires_at = datetime.now(UTC) + timedelta(seconds=get_settings().command_ttl_seconds)
     db.add(
         PendingCommand(
-            device_id=device_id, command_id=command_id, kind=CommandKind.take_backup_now
+            device_id=device_id,
+            command_id=command_id,
+            kind=CommandKind.take_backup_now,
+            expires_at=expires_at,
         )
     )
     await audit.record(db, ctx, "device.backup.request", target_device_id=device_id)
@@ -79,12 +85,14 @@ async def restore_backup(
 
     download_url = presigned_download_url(backup.storage_url)
     command_id = f"restore:{backup_id}"
+    expires_at = datetime.now(UTC) + timedelta(seconds=get_settings().command_ttl_seconds)
     db.add(
         PendingCommand(
             device_id=device_id,
             command_id=command_id,
             kind=CommandKind.restore,
             payload={"backup_download_url": download_url},
+            expires_at=expires_at,
         )
     )
     # Written before the command is even delivered, let alone applied --

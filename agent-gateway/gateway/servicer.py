@@ -145,14 +145,34 @@ class AgentLinkServicer(_AgentLinkServicer):
         }
         while True:
             async with session_factory() as session:
+                now = datetime.now(UTC)
+                expired = (
+                    await session.execute(
+                        select(PendingCommand).where(
+                            PendingCommand.device_id == device_id,
+                            PendingCommand.completed_at.is_(None),
+                            PendingCommand.expires_at.is_not(None),
+                            PendingCommand.expires_at <= now,
+                        )
+                    )
+                ).scalars().all()
+                for row in expired:
+                    row.state = CommandState.expired
+                    row.result_code = "DEADLINE_EXCEEDED"
+                    row.result_error = "command deadline exceeded"
+                    row.retryable = False
+                    row.completed_at = now
+                    row.lease_until = None
                 rows = (
                     await session.execute(
                         select(PendingCommand)
                         .where(
                             PendingCommand.device_id == device_id,
                             PendingCommand.completed_at.is_(None),
+                            (PendingCommand.expires_at.is_(None))
+                            | (PendingCommand.expires_at > now),
                             (PendingCommand.lease_until.is_(None))
-                            | (PendingCommand.lease_until < datetime.now(UTC)),
+                            | (PendingCommand.lease_until < now),
                         )
                         .order_by(PendingCommand.created_at)
                         .limit(32)
