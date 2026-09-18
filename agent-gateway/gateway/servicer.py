@@ -14,6 +14,7 @@ IMPLEMENTATION_PLAN §2.2's "checked on each frame."
 """
 
 import asyncio
+import json
 import logging
 from datetime import datetime, timedelta, UTC
 
@@ -157,6 +158,18 @@ class AgentLinkServicer(_AgentLinkServicer):
                     )
                 ),
             ),
+            CommandKind.configuration_read: (
+                "configuration.read",
+                lambda payload: dict(
+                    json_args=json.dumps(payload, sort_keys=True, separators=(",", ":"))
+                ),
+            ),
+            CommandKind.configuration_write: (
+                "configuration.write",
+                lambda payload: dict(
+                    json_args=json.dumps(payload, sort_keys=True, separators=(",", ":"))
+                ),
+            ),
         }
         while True:
             async with session_factory() as session:
@@ -217,7 +230,7 @@ class AgentLinkServicer(_AgentLinkServicer):
                                 command_id=row.command_id,
                                 operation=operation_name,
                                 daemon="configuration",
-                                correlation_id=row.command_id,
+                                correlation_id=row.correlation_id or row.command_id,
                                 idempotency_key=row.command_id,
                                 **build_kind(row.payload or {}),
                             )
