@@ -43,6 +43,7 @@ from gateway.config import get_gateway_settings
 from gateway.connection_manager import manager
 
 logger = logging.getLogger("gateway.servicer")
+SUPPORTED_PROTOCOL_VERSION = 1
 
 
 class AgentLinkServicer(_AgentLinkServicer):
@@ -68,6 +69,15 @@ class AgentLinkServicer(_AgentLinkServicer):
             return
 
         device_id = first.heartbeat.device_id
+        if (
+            first.heartbeat.protocol_version
+            and first.heartbeat.protocol_version != SUPPORTED_PROTOCOL_VERSION
+        ):
+            await context.abort(
+                grpc.StatusCode.FAILED_PRECONDITION,
+                f"unsupported device protocol version {first.heartbeat.protocol_version}",
+            )
+            return
         async with session_factory() as session:
             device = await validate_long_lived_credential(
                 session, device_id, first.heartbeat.credential_token
@@ -91,6 +101,7 @@ class AgentLinkServicer(_AgentLinkServicer):
                 heartbeat_ack=HeartbeatAck(
                     server_time_unix_ms=_now_ms(),
                     next_heartbeat_interval_s=settings.sweep_interval_s,
+                    protocol_version=SUPPORTED_PROTOCOL_VERSION,
                 )
             )
             async for out in self._pump(request_iterator, queue, device_id, session_factory):
@@ -223,6 +234,11 @@ class AgentLinkServicer(_AgentLinkServicer):
             return None
 
         if frame.HasField("heartbeat"):
+            if (
+                frame.heartbeat.protocol_version
+                and frame.heartbeat.protocol_version != SUPPORTED_PROTOCOL_VERSION
+            ):
+                return False
             device.online = True
             device.last_seen_at = datetime.now(UTC)
             return None
