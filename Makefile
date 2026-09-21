@@ -102,9 +102,11 @@ run: db-up migrate ## start db + api + agent-gateway + web in the background
 	echo ""; \
 	echo "logs:     make logs   |   stop:  make stop"
 
-stop: ## stop everything 'make run' started
+stop: ## stop everything 'make run' started, incl. db (data persists in volumes)
 	-@for f in $(RUN_DIR)/*.pid; do [ -f "$$f" ] && kill $$(cat "$$f") 2>/dev/null; rm -f "$$f"; done
-	@echo "background services stopped (db left running -- 'make db-down' to stop it too)"
+	@echo "background services stopped"
+	-$(COMPOSE) down
+	@echo "db stopped (data persists in docker volumes)"
 
 logs: ## tail logs for the background services
 	@tail -n 100 -f $(RUN_DIR)/api.log $(RUN_DIR)/gateway.log $(RUN_DIR)/web.log
