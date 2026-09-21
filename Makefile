@@ -78,7 +78,15 @@ run: db-up migrate ## start db + api + agent-gateway + web in the background
 		nohup $(PY) -m uvicorn app.main:app --host 0.0.0.0 --port 8000 > $(RUN_DIR)/api.log 2>&1) & echo $$! > $(RUN_DIR)/api.pid
 	@(cd agent-gateway && exec env ACADIAHQ_DATABASE_URL=$(DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
 		nohup $(PY) -m gateway.server > $(RUN_DIR)/gateway.log 2>&1) & echo $$! > $(RUN_DIR)/gateway.pid
-	@(cd web && exec nohup ./node_modules/.bin/vite --host 0.0.0.0 --port 5173 > $(RUN_DIR)/web.log 2>&1) & echo $$! > $(RUN_DIR)/web.pid
+	@WATCH_OK=1; \
+		node -e 'try{const w=require("fs").watch(__filename);w.close()}catch(e){process.exit(1)}' 2>/dev/null || WATCH_OK=0; \
+		if [ "$$WATCH_OK" = 0 ]; then \
+			echo "inotify watcher limit reached -- vite falling back to polling watcher"; \
+			VITE_ENV='CHOKIDAR_USEPOLLING=true'; \
+		else \
+			VITE_ENV=''; \
+		fi; \
+		(cd web && exec env $$VITE_ENV nohup ./node_modules/.bin/vite --host 0.0.0.0 --port 5173 > $(RUN_DIR)/web.log 2>&1) & echo $$! > $(RUN_DIR)/web.pid
 	@sleep 1
 	@LAN_IP=$$(hostname -I 2>/dev/null | awk '{print $$1}'); \
 	echo "web:      http://$$LAN_IP:5173   (use this on every device, including this host --"; \

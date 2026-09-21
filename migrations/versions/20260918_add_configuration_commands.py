@@ -1,14 +1,14 @@
 """add durable configuration command kinds
 
 Revision ID: 20260918cfg
-Revises: d7f1e2a3b4c5
+Revises: a1b2c3d4e5f6
 """
 from collections.abc import Sequence
 
 from alembic import op
 
 revision: str = "20260918cfg"
-down_revision: str | Sequence[str] | None = "d7f1e2a3b4c5"
+down_revision: str | Sequence[str] | None = "a1b2c3d4e5f6"
 branch_labels = None
 depends_on = None
 
