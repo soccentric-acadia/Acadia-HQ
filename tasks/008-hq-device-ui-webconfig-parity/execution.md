@@ -32,3 +32,7 @@ agent-gateway, or migration files touched. Task-007 uncommitted work preserved
 - `make lint-web` ✅ 0 · `npx vitest run` ✅ 24/24 · `npm run build` ✅ ·
   `node scripts/check-section-parity.mjs` ✅ 36/36 · `make test-api` 40/43 (3 pre-existing)
   · `make test-gateway` 15/17 (2 pre-existing, clean-tree repro) · token diff identical.
+## Commits and pushes
+
+- Acadia-HQ `develop`: `0f51388` — "Rebuild device detail as 1:1 WebConfig UI
+  (task 008)" — pushed to origin/develop (e3b63e1..0f51388).
