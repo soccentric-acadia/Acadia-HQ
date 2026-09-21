@@ -36,6 +36,18 @@ export default defineConfigWithVueTs(
     },
   },
 
+  {
+    // Device section components intentionally reuse the Acadia-Configuration
+    // (WebConfig) registry ids as file names (wired.vue, usb.vue, can.vue,
+    // ...) so the registry, routes, and section files stay 1:1 with the
+    // on-device UI they mirror (task 008).
+    name: 'app/device-sections',
+    files: ['src/views/device/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,

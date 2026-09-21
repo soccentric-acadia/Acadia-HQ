@@ -138,3 +138,43 @@ export interface BackupListResponse {
   items: Backup[]
   page: Page
 }
+
+export interface DeviceHealthFactor {
+  name: string
+  status: string
+  penalty: number
+  count?: number
+}
+
+export interface DeviceHealth {
+  device_id: string
+  score: number
+  status: 'healthy' | 'degraded' | 'offline'
+  online: boolean
+  last_seen_at: string | null
+  factors: DeviceHealthFactor[]
+}
+
+export type CommandState = 'queued' | 'delivered' | 'succeeded' | 'failed' | 'expired'
+
+export interface CommandStatus {
+  command_id: string
+  state: CommandState
+  attempt_count: number
+  correlation_id: string
+  code: string | null
+  error: string | null
+  payload: Record<string, unknown> | null
+  completed_at: string | null
+  expires_at: string | null
+  retryable: boolean | null
+  integration_status?: string
+}
+
+export interface Operation {
+  name: string
+  daemon: string
+  command_kind: string
+  description: string
+  integration_status?: string
+}

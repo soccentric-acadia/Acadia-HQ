@@ -4,13 +4,16 @@ import type {
   AuditLogListResponse,
   Backup,
   BackupListResponse,
+  CommandStatus,
   Device,
   DeviceAlarm,
   DeviceAlarmListResponse,
   DeviceCreateResponse,
+  DeviceHealth,
   DeviceListResponse,
   FaultListResponse,
   LogBundleListResponse,
+  Operation,
   User,
   UserRole,
 } from './types'
@@ -49,9 +52,12 @@ export const api = {
   auth: {
     loginUrl: () => request<{ authorization_url: string }>('/auth/login'),
     callback: (code: string, state: string) =>
-      request<{ ok: boolean }>(`/auth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`, {
-        method: 'POST',
-      }),
+      request<{ ok: boolean }>(
+        `/auth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`,
+        {
+          method: 'POST',
+        },
+      ),
     logout: () => request<{ ok: boolean }>('/auth/logout', { method: 'POST' }),
     me: () => request<User>('/auth/me'),
   },
@@ -72,6 +78,33 @@ export const api = {
     factoryReset: (id: string) =>
       request<{ ok: boolean }>(`/devices/${id}/factory-reset`, { method: 'POST' }),
     disable: (id: string) => request<Device>(`/devices/${id}/disable`, { method: 'POST' }),
+    health: (id: string) => request<DeviceHealth>(`/devices/${id}/health`),
+    commandStatus: (id: string, commandId: string) =>
+      request<CommandStatus>(`/devices/${id}/commands/${encodeURIComponent(commandId)}`),
+  },
+  operations: {
+    list: () => request<{ items: Operation[] }>('/operations'),
+  },
+  configuration: {
+    // Both endpoints return HTTP 202 with the queued command envelope; the
+    // device-reported result arrives via commandStatus polling.
+    read: (id: string) =>
+      request<{
+        status: string
+        integration_status: string
+        command_id: string
+        correlation_id: string
+      }>(`/devices/${id}/configuration`, { method: 'GET' }),
+    write: (id: string, values: Record<string, unknown>) =>
+      request<{
+        status: string
+        integration_status: string
+        command_id: string
+        correlation_id: string
+      }>(`/devices/${id}/configuration`, {
+        method: 'PUT',
+        body: JSON.stringify({ values }),
+      }),
   },
   faults: {
     list: (deviceId: string) => request<FaultListResponse>(`/devices/${deviceId}/faults`),
@@ -87,7 +120,10 @@ export const api = {
   alarmRules: {
     list: () => request<AlarmRule[]>('/alarm-rules'),
     create: (name: string, condition: Record<string, unknown>) =>
-      request<AlarmRule>('/alarm-rules', { method: 'POST', body: JSON.stringify({ name, condition }) }),
+      request<AlarmRule>('/alarm-rules', {
+        method: 'POST',
+        body: JSON.stringify({ name, condition }),
+      }),
   },
   logs: {
     list: (deviceId: string) => request<LogBundleListResponse>(`/devices/${deviceId}/logs`),
@@ -96,9 +132,12 @@ export const api = {
   },
   backups: {
     list: (deviceId: string) => request<BackupListResponse>(`/devices/${deviceId}/backups`),
-    takeNow: (deviceId: string) => request<Backup>(`/devices/${deviceId}/backups`, { method: 'POST' }),
+    takeNow: (deviceId: string) =>
+      request<Backup>(`/devices/${deviceId}/backups`, { method: 'POST' }),
     restore: (deviceId: string, backupId: string) =>
-      request<{ ok: boolean }>(`/devices/${deviceId}/backups/${backupId}/restore`, { method: 'POST' }),
+      request<{ ok: boolean }>(`/devices/${deviceId}/backups/${backupId}/restore`, {
+        method: 'POST',
+      }),
   },
   users: {
     list: () => request<User[]>('/users'),

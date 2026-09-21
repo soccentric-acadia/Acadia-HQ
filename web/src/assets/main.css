@@ -1,50 +1,56 @@
 @import 'tailwindcss';
+@import './wc.css';
 
 /*
- * Design tokens -- shadcn-inspired, light theme only (IMPLEMENTATION_PLAN §1.4).
- * No dark-mode variables, no prefers-color-scheme branch: deliberate scope cut.
+ * Design tokens — ported 1:1 from Acadia-Configuration (WebConfig)
+ * `frontend/styles/tokens.css` (task 008): zinc neutral scale + light-blue
+ * accent, light theme only. The raw WebConfig custom properties live in
+ * wc.css (`:root`); this @theme block maps the existing Tailwind utility
+ * names onto them so the whole app shares one palette. `inline` keeps the
+ * generated utilities referencing the wc.css variables at runtime.
  */
-@theme {
-  --color-background: oklch(99% 0 0);
-  --color-foreground: oklch(20% 0.01 260);
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
-  --color-surface: oklch(100% 0 0);
-  --color-surface-muted: oklch(97% 0.002 260);
+  --color-surface: var(--card);
+  --color-surface-muted: var(--muted);
 
-  --color-border: oklch(90% 0.004 260);
-  --color-border-strong: oklch(82% 0.004 260);
+  --color-border: var(--border);
+  --color-border-strong: var(--zinc-300);
 
-  --color-muted: oklch(55% 0.01 260);
-  --color-muted-foreground: oklch(45% 0.01 260);
+  --color-muted: var(--muted-foreground);
+  --color-muted-foreground: var(--muted-foreground);
 
-  --color-accent: oklch(52% 0.16 264);
-  --color-accent-foreground: oklch(98% 0 0);
-  --color-accent-muted: oklch(94% 0.03 264);
+  --color-accent: var(--primary);
+  --color-accent-foreground: var(--primary-foreground);
+  --color-accent-muted: var(--info-bg);
 
-  --color-success: oklch(56% 0.11 155);
-  --color-success-muted: oklch(94% 0.04 155);
-  --color-warning: oklch(65% 0.13 80);
-  --color-warning-muted: oklch(94% 0.05 80);
-  --color-danger: oklch(55% 0.19 25);
-  --color-danger-muted: oklch(94% 0.05 25);
+  --color-success: var(--success);
+  --color-success-muted: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-muted: var(--warning-bg);
+  --color-danger: var(--destructive);
+  --color-danger-muted: var(--destructive-bg);
 
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
 
-  --font-sans:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-sans);
 }
 
 body {
-  background-color: var(--color-background);
+  background: var(--muted);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
 }
 
 /* Restrained focus ring -- visible, not loud. */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }

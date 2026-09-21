@@ -22,6 +22,20 @@ const router = createRouter({
       name: 'device-detail',
       component: () => import('@/views/DeviceDetailView.vue'),
       props: true,
+      children: [
+        {
+          path: '',
+          redirect: (to) => ({
+            name: 'device-section',
+            params: { ...to.params, section: 'overview' },
+          }),
+        },
+        {
+          path: ':section',
+          name: 'device-section',
+          component: () => import('@/views/device/DeviceSectionView.vue'),
+        },
+      ],
     },
     {
       path: '/alarm-rules',

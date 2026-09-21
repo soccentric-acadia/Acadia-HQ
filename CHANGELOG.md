@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-21 — Device detail: 1:1 WebConfig (Acadia-Configuration) UI (task 008)
+
+- Selecting a device in HQ now presents the WebConfig experience 1:1: design
+  tokens (zinc + sky-blue accent) ported app-wide, a categorized device
+  sidebar (36 sections mirroring the WebConfig registry: Dashboard, System,
+  Time & Sync, Connectivity, Maintenance, Security, Hardware), topbar with
+  device identity/status/health, Ctrl+K command palette, `g <key>` chords,
+  toasts, skeletons, confirm dialogs, and admin-only gating.
+- Live sections are backed by existing HQ APIs (overview/health, monitoring,
+  telemetry, faults, alarms with ack/resolve/clear, log bundles, backups,
+  factory reset/disable, update operation catalog).
+- Configuration-backed sections (system, clock/NTP/PTP/GPS, wired, wireless,
+  5G, services, cloud, security, SSH, firewall, secure boot, users, display,
+  LEDs, GPIO, serial, CAN, USB, PCI, MCU, camera, telemetry policy) render
+  schema-driven forms via the existing 202-queued configuration command
+  channel and show explicit pending-contract states until the device reports
+  its configuration; they need no further UI change when the contract lands.
+- Web-only change: no API, gateway, or migration changes; API client gained
+  additive methods (device health, command status, operations catalog,
+  configuration read/write). Superseded device tab panels removed.
+- Validation: web tests 25/25, lint 0, build ok, section registry 36/36 vs
+  Acadia-Configuration, token values identical; API/gateway suites unchanged
+  (pre-existing failures documented in the task records).
+
 ## 2026-09-21 — Fix login over Tailscale (task 007)
 
 - `make run` no longer bakes the OIDC issuer (Keycloak) URL to the first LAN

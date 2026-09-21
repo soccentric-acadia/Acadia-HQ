@@ -8,8 +8,11 @@
 
   "compilerOptions": {
     // Vitest runs in a different environment than the application code.
-    // Adjust lib and types accordingly.
-    "lib": [],
+    // Adjust lib and types accordingly. The ES2022 lib matches the app config
+    // (tsconfig.app.json via @vue/tsconfig) — test files reach app sources
+    // through imports, so they must type-check with the same language
+    // built-ins (task 008).
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node", "jsdom"],
 
     // `vue-tsc --build` produces a .tsbuildinfo file for incremental type-checking.
