@@ -89,3 +89,47 @@ INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
 INFO:     connection open
 2026-09-21 15:53:08,639 INFO acadiahq.request GET /devices request_id=eead06a8-9e66-4ed5-97b7-bebc5e80f060
 INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:57:07,341 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=35b46f36-825b-471b-96e7-ffae19c921b6
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+2026-09-21 15:57:08,930 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=c3122ae8-27af-44f5-b2ff-884d84f15e19
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 15:57:09,554 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/faults request_id=c4baad5c-bec9-4f3c-932e-33b8e5497991
+2026-09-21 15:57:09,555 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/alarms request_id=1f8bbc31-049b-472a-a994-1dd222087e99
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/faults HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/alarms HTTP/1.1" 200 OK
+2026-09-21 15:57:09,999 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/logs request_id=2ffe7cb9-406e-4e80-b1db-f0655614c21e
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/logs HTTP/1.1" 200 OK
+2026-09-21 15:57:10,354 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/backups request_id=6baa41a7-3267-47a1-89af-ec24e47116ba
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/backups HTTP/1.1" 404 Not Found
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 15:57:13,992 INFO acadiahq.request GET /devices request_id=d0ddc9d0-c0f2-4594-89d0-8d55a6115832
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:57:16,836 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=4d1c6f88-6008-430b-a039-1521648eacf2
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 15:57:54,904 INFO acadiahq.request GET /devices request_id=979b8b9f-9bf4-4b9d-a85b-162a674fe939
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:57:56,946 INFO acadiahq.request GET /alarm-rules request_id=d7893bbe-5761-4bc3-9fe4-7817b9120e93
+INFO:     100.92.53.119:0 - "GET /alarm-rules HTTP/1.1" 200 OK
+2026-09-21 15:57:57,722 INFO acadiahq.request GET /users request_id=88acf3cd-422b-4eac-b1d2-e64fe77ac72b
+INFO:     100.92.53.119:0 - "GET /users HTTP/1.1" 200 OK
+2026-09-21 15:57:58,206 INFO acadiahq.request GET /audit-log request_id=00d854bd-d68b-400b-ae7d-1a4b0526d033
+INFO:     100.92.53.119:0 - "GET /audit-log?limit=100 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 15:58:00,297 INFO acadiahq.request GET /devices request_id=1d8dd935-2c13-422b-aa0d-c6c21fc34a39
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:58:04,484 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=b122a821-1890-4022-8c18-f4012359e68b
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 15:58:07,735 INFO acadiahq.request GET /devices request_id=624746f2-5e2c-462b-95a8-08476cae0780
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:58:09,458 INFO acadiahq.request GET /auth/me request_id=415b12f3-0881-439d-9313-ca88d9c9d274
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 15:58:09,542 INFO acadiahq.request GET /devices request_id=eb16e4eb-6b9b-44a9-a422-1fd9541710ee
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
