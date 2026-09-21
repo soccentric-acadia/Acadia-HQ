@@ -1,8 +1,91 @@
 /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/.venv/lib/python3.12/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
   from ._compat import httpx2
-INFO:     Started server process [3804672]
+INFO:     Started server process [4042420]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-09-21 15:51:32,145 INFO acadiahq.request GET /auth/login request_id=9e2445ad-8b7e-42c4-bc70-7c598e8075f4
+INFO:     127.0.0.1:48658 - "GET /auth/login HTTP/1.1" 200 OK
+2026-09-21 15:51:32,188 INFO acadiahq.request GET /auth/login request_id=9d586d73-0249-4428-8477-173acf410f9e
+INFO:     127.0.0.1:48672 - "GET /auth/login HTTP/1.1" 200 OK
+2026-09-21 15:51:50,578 INFO acadiahq.request GET /auth/me request_id=c8fd4532-2a28-467f-8473-2506740e7970
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+2026-09-21 15:51:53,789 INFO acadiahq.request GET /auth/me request_id=cec520ee-9a04-40bb-beff-be386d2b349f
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+2026-09-21 15:51:55,286 INFO acadiahq.request GET /auth/login request_id=7fbcd560-c9bd-40ec-8b83-04b02f3e1dcb
+INFO:     100.92.53.119:0 - "GET /auth/login HTTP/1.1" 200 OK
+2026-09-21 15:51:55,944 INFO acadiahq.request GET /auth/me request_id=03d5e1f4-30b3-427f-b6f8-27ec51bb990c
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+2026-09-21 15:51:55,998 INFO acadiahq.request POST /auth/callback request_id=02944f3f-055c-482f-8fda-1027f372f9a4
+2026-09-21 15:51:56,023 INFO httpx HTTP Request: GET http://100.89.99.106:8081/realms/acadiahq/.well-known/openid-configuration "HTTP/1.1 200 OK"
+2026-09-21 15:51:56,090 INFO httpx HTTP Request: POST http://100.89.99.106:8081/realms/acadiahq/protocol/openid-connect/token "HTTP/1.1 200 OK"
+2026-09-21 15:51:56,130 INFO httpx HTTP Request: GET http://100.89.99.106:8081/realms/acadiahq/protocol/openid-connect/certs "HTTP/1.1 200 OK"
+INFO:     100.92.53.119:0 - "POST /auth/callback?code=dc0b356c-af30-4473-9cea-3e5648d3de4c.ba12a8d5-cd09-4dce-8c6a-0e248ce543ae.1e7e84b6-b037-4a89-b9c5-56c1897690d9&state=xB8qR3dq-73YA1J_cxUL0KFKn7IWee3d HTTP/1.1" 200 OK
+2026-09-21 15:51:56,202 INFO acadiahq.request GET /auth/me request_id=d311cc29-dfb4-49bc-b99b-ada203d9044f
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 15:51:56,331 INFO acadiahq.request GET /devices request_id=d7d65684-5ef6-472c-9e72-2b9ace26feac
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:52:02,742 INFO acadiahq.request GET /alarm-rules request_id=7d935ad1-defc-423a-bfbb-9f6bdd0f8f4d
+INFO:     100.92.53.119:0 - "GET /alarm-rules HTTP/1.1" 200 OK
+2026-09-21 15:52:03,873 INFO acadiahq.request GET /users request_id=85ba7654-8647-49fb-811b-09fb7754028b
+INFO:     100.92.53.119:0 - "GET /users HTTP/1.1" 200 OK
+2026-09-21 15:52:07,500 INFO acadiahq.request GET /audit-log request_id=1f26abdd-daa0-4de1-9825-2d7c1575db04
+INFO:     100.92.53.119:0 - "GET /audit-log?limit=100 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 15:52:09,518 INFO acadiahq.request GET /devices request_id=17bbadc9-1148-4698-91b9-9bf5b165278d
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:52:11,749 INFO acadiahq.request GET /alarm-rules request_id=d2a220cd-5dd6-422a-b3c8-edbb32e3a599
+INFO:     100.92.53.119:0 - "GET /alarm-rules HTTP/1.1" 200 OK
+2026-09-21 15:52:12,529 INFO acadiahq.request GET /users request_id=675fb605-0ca9-4f7c-a6fe-0c1de43f09dd
+INFO:     100.92.53.119:0 - "GET /users HTTP/1.1" 200 OK
+2026-09-21 15:52:13,090 INFO acadiahq.request GET /audit-log request_id=40d42f4f-cacc-423c-a7a1-2d0967f03f22
+INFO:     100.92.53.119:0 - "GET /audit-log?limit=100 HTTP/1.1" 200 OK
+2026-09-21 15:52:16,765 INFO acadiahq.request GET /users request_id=1f3a7fc7-ad66-4db6-9816-4eec96a9523b
+INFO:     100.92.53.119:0 - "GET /users HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 15:52:29,475 INFO acadiahq.request GET /devices request_id=bcaa6a94-f95c-4b3b-8f3f-6441961467fb
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:52:35,974 INFO acadiahq.request POST /devices request_id=e56b2c7e-f3eb-4dfb-b650-7e2ef52b8068
+INFO:     100.92.53.119:0 - "POST /devices HTTP/1.1" 201 Created
+2026-09-21 15:52:36,033 INFO acadiahq.request GET /devices request_id=f7b046cd-1200-4e93-9d29-760ff52c9562
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:52:42,209 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=6a735ac0-a03b-4662-8061-76f45e534f44
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+2026-09-21 15:52:43,847 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=968e27c7-b60b-4094-ac59-917766b82a72
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 15:52:44,418 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/faults request_id=3476c0fe-494a-4e14-b535-49b5d466cc0d
+2026-09-21 15:52:44,420 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/alarms request_id=8934940e-bd03-4f68-8dfb-d620bd3ec371
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/faults HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/alarms HTTP/1.1" 200 OK
+2026-09-21 15:52:44,844 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/logs request_id=29f117ec-3292-4887-9dcd-35cd9ea9bde4
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/logs HTTP/1.1" 200 OK
+2026-09-21 15:52:45,286 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/backups request_id=cadcc454-a8fe-4df1-9897-f5ede63090cf
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/backups HTTP/1.1" 404 Not Found
+2026-09-21 15:52:58,713 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=43a23f06-0bbc-4a57-ac6a-7726ed73cdd6
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 15:52:59,471 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/faults request_id=33f2a554-39a3-429a-a1f0-73a6fba36a1c
+2026-09-21 15:52:59,472 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/alarms request_id=366d8c39-e1ba-46b8-97f7-8073148f4b18
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/faults HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/alarms HTTP/1.1" 200 OK
+2026-09-21 15:53:00,286 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/logs request_id=4971b3c3-0c7a-489c-8c3f-6db9742919e3
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/logs HTTP/1.1" 200 OK
+2026-09-21 15:53:01,037 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/backups request_id=65cfad2a-4823-4fdb-afa9-fec77223b33b
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/backups HTTP/1.1" 404 Not Found
+2026-09-21 15:53:02,380 INFO acadiahq.request GET /devices request_id=d0140bb0-0f4e-420a-9efb-a14a2bf3b880
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 15:53:05,842 INFO acadiahq.request GET /alarm-rules request_id=ad0c2cb5-7e38-4ddc-9598-a25e4a4ceff1
+INFO:     100.92.53.119:0 - "GET /alarm-rules HTTP/1.1" 200 OK
+2026-09-21 15:53:06,393 INFO acadiahq.request GET /users request_id=8139eaaf-ea07-407e-a27b-ea11ec1ec6e4
+INFO:     100.92.53.119:0 - "GET /users HTTP/1.1" 200 OK
+2026-09-21 15:53:06,974 INFO acadiahq.request GET /audit-log request_id=23ec8c45-a2b7-47be-b48b-a3f6656abce3
+INFO:     100.92.53.119:0 - "GET /audit-log?limit=100 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 15:53:08,639 INFO acadiahq.request GET /devices request_id=eead06a8-9e66-4ed5-97b7-bebc5e80f060
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK

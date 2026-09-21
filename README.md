@@ -28,6 +28,29 @@ environment-specific commands. Migrations and infrastructure must be reviewed wi
 database and deployment environment. Authentication, tenant boundaries, destructive operations,
 OTA delivery, and gateway reconnect behavior require manual verification.
 
+## Accessing HQ from other devices (Tailscale / LAN)
+
+`make run` picks the OIDC issuer (Keycloak) host automatically, in this order:
+
+1. `ACADIAHQ_OIDC_ISSUER` from the environment, used verbatim;
+2. the first Tailscale IPv4 (`tailscale ip -4`) — the common case for this
+   deployment, which is reached over the tailnet;
+3. the first `hostname -I` address (LAN-only deployments).
+
+The issuer must be reachable from the browser on every device that opens the web UI *and* from
+the API process itself, and it must be the same host for everyone: Keycloak echoes the request
+Host as the token `iss`, and the API validates it against exactly this issuer. If some clients
+reach HQ by a different address than the auto-detected one (e.g. LAN-only machines when the
+issuer defaulted to the Tailscale IP), set it explicitly before `make run`:
+
+```bash
+ACADIAHQ_OIDC_ISSUER=http://<lan-ip>:8081/realms/acadiahq make run
+```
+
+Open the web UI on one consistent origin per device (the URL `make run` prints) — the session
+cookie is per-origin, so mixing `localhost`, LAN IP, and Tailscale IP origins splits the login
+session.
+
 HQ also sits above a stateful device fleet: an apparently successful API response does not by
 itself prove that a device received an operation, retained authorization, or reported the
 resulting state. Review queueing, retries, stale connections, auditability, and tenant scoping

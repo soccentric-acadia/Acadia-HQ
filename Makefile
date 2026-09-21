@@ -16,6 +16,32 @@ DATABASE_URL ?= postgresql+asyncpg://acadiahq:acadiahq@localhost:5432/acadiahq
 TEST_DATABASE_URL ?= postgresql+asyncpg://acadiahq:acadiahq@localhost:5432/acadiahq_test
 S3_ENDPOINT_URL ?= http://localhost:9000
 
+# Host by which other devices reach this machine's services -- the canonical
+# origin for the web UI (the session cookie is per-origin, so every device
+# should browse the same host) and the default host for the OIDC issuer.
+# Tailscale IPv4 first (HQ is commonly reached over the tailnet), falling
+# back to the first `hostname -I` address (LAN-only deployments).
+REMOTE_HOST = $(shell \
+	host=""; \
+	if command -v tailscale >/dev/null 2>&1; then \
+		host=$$(tailscale ip -4 2>/dev/null | head -n1); \
+	fi; \
+	if [ -z "$$host" ]; then \
+		host=$$(hostname -I 2>/dev/null | awk '{print $$1}'); \
+	fi; \
+	echo "$$host")
+
+# Full OIDC issuer URL handed to the API by `make run`. A pre-set
+# ACADIAHQ_OIDC_ISSUER environment variable overrides it verbatim -- use that
+# when Keycloak must be reached at a different address than $(REMOTE_HOST)
+# (e.g. LAN-only access: ACADIAHQ_OIDC_ISSUER=http://<lan-ip>:8081/realms/acadiahq).
+# The issuer must be reachable from the browser AND from the API process, and
+# it must be the same host for everyone: Keycloak (KC_HOSTNAME_STRICT=false)
+# echoes the request Host as the token `iss`, which the API validates against
+# exactly this issuer (api/app/auth/oidc.py). Baking in the LAN IP broke login
+# from Tailscale clients (task 007).
+ACADIAHQ_OIDC_ISSUER ?= http://$(REMOTE_HOST):8081/realms/acadiahq
+
 .PHONY: help doctor install db-up db-down migrate seed run stop logs e2e-enroll test test-api test-gateway test-web lint lint-api lint-gateway lint-web build clean
 
 
@@ -72,9 +98,22 @@ seed:
 # Without this, `make stop` kills the wrapper and orphans the real process.
 run: db-up migrate ## start db + api + agent-gateway + web in the background
 	@mkdir -p $(RUN_DIR)
+	@busy=""; \
+	for p in 8000 5173 50051; do \
+		if ss -tlnH 2>/dev/null | awk '{print $$4}' | grep -qE "[:.]$$p$$"; then \
+			busy="$$busy $$p"; \
+		fi; \
+	done; \
+	if [ -n "$$busy" ]; then \
+		echo "refusing to start: port(s)$$busy already in use."; \
+		echo "  run 'make stop' first. If the ports stay busy after that, the"; \
+		echo "  listeners are orphans from an earlier run -- locate them with"; \
+		echo "  'ss -tlnp | grep -E \":(8000|5173|50051)\"' and kill them, then re-run."; \
+		exit 1; \
+	fi
 	@echo "starting api, agent-gateway, web..."
 	@(cd api && exec env ACADIAHQ_DATABASE_URL=$(DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
-		ACADIAHQ_OIDC_ISSUER=http://$$(hostname -I | awk '{print $$1}'):8081/realms/acadiahq \
+		ACADIAHQ_OIDC_ISSUER=$(ACADIAHQ_OIDC_ISSUER) \
 		nohup $(PY) -m uvicorn app.main:app --host 0.0.0.0 --port 8000 > $(RUN_DIR)/api.log 2>&1) & echo $$! > $(RUN_DIR)/api.pid
 	@(cd agent-gateway && exec env ACADIAHQ_DATABASE_URL=$(DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
 		nohup $(PY) -m gateway.server > $(RUN_DIR)/gateway.log 2>&1) & echo $$! > $(RUN_DIR)/gateway.pid
@@ -88,14 +127,14 @@ run: db-up migrate ## start db + api + agent-gateway + web in the background
 		fi; \
 		(cd web && exec env $$VITE_ENV nohup ./node_modules/.bin/vite --host 0.0.0.0 --port 5173 > $(RUN_DIR)/web.log 2>&1) & echo $$! > $(RUN_DIR)/web.pid
 	@sleep 1
-	@LAN_IP=$$(hostname -I 2>/dev/null | awk '{print $$1}'); \
-	echo "web:      http://$$LAN_IP:5173   (use this on every device, including this host --"; \
-	echo "                                  login redirects always go to the LAN IP, so mixing"; \
-	echo "                                  it with http://localhost:5173 splits your session"; \
-	echo "                                  cookie across two origins)"; \
-	echo "api:      http://$$LAN_IP:8000"; \
-	echo "keycloak: http://$$LAN_IP:8081/admin  (admin/admin)"; \
-	echo "gateway:  $$LAN_IP:50051 (gRPC)"; \
+	@echo "web:      http://$(REMOTE_HOST):5173   (open THIS origin on every device, including"; \
+	echo "                                  this host -- the session cookie is per-origin, so"; \
+	echo "                                  mixing hosts splits your login; http://localhost:5173"; \
+	echo "                                  works on this machine only)"; \
+	echo "api:      http://$(REMOTE_HOST):8000"; \
+	echo "keycloak: $(ACADIAHQ_OIDC_ISSUER)"; \
+	echo "          admin console: $(subst /realms/acadiahq,,$(ACADIAHQ_OIDC_ISSUER))/admin  (admin/admin)"; \
+	echo "gateway:  $(REMOTE_HOST):50051 (gRPC)"; \
 	echo ""; \
 	echo "login:    admin@example.com / devpassword"; \
 	echo "          (first time: make seed EMAIL=admin@example.com to pre-invite it as admin)"; \
