@@ -8,3 +8,653 @@
   ➜  Network: http://172.22.0.1:5173/
   ➜  Vue DevTools: Open http://localhost:5173/__devtools__/ as a separate window
   ➜  Vue DevTools: Press Alt(⌥)+Shift(⇧)+D in App to toggle the Vue DevTools
+3:58:43 PM [vite] (client) hmr update /src/assets/main.css
+3:58:43 PM [vite] Internal server error: Can't resolve './wc.css' in '/mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/assets'
+  Plugin: @tailwindcss/vite:generate:serve
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/assets/main.css
+      at finishWithoutResolve (/mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/enhanced-resolve/lib/Resolver.js:952:18)
+      at /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/enhanced-resolve/lib/Resolver.js:1048:13
+      at /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/enhanced-resolve/lib/Resolver.js:1132:5
+      at eval (eval at create (/mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:15:1)
+      at /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/enhanced-resolve/lib/Resolver.js:1132:5
+      at eval (eval at create (/mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:27:1)
+      at /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/enhanced-resolve/lib/DescriptionFilePlugin.js:94:43
+      at /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/enhanced-resolve/lib/Resolver.js:1132:5
+      at eval (eval at create (/mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/tapable/lib/HookCodeFactory.js:31:10), <anonymous>:15:1)
+      at /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/enhanced-resolve/lib/Resolver.js:1132:5
+3:58:43 PM [vite] (client) [console.error] [vite] Failed to reload /src/assets/main.css. This could be due to syntax errors or importing non-existent modules. (see errors above)
+3:59:31 PM [vite] (client) hmr update /src/assets/main.css
+3:59:52 PM [vite] (client) hmr update /src/assets/main.css, /src/components/device/OperationsPanel.vue
+3:59:55 PM [vite] (client) page reload src/lib/api.ts
+4:00:49 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/assets/main.css
+4:00:50 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+4:00:50 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+4:00:50 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+4:00:50 PM [vite] Internal server error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:00:50 PM [vite] (client) [console.error] [vite] Failed to reload /src/views/DeviceDetailView.vue. This could be due to syntax errors or importing non-existent modules. (see errors above)
+4:00:51 PM [vite] (client) [optimizer] bundling dependencies...
+4:00:51 PM [vite] (client) dependency optimized: lucide-vue-next
+4:00:56 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/assets/main.css
+4:00:56 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+4:00:56 PM [vite] (client) [console.error] [vite] Failed to reload /src/views/DeviceDetailView.vue. This could be due to syntax errors or importing non-existent modules. (see errors above)
+4:01:00 PM [vite] (client) page reload src/router/index.ts
+4:01:00 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue
+4:01:00 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+4:01:00 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+4:01:00 PM [vite] Internal server error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:00 PM [vite] (client) [console.error] [vite] Failed to reload /src/views/DeviceDetailView.vue. This could be due to syntax errors or importing non-existent modules. (see errors above)
+4:01:01 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:01 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+4:01:01 PM [vite] Internal server error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:01 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:01 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031660751
+4:01:01 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:01 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue
+
+4:01:07 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:08 PM [vite] Internal server error: Failed to resolve import "@/views/device/overview.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:66:119
+  10 |  		key: "o",
+  11 |  		kind: "live",
+  12 |  		loader: () => import("@/views/device/overview.vue")
+     |                         ^
+  13 |  	}),
+  14 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:08 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:08 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031660751
+4:01:08 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:08 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue
+
+4:01:14 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:01:14 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:14 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:14 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:14 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:14 PM [vite] Internal server error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:14 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:14 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031674092
+4:01:14 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:14 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue?t=1790031674092
+
+4:01:22 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:01:22 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:22 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:22 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:22 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:22 PM [vite] Internal server error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:22 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue?t=1790031682016
+
+4:01:22 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:22 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031682016
+4:01:22 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:27 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:01:27 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:27 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:27 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:27 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:27 PM [vite] Internal server error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:27 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:27 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031687533
+4:01:27 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:27 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue?t=1790031687533
+
+4:01:35 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:01:35 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:35 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:35 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:35 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:35 PM [vite] Internal server error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:35 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue?t=1790031695158
+
+4:01:35 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:35 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031695158
+4:01:35 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:37 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:37 PM [vite] Internal server error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:37 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:37 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031695158
+4:01:37 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:37 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue?t=1790031695158
+
+4:01:38 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:01:39 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:39 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:39 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:39 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:39 PM [vite] Internal server error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:39 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:39 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031698863
+4:01:39 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:39 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue?t=1790031698863
+
+4:01:47 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:01:48 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:48 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:48 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:48 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+4:01:48 PM [vite] Internal server error: Failed to resolve import "@/views/device/telemetry.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:68:132
+  28 |  		key: "4",
+  29 |  		kind: "configuration",
+  30 |  		loader: () => import("@/views/device/telemetry.vue")
+     |                         ^
+  31 |  	},
+  32 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:48 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue?t=1790031707785
+
+4:01:48 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:48 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031707785
+4:01:48 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:55 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:01:55 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:01:55 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/time.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:75:124
+  75 |  		key: "t",
+  76 |  		kind: "configuration",
+  77 |  		loader: () => import("@/views/device/time.vue")
+     |                         ^
+  78 |  	},
+  79 |  	{
+4:01:55 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/time.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:75:124
+  75 |  		key: "t",
+  76 |  		kind: "configuration",
+  77 |  		loader: () => import("@/views/device/time.vue")
+     |                         ^
+  78 |  	},
+  79 |  	{
+4:01:55 PM [vite] (client) Pre-transform error: Failed to resolve import "@/views/device/time.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:75:124
+  75 |  		key: "t",
+  76 |  		kind: "configuration",
+  77 |  		loader: () => import("@/views/device/time.vue")
+     |                         ^
+  78 |  	},
+  79 |  	{
+4:01:55 PM [vite] Internal server error: Failed to resolve import "@/views/device/time.vue" from "src/lib/deviceSections.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/src/lib/deviceSections.ts:75:124
+  75 |  		key: "t",
+  76 |  		kind: "configuration",
+  77 |  		loader: () => import("@/views/device/time.vue")
+     |                         ^
+  78 |  	},
+  79 |  	{
+      at TransformPluginContext._formatLog (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30416:39)
+      at TransformPluginContext.error (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30413:14)
+      at normalizeUrl (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27438:18)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27506:30
+      at async Promise.all (index 8)
+      at async TransformPluginContext.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:27474:4)
+      at async file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.Fv_Ybe1U.mjs:403:17
+      at async EnvironmentPluginContainer.transform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:30201:14)
+      at async loadAndTransform (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:20124:26)
+      at async viteTransformMiddleware (file:///mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/web/node_modules/vite/dist/node/chunks/node.js:24604:20)
+4:01:55 PM [vite] (client) [console.warn] [VUE_ROUTER_R0010] Uncaught error during route navigation
+╰▶ fix: Register an error handler with `router.onError()` to handle navigation errors.
+4:01:55 PM [vite] (client) [console.error] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/DeviceDetailView.vue?t=1790031715402
+4:01:55 PM [vite] (client) [console.warn] [VUE_ROUTER_R0011] Unexpected error when starting the router:
+╰▶ fix: Inspect the actual cause; a navigation guard or async component likely threw during the initial navigation.
+4:01:55 PM [vite] (client) [Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://pabi:5173/src/views/device/DeviceSectionView.vue?t=1790031715402
+
+4:02:05 PM [vite] (client) hmr update /src/assets/main.css
+4:02:05 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:02:06 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:02:14 PM [vite] (client) hmr update /src/assets/main.css, /src/components/device/TelemetryPanel.vue
+4:02:14 PM [vite] (client) hmr update /src/assets/main.css, /src/components/device/FaultsAlarmsPanel.vue
+4:02:14 PM [vite] (client) hmr update /src/assets/main.css, /src/components/device/OperationsPanel.vue
+4:02:14 PM [vite] (client) hmr update /src/assets/main.css
+4:02:14 PM [vite] (client) hmr update /src/assets/main.css, /src/components/device/LogsPanel.vue
+4:03:43 PM [vite] (client) hmr update /src/assets/main.css
+4:03:44 PM [vite] (client) [console.warn] [VUE_ROUTER_R0103] The route named "device-detail" has a child without a name, an empty path, and no children. Using that name won't render the empty path child, so this is probably a mistake.
+├▶ fix: Move the `name` onto the empty-path child; or, if intentional, give the child its own name to silence this.
+╰▶ see: https://router.vuejs.org/guide/essentials/nested-routes.html#Nested-Named-Routes
+4:03:57 PM [vite] (client) hmr update /src/assets/main.css
+4:03:57 PM [vite] (client) hmr update /src/assets/main.css
+4:03:57 PM [vite] (client) hmr update /src/assets/main.css
+4:03:57 PM [vite] (client) hmr update /src/assets/main.css
+4:04:05 PM [vite] (client) hmr update /src/assets/main.css
+4:04:05 PM [vite] (client) hmr update /src/assets/main.css
+4:04:05 PM [vite] (client) hmr update /src/assets/main.css
+4:04:29 PM [vite] (client) hmr update /src/assets/main.css
+4:04:29 PM [vite] (client) hmr update /src/assets/main.css
+4:04:29 PM [vite] (client) hmr update /src/views/DeviceDetailView.vue, /src/assets/main.css
+4:04:29 PM [vite] (client) hmr update /src/assets/main.css
+4:04:33 PM [vite] (client) hmr update /src/assets/main.css
+4:04:33 PM [vite] (client) hmr update /src/assets/main.css
+4:04:36 PM [vite] (client) hmr update /src/assets/main.css
+4:04:46 PM [vite] (client) hmr update /src/components/wc/CommandPalette.vue, /src/assets/main.css
+4:04:46 PM [vite] (client) hmr update /src/assets/main.css
+4:05:01 PM [vite] (client) hmr update /src/assets/main.css
+4:05:01 PM [vite] (client) hmr update /src/assets/main.css, /src/views/DeviceDetailView.vue, /src/components/wc/CommandPalette.vue, /src/views/device/DeviceSectionView.vue
+4:05:10 PM [vite] (client) hmr update /src/assets/main.css
+4:06:32 PM [vite] (client) [console.warn] [VUE_ROUTER_R0025] The `next()` callback in navigation guards is deprecated.
+├▶ fix: Return the value instead: `next()` becomes `return`, `next(false)` becomes `return false`, `next("/path")` becomes `return "/path"`.
+╰▶ see: https://router.vuejs.org/guide/advanced/navigation-guards.html#Optional-third-argument-next

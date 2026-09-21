@@ -133,3 +133,265 @@ INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
 INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
 INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
 INFO:     connection open
+2026-09-21 15:58:39,556 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=61b7c55d-e8fe-46a9-ae36-2e54353d526a
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+2026-09-21 15:58:41,425 INFO acadiahq.request GET /auth/me request_id=880836ff-cdb0-4517-a249-1c96693bc1d9
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 15:58:41,554 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=d3177c34-beb5-4c88-b6cc-3bbce58a22bf
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+2026-09-21 15:59:56,627 INFO acadiahq.request GET /auth/me request_id=b62d82b8-ea18-4792-a5c8-33da452b75c5
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 15:59:56,824 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=46017621-623f-441d-8680-f2799865a398
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+2026-09-21 16:01:01,625 INFO acadiahq.request GET /auth/me request_id=1ce7f498-c74a-48e9-8a2f-a13dbab48651
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:07,947 INFO acadiahq.request GET /auth/me request_id=5e63cf3d-28ab-4d90-9ec8-4a6230b75f90
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:14,345 INFO acadiahq.request GET /auth/me request_id=912063f4-d745-4a50-b9be-c55366b368d6
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:22,287 INFO acadiahq.request GET /auth/me request_id=2673f3bc-7381-4c80-bf13-a7bed46440c4
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:27,772 INFO acadiahq.request GET /auth/me request_id=d65cae58-c916-416e-895d-6bda0dbd2954
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:35,384 INFO acadiahq.request GET /auth/me request_id=33d8c377-edaa-48fc-a27c-b46f0124d76a
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:37,073 INFO acadiahq.request GET /auth/me request_id=64af76ca-af35-4616-9277-75cc0141442a
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:39,059 INFO acadiahq.request GET /auth/me request_id=6f7a1501-bbab-48c6-a9e9-7e9bf2600971
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:48,033 INFO acadiahq.request GET /auth/me request_id=dabe7487-070a-4878-aa9f-d4f641050e9a
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:01:55,671 INFO acadiahq.request GET /auth/me request_id=8bd008df-d818-4073-8e24-b1c59d850600
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:02:06,186 INFO acadiahq.request GET /auth/me request_id=674beae9-6152-4946-abdd-fa164022c1c1
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:02:06,323 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=74a2434f-c244-4943-ad55-316e4ff79256
+2026-09-21 16:02:06,324 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=931d2a9d-3e8d-4e20-8170-d95f65033c98
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 16:02:06,477 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=257b5721-10e0-4e8b-b3f0-44ec1f4991fc
+2026-09-21 16:02:06,479 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=50ca1fff-3cb2-447a-a321-49c094323f89
+2026-09-21 16:02:06,479 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=d8f1cf20-c401-4c2a-bfa1-a7eee43dee89
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 16:03:44,603 INFO acadiahq.request GET /auth/me request_id=af9d96f1-aaa1-47fe-958c-7a4c254fc41d
+INFO:     100.92.53.119:0 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-21 16:03:44,793 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=9af5ba5a-b302-4473-9e3e-4d6e1354d088
+2026-09-21 16:03:44,795 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=925f14c9-20ae-41d0-a517-0c6aefb5f988
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 16:03:44,900 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=e8e45a24-93ab-4f70-95c2-5f8aa4f3ea08
+2026-09-21 16:03:44,902 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=299d92e5-2b63-41f9-93b6-de53c4592944
+2026-09-21 16:03:44,902 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=8c9f2dc3-cca0-4994-9bd5-c5d39b68f2af
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+2026-09-21 16:04:29,740 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=24b8a732-a605-48dd-b269-955bc3449e03
+2026-09-21 16:04:29,741 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=7784fd74-5e58-451d-af10-152fc598e12f
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 16:04:29,793 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=1f6d3a97-d5f4-4a1c-8850-6a61eca80ee2
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+2026-09-21 16:04:29,811 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=a43510af-a747-4675-8863-a9a1329806dc
+2026-09-21 16:04:29,812 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=b3fe8e9b-4885-478e-aaa1-b4d44160f350
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 16:05:01,875 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=68c610c5-d48f-43c9-8e0a-7638c318e9e9
+2026-09-21 16:05:01,876 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=a0d26e6e-f419-4714-99af-25727ccdbd7b
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 16:05:01,916 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=bcccaae6-8a05-40cc-a3c1-ed81dc9ec693
+2026-09-21 16:05:01,917 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=fad30b6b-c82c-431c-b9a8-a64a7f272ec5
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+2026-09-21 16:05:01,927 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=c0d7edec-a012-4bab-a6f4-ae9f011ec60c
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 16:05:31,719 INFO acadiahq.request GET /devices request_id=6a001998-8286-4053-849a-f46feb6e0e65
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 16:05:32,979 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=62ac191c-6c22-4590-b8bf-6fc5c62be53d
+2026-09-21 16:05:32,983 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=f5dd01af-1bcb-4a91-a180-ca1d2c7c5069
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 16:05:53,170 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=ae4f1bf8-e47d-47be-9d53-d603d4a10549
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+2026-09-21 16:05:53,184 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=4921ae6b-a048-41bc-863d-982797090b53
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 16:06:08,197 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=f1e6f641-99dc-47a3-8024-f400403f862f
+2026-09-21 16:06:08,199 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=ff36c232-9e78-4e9d-9e7f-f0b87b8a9593
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 16:06:09,152 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/configuration request_id=c4b61988-126d-4ae4-b0f3-98eab3d1d709
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/configuration HTTP/1.1" 202 Accepted
+2026-09-21 16:06:09,202 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=4921343d-c564-404c-bbf4-694e585fc13e
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:10,438 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=1c4c36fa-c80a-46cd-8d52-84412cd4241b
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:11,668 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=779709aa-fa3c-4163-adb6-7cd7e0ad4dde
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:12,898 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=f412e182-ca42-417d-9ed0-2a8ce832edb7
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:14,143 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=8f5088e1-914a-428f-8db9-808a5de9644a
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:15,403 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=0c9bc99e-7363-44f9-9333-67555613b10c
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:15,591 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/configuration request_id=a4b3f010-e004-488e-a2e9-0ff3e04f3f71
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/configuration HTTP/1.1" 202 Accepted
+2026-09-21 16:06:15,640 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=d4ff123d-8e36-4acf-b272-29169e2377a6
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:16,661 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=35b5c8af-6c98-42d0-8fc0-f7c3ccf8842c
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:16,896 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=b1a38d14-95e1-4cdf-a3be-c532b8018c38
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:17,904 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=d031cbf9-2f83-4faf-9529-c4f95e8ef73d
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:18,143 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=3fddc510-5db3-4741-b8f6-53d5655c56f5
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:18,443 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/configuration request_id=01730cf0-ebec-4260-9da3-30321f9e0aa9
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/configuration HTTP/1.1" 202 Accepted
+2026-09-21 16:06:18,490 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=eea0c977-b9d4-47e8-b381-f655bd754389
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:19,163 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=c027d387-11f1-448a-80f9-c7c7587ca943
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:19,403 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=60ece113-f267-443c-b6cc-f114c90860be
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:19,744 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=e24b5abe-d33b-4f50-ac14-2c57c056167a
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:20,409 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=3f770141-36e1-4bfa-89fd-b08712729bd3
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:20,657 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=3dad5ba3-71e2-435c-8673-85c339546255
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:21,001 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=1d0db8e3-1091-4847-a6a0-978cf4ea5158
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:21,350 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 request_id=a74a805d-683f-4337-bf50-10cac9d4c52b
+2026-09-21 16:06:21,351 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=778ace9f-58ab-41f5-a4b0-8a3c340bc6db
+2026-09-21 16:06:21,351 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=729b18d5-7c55-4bca-b3bb-1e20528e29cc
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916 HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+2026-09-21 16:06:21,656 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=53eae627-0896-4f9b-835c-438804e577e3
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:21,964 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=5326b876-2dde-434d-9269-1ae38d12d61e
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:22,274 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=a1faf3ec-82f3-4fee-bb7e-f445d44513ed
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:22,900 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=f46dd4cd-7e25-435b-bfae-cd66c9e9883c
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:23,222 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=1f719312-ba42-43d6-8399-b59832c4ed77
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:23,534 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=604645f6-a7b2-441d-b6c2-1d11c1f0ba26
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:24,182 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=3c21162f-8538-428d-9688-2b3b9e29473b
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:24,475 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=890ddf87-6862-4862-bd9b-c9908e8bbbb8
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:24,775 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=4d89d2a0-857b-4bf9-b0d1-59326b266486
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:25,432 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=8ddc81c9-f3aa-4e57-ae4f-0b7c23e36978
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:25,726 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=a3c05150-7f68-4170-a87e-95b41aef5caf
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:25,782 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health request_id=0486cccc-0569-4d46-8e04-f739fc62c925
+2026-09-21 16:06:25,784 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry request_id=4a16ceb3-de98-4f58-9695-ef1c398b32cb
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/health HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/telemetry HTTP/1.1" 200 OK
+2026-09-21 16:06:26,019 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=521b8bd5-b9fb-4f7f-83b5-80d1d3356bc9
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:26,682 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=193e6389-0380-42b0-9676-5c519b38cacb
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:26,983 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=7a2d5d6f-afe3-4fc4-b14b-d8540f97d22e
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:27,260 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=92f5e03b-21c2-4350-b548-e0ce4ce83ad9
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:27,931 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=1cf5271a-cc3d-4101-8045-4e876183607c
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:28,130 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/configuration request_id=2d2168f3-dca5-4ae7-92a1-ff19257b16f9
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/configuration HTTP/1.1" 202 Accepted
+2026-09-21 16:06:28,174 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=f353d27a-c143-4f77-845b-25a13790e3a0
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:28,229 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=7de97967-08cc-4a9b-ac3b-22a1da971241
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:28,501 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=250c190e-36cf-4057-bd40-d869a0e82cc1
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:29,173 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:cdd44b05-389f-4f1e-920f-b384cb5d5496 request_id=9def5ee6-f31a-4909-9fe4-73c3d57fc075
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Acdd44b05-389f-4f1e-920f-b384cb5d5496 HTTP/1.1" 200 OK
+2026-09-21 16:06:29,426 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=14ff8c86-3e87-45f6-89e4-c89c446da047
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:29,469 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=e7983e3e-9c73-4c72-a14f-bbe704fa1561
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:29,750 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=39430bc5-45ab-4425-9bf2-d43f1f0c32ca
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:30,675 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=0fd20168-f319-43c1-a3de-2152fc7cd893
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:30,711 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=b923b43e-43a2-400d-9ff5-73e06d2621b9
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:31,008 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=8ba02b09-dbdd-411b-a4ce-1b7679cf6b73
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:31,943 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=328af1b9-b260-4926-80c0-e72fca20357d
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:31,974 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=a76abe26-d6b5-4e48-84e5-9a546c6b72e2
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:32,258 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=7a8be456-19b4-4997-bab6-d60a32793320
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 16:06:32,832 INFO acadiahq.request GET /devices request_id=169a5d95-6e8c-467a-9ded-473e549bfa81
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 16:06:33,200 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=31f63754-01db-40f3-b48c-545dcc71f723
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:33,227 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=9f27b06f-4108-44b2-8852-0f0cdd41a00b
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:33,502 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=0ca7a1c9-8e5c-40df-8950-73e0038479c6
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:34,446 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=6dc1fd2f-c49a-4b52-bd61-43bc2376a5cd
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:34,474 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b2c0f200-f993-4aa7-b4f1-def3ac4e67ba request_id=ce2440b6-37dc-4206-b960-a26f1e7ae73f
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab2c0f200-f993-4aa7-b4f1-def3ac4e67ba HTTP/1.1" 200 OK
+2026-09-21 16:06:34,750 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=9a1a6da7-c575-4783-9809-763a1c72eb0d
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:35,696 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=a5c03933-3345-45bc-8fa9-1ec165e34369
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:36,005 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=1e2260ac-ad64-4f6b-8eb0-64ce3560a61a
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:36,947 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=870bd4ee-9b5b-468c-8ead-c73c4ec98ccc
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:37,263 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:b68a2271-fccc-4a76-ad41-2aee1ff165bb request_id=99c42757-981a-4c4a-b494-2f06722dbc6e
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ab68a2271-fccc-4a76-ad41-2aee1ff165bb HTTP/1.1" 200 OK
+2026-09-21 16:06:38,202 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=2b5937cd-2041-4acd-bca1-0726bd1bd166
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:39,485 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=2fb339e1-c756-4e0f-b04c-b386a3b5cc49
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:40,758 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=eb04c897-83fa-42da-a4bf-816b3a009965
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:40,833 INFO acadiahq.request GET /alarm-rules request_id=db2c9530-31bc-4897-8ad8-94a70cd109ec
+INFO:     100.92.53.119:0 - "GET /alarm-rules HTTP/1.1" 200 OK
+2026-09-21 16:06:42,004 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=b1665420-230f-462e-bf22-31749a3c046c
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:42,300 INFO acadiahq.request GET /users request_id=5284c0c1-30b4-4296-a12b-b78f04553406
+INFO:     100.92.53.119:0 - "GET /users HTTP/1.1" 200 OK
+2026-09-21 16:06:43,248 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=2a44f8db-019f-4cc0-b1d5-f6e8ee7d1d10
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:43,522 INFO acadiahq.request GET /audit-log request_id=3fb89772-105e-42c8-97cf-53f471274c5e
+INFO:     100.92.53.119:0 - "GET /audit-log?limit=100 HTTP/1.1" 200 OK
+2026-09-21 16:06:44,496 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=928848f6-cb3b-47b5-8e6d-b0e7c788c959
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+2026-09-21 16:06:45,739 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=890be3f2-d7a8-4597-8ad7-3bb6a8664f5f
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
+INFO:     100.92.53.119:0 - "WebSocket /ws/devices" [accepted]
+INFO:     connection open
+2026-09-21 16:06:46,768 INFO acadiahq.request GET /devices request_id=2b6fbde8-fb12-43b3-bb6a-573e58d81ff4
+INFO:     100.92.53.119:0 - "GET /devices HTTP/1.1" 200 OK
+2026-09-21 16:06:46,999 INFO acadiahq.request GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration:configuration.read:c203bb85-fd57-4146-be97-c2adb6127b5c request_id=8cc5574f-3f72-476c-9430-3508c2147f83
+INFO:     100.92.53.119:0 - "GET /devices/d67186cb-39c4-4dee-aabd-f81a14996916/commands/configuration%3Aconfiguration.read%3Ac203bb85-fd57-4146-be97-c2adb6127b5c HTTP/1.1" 200 OK
