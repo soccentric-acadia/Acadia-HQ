@@ -1,7 +1,7 @@
 # Task 008 (leaf: Acadia-HQ) — Device detail: 1:1 WebConfig look, feel, and features
 
 Parent: [`tasks/008-hq-device-ui-webconfig-parity/plan.md`](../../../tasks/008-hq-device-ui-webconfig-parity/plan.md)
-- **Status:** PROPOSED — awaiting plan approval
+- **Status:** COMPLETE — executed 2026-09-21 (see leaf `execution.md` / `validation.md`)
 - **Role in task:** affected (implementation repository; `web/` only)
 
 ## Scope

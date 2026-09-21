@@ -2,7 +2,8 @@
 
 Parent: [`tasks/008-hq-device-ui-webconfig-parity/execution.md`](../../../tasks/008-hq-device-ui-webconfig-parity/execution.md)
 - **Approval:** 2026-09-21 ("go") — web-only scope as in `plan.md`.
-- **Status:** IMPLEMENTED — awaiting implementation approval
+- **Status:** COMPLETE — implemented, validated, audited (92/100), approved, committed
+  and pushed.
 
 ## Checklist
 
