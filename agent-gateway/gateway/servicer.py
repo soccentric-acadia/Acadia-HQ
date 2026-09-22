@@ -108,7 +108,7 @@ class AgentLinkServicer(_AgentLinkServicer):
             yield ServerFrame(
                 heartbeat_ack=HeartbeatAck(
                     server_time_unix_ms=_now_ms(),
-                    next_heartbeat_interval_s=settings.sweep_interval_s,
+                    next_heartbeat_interval_s=settings.device_heartbeat_interval_s,
                     protocol_version=SUPPORTED_PROTOCOL_VERSION,
                 )
             )
@@ -146,7 +146,13 @@ class AgentLinkServicer(_AgentLinkServicer):
             ),
             CommandKind.factory_reset: (
                 "factory_reset",
-                lambda payload: dict(factory_reset=FactoryReset()),
+                # The device gate (hq_bridge REQUIRED_FACTORY_RESET_CONFIRMATION):
+                # an HQ factory reset without this confirmation is refused
+                # on-device (task 009, H4).
+                lambda payload: dict(
+                    factory_reset=FactoryReset(),
+                    required_confirmation="FACTORY-RESET",
+                ),
             ),
             CommandKind.apply_update: (
                 "apply_update",
@@ -230,6 +236,10 @@ class AgentLinkServicer(_AgentLinkServicer):
                                 command_id=row.command_id,
                                 operation=operation_name,
                                 daemon="configuration",
+                                # Explicit actor + device deadline (task 009, H9):
+                                # the device previously defaulted both silently.
+                                actor="hq",
+                                deadline_ms=get_gateway_settings().command_deadline_ms,
                                 correlation_id=row.correlation_id or row.command_id,
                                 idempotency_key=row.command_id,
                                 **build_kind(row.payload or {}),

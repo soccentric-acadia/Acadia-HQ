@@ -187,13 +187,19 @@ async def test_configuration_read_is_durable_signed_and_explicitly_blocked(
     assert response.status_code == 202
     body = response.json()
     assert body["status"] == "queued"
-    assert body["integration_status"] == "awaiting_configuration_contract"
+    assert body["integration_status"] == "contract_v1_device_integrated"
     assert len(body["signature"]) == 64
 
-    command = await db_session.get(PendingCommand, body["command_id"])
-    assert command is not None
+    # command_id is a string prefix + UUID; look the row up by its unique
+    # column (the UUID-PK get() with a string was a known test debt, task 009).
+    command = (
+        await db_session.execute(
+            select(PendingCommand).where(PendingCommand.command_id == body["command_id"])
+        )
+    ).scalar_one()
     assert command.kind.value == "configuration_read"
     assert command.correlation_id == body["correlation_id"]
+    assert command.payload["schema_version"] == 1
     audit_row = (
         (await db_session.execute(
             select(AuditLog).where(AuditLog.target_device_id == device.id)
@@ -218,6 +224,15 @@ async def test_configuration_write_requires_operator_and_queues_signed_values(
     )
     assert response.status_code == 202
     body = response.json()
-    command = await db_session.get(PendingCommand, body["command_id"])
-    assert command.payload["values"] == {"mode": "safe"}
+    command = (
+        await db_session.execute(
+            select(PendingCommand).where(PendingCommand.command_id == body["command_id"])
+        )
+    ).scalar_one()
+    # Device contract envelope (task 009, H5): schema_version/origin/config
+    # field names webconfigd validates.
+    assert command.payload["config"] == {"mode": "safe"}
+    assert command.payload["origin"] == "hq"
+    assert command.payload["schema_version"] == 1
+    assert command.payload["signature_algorithm"] == "HMAC-SHA256"
     assert command.payload["signature"] == body["signature"]

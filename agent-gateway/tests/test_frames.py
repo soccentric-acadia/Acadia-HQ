@@ -253,3 +253,86 @@ async def test_duplicate_command_ack_is_terminal_and_does_not_retry(gateway_stub
     assert command.state == CommandState.succeeded
     assert command.attempt_count == 1
     assert command.retryable is False
+
+
+async def test_command_ack_json_payload_is_stored(gateway_stub, db_session):
+    """The device's result payload must land in the durable command record
+    (task 009, H1: a payload smuggled through `error` was discarded on
+    success, so e.g. a configuration.read answer never reached HQ)."""
+    import json
+
+    from acadiahq.agent_pb2 import CommandAck
+
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+    command = PendingCommand(
+        device_id=device.id,
+        command_id="configuration:read:11111111-2222-3333-4444-555555555555",
+        kind=CommandKind.configuration_read,
+        state=CommandState.delivering,
+        attempt_count=1,
+        correlation_id="corr-payload",
+    )
+    db_session.add(command)
+    await db_session.commit()
+
+    payload = {"schema_version": 1, "config": {"system": {"hostname": "edge-1"}}}
+
+    async def frames():
+        yield AgentFrame(heartbeat=_hb(str(device.id), credential))
+        yield AgentFrame(
+            command_ack=CommandAck(
+                command_id=command.command_id,
+                success=True,
+                correlation_id=command.correlation_id,
+                code="OK",
+                json_payload=json.dumps(payload),
+                operation="configuration.read",
+                daemon="configuration",
+            )
+        )
+
+    async for _ in gateway_stub.Connect(frames()):
+        pass
+
+    await db_session.refresh(command)
+    assert command.state == CommandState.succeeded
+    assert command.result_error is None
+    assert command.result_payload == payload
+
+
+async def test_command_ack_failure_records_error_and_payload(gateway_stub, db_session):
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+    command = PendingCommand(
+        device_id=device.id,
+        command_id="backup:failed-ack",
+        kind=CommandKind.take_backup_now,
+        state=CommandState.delivering,
+        attempt_count=1,
+        correlation_id="corr-failed",
+    )
+    db_session.add(command)
+    await db_session.commit()
+
+    from acadiahq.agent_pb2 import CommandAck
+
+    async def frames():
+        yield AgentFrame(heartbeat=_hb(str(device.id), credential))
+        yield AgentFrame(
+            command_ack=CommandAck(
+                command_id=command.command_id,
+                success=False,
+                correlation_id=command.correlation_id,
+                code="INTERNAL",
+                error="spoke not connected",
+            )
+        )
+
+    async for _ in gateway_stub.Connect(frames()):
+        pass
+
+    await db_session.refresh(command)
+    assert command.state == CommandState.failed
+    assert command.result_code == "INTERNAL"
+    assert command.result_error == "spoke not connected"

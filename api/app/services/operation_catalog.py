@@ -29,14 +29,14 @@ OPERATIONS = (
         "name": "configuration.read",
         "daemon": "configuration",
         "command_kind": "configuration_read",
-        "description": "Read device configuration (requires Configuration contract).",
-        "integration_status": "awaiting_configuration_contract",
+        "description": "Read device configuration (device configuration contract v1).",
+        "integration_status": "contract_v1_device_integrated",
     },
     {
         "name": "configuration.write",
         "daemon": "configuration",
         "command_kind": "configuration_write",
-        "description": "Apply signed device configuration (requires Configuration contract).",
-        "integration_status": "awaiting_configuration_contract",
+        "description": "Apply signed device configuration (device configuration contract v1, transitional HMAC).",
+        "integration_status": "contract_v1_device_integrated",
     },
 )

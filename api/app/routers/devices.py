@@ -121,7 +121,7 @@ async def get_command_status(
         "retryable": command.retryable,
     }
     if command.kind.value.startswith("configuration_"):
-        response["integration_status"] = "awaiting_configuration_contract"
+        response["integration_status"] = "contract_v1_device_integrated"
     return response
 
 

@@ -7,6 +7,12 @@ from uuid import UUID
 from app.config import get_settings
 
 
+# The device configuration contract version webconfigd validates
+# (webconfig_engine::CONFIG_SCHEMA_VERSION in Acadia-Configuration). The
+# envelope field is `schema_version`, not `config_version` (task 009, H5).
+CONFIGURATION_SCHEMA_VERSION = 1
+
+
 def canonical_document(
     *, device_id: UUID, command_id: str, operation: str, values: dict[str, Any] | None = None
 ) -> bytes:

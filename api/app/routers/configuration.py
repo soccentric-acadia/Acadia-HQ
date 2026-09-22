@@ -11,13 +11,21 @@ from app.models.enums import CommandKind, UserRole
 from app.models.pending_command import PendingCommand
 from app.schemas.configuration import ConfigurationWrite
 from app.services import audit
-from app.services.configuration import canonical_document, sign_document
+from app.services.configuration import (
+    CONFIGURATION_SCHEMA_VERSION,
+    canonical_document,
+    sign_document,
+)
 from app.services.device_scope import get_tenant_device_or_404
 from app.services.tenant_repo import TenantContext
 
 router = APIRouter(prefix="/devices/{device_id}/configuration", tags=["configuration"])
 
-_STATUS = "awaiting_configuration_contract"
+# The device contract is now implemented (Acadia-Configuration webconfigd
+# validates this exact envelope; task 009, H5). The HMAC-SHA256 signature is a
+# transitional form: webconfigd shape-checks it while Ed25519 key provisioning
+# is not in place, mirroring istate's SignedConfig legacy policy.
+_STATUS = "contract_v1_device_integrated"
 
 
 async def _queue(
@@ -38,8 +46,9 @@ async def _queue(
     signature = sign_document(document)
     correlation_id = request_id or command_id
     payload = {
-        "config_version": 1,
-        "values": values,
+        "schema_version": CONFIGURATION_SCHEMA_VERSION,
+        "origin": "hq",
+        "config": values,
         "signature": signature,
         "signature_algorithm": "HMAC-SHA256",
         "integration_status": _STATUS,
@@ -86,7 +95,7 @@ async def read_configuration(
     db: AsyncSession = Depends(get_db),
     ctx: TenantContext = Depends(require_role(UserRole.viewer)),
 ):
-    """Queue a read; the device response requires the Configuration contract."""
+    """Queue a read; the device responds through the configuration contract."""
     return await _queue(
         device_id=device_id,
         operation="configuration.read",
