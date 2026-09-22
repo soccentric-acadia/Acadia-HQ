@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-21 — Cross-repo API surface audit: API gap closure (task 009)
+
+### Added
+
+- New updates command router with regression tests; log-bundle fetch
+  via istate bulk socket; command ack result-payload propagation
+  in configuration/device services.
+- Mounted the previously missing backups router (regression-tested).
+
 ## 2026-09-21 — Device detail: 1:1 WebConfig (Acadia-Configuration) UI (task 008)
 
 - Selecting a device in HQ now presents the WebConfig experience 1:1: design
