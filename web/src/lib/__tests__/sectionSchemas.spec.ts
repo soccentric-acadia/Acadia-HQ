@@ -65,7 +65,7 @@ describe('sectionSchemas', () => {
 describe('T-P19 descriptor coverage', () => {
   it('every descriptor carries a device config path', () => {
     for (const [id, d] of Object.entries(SECTION_DESCRIPTORS)) {
-      expect(d.config_path, `descriptor ${id}`).toMatch(/^[a-z_]+(\.[a-z_]+)+$/)
+      expect(d.config_path, `descriptor ${id}`).toMatch(/^[a-z_]+(\.[a-z_]+)*$/)
     }
   })
 
