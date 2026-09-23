@@ -23,7 +23,13 @@ watch(
   (values) => {
     for (const group of props.descriptor.groups) {
       for (const field of group.fields) {
-        local[field.id] = values[field.id] ?? (field.field_type === 'bool' ? false : '')
+        if (field.field_type === 'string_list') {
+          // T-P19: list-valued fields edit as one-entry-per-line text.
+          const v = values[field.id]
+          local[field.id] = Array.isArray(v) ? (v as unknown[]).join('\n') : ''
+        } else {
+          local[field.id] = values[field.id] ?? (field.field_type === 'bool' ? false : '')
+        }
       }
     }
   },
@@ -41,11 +47,24 @@ const dirty = computed(() => {
 })
 
 function save() {
-  const issues = validateValues(props.descriptor, local)
+  const outgoing: Record<string, unknown> = { ...local }
+  // string_list fields serialize back to arrays (one entry per line).
+  for (const group of props.descriptor.groups) {
+    for (const field of group.fields) {
+      if (field.field_type === 'string_list') {
+        const raw = String(local[field.id] ?? '')
+        outgoing[field.id] = raw
+          .split('\n')
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0)
+      }
+    }
+  }
+  const issues = validateValues(props.descriptor, outgoing)
   for (const key of Object.keys(errors)) delete errors[key]
   Object.assign(errors, issues)
   if (Object.keys(issues).length) return
-  emit('save', { ...local })
+  emit('save', outgoing)
 }
 
 defineExpose({ dirty, save })
@@ -62,6 +81,15 @@ defineExpose({ dirty, save })
           :label="field.title"
           :disabled="disabled"
           @update:model-value="local[field.id] = $event"
+        />
+        <textarea
+          v-else-if="field.field_type === 'string_list'"
+          class="wc-field wc-field--textarea"
+          :value="String(local[field.id] ?? '')"
+          :aria-label="field.title"
+          :disabled="disabled"
+          rows="4"
+          @input="local[field.id] = ($event.target as HTMLTextAreaElement).value"
         />
         <WcField
           v-else

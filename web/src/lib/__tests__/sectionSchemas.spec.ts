@@ -1,10 +1,16 @@
 // Task 008 — schema-driven form: WebConfig descriptor parity, validation, dirty tracking.
 import { describe, expect, it } from 'vitest'
-import { SECTION_DESCRIPTORS, validateField, validateValues } from '@/lib/sectionSchemas'
+import {
+  COMMAND_MANAGED_SECTIONS,
+  READ_ONLY_SECTIONS,
+  SECTION_DESCRIPTORS,
+  validateField,
+  validateValues,
+} from '@/lib/sectionSchemas'
 
 describe('sectionSchemas', () => {
-  it('descriptors use the WebConfig field-type set (string|int|bool|enum|secret)', () => {
-    const allowed = new Set(['string', 'int', 'bool', 'enum', 'secret'])
+  it('descriptors use the field-type set (string|int|bool|enum|secret|string_list)', () => {
+    const allowed = new Set(['string', 'int', 'bool', 'enum', 'secret', 'string_list'])
     for (const descriptor of Object.values(SECTION_DESCRIPTORS)) {
       for (const group of descriptor.groups) {
         for (const field of group.fields) {
@@ -53,5 +59,31 @@ describe('sectionSchemas', () => {
     const errors = validateValues(descriptor, { publish_interval_secs: 1 })
     expect(Object.keys(errors)).toEqual(['publish_interval_secs'])
     expect(validateValues(descriptor, { publish_interval_secs: 30 })).toEqual({})
+  })
+})
+
+describe('T-P19 descriptor coverage', () => {
+  it('every descriptor carries a device config path', () => {
+    for (const [id, d] of Object.entries(SECTION_DESCRIPTORS)) {
+      expect(d.config_path, `descriptor ${id}`).toMatch(/^[a-z_]+(\.[a-z_]+)+$/)
+    }
+  })
+
+  it('covers the scalar configuration sections (T-P19)', () => {
+    for (const id of [
+      'system', 'time', 'ntp', 'ptp', 'gps', 'wired', 'wireless', 'services',
+      'cloud', 'security', 'ssh', 'firewall', 'leds', 'serial', 'can', 'gpio',
+      'camera', 'telemetry',
+    ]) {
+      expect(SECTION_DESCRIPTORS[id], `descriptor ${id}`).toBeDefined()
+    }
+  })
+
+  it('re-classifies live/read-only and command-managed sections (T-P19)', () => {
+    for (const id of ['display', 'usb', 'pci', 'secure-boot', '5g', 'mcu']) {
+      expect(READ_ONLY_SECTIONS.has(id), `${id} is live/read-only`).toBe(true)
+    }
+    expect(COMMAND_MANAGED_SECTIONS.has('users')).toBe(true)
+    expect(SECTION_DESCRIPTORS['usb']).toBeUndefined()
   })
 })

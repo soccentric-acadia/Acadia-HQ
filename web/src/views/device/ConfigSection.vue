@@ -50,6 +50,8 @@ const commandError = computed(() => {
   return null
 })
 const hasDescriptor = computed(() => descriptor.value !== undefined)
+const readOnly = computed(() => READ_ONLY_SECTIONS.has(props.sectionId))
+const commandManaged = computed(() => COMMAND_MANAGED_SECTIONS.has(props.sectionId))
 
 async function read() {
   loading.value = true
@@ -169,6 +171,33 @@ onMounted(read)
             <RefreshCw /> Read configuration
           </button>
         </div>
+      </WcCard>
+
+      <WcCard
+        v-else-if="readOnly"
+        title="Live device data (read-only)"
+        subtitle="This section reports state, not configuration — values come from the device's live telemetry/commands."
+      >
+        <WcEmptyState
+          title="Read-only section"
+          subtitle="Inventory and status sections are not editable configuration. Values appear once the device reports them (T-P24 heartbeat enrichment)."
+        />
+        <div class="form-actions">
+          <button class="btn btn-outline" @click="read">
+            <RefreshCw /> Read state
+          </button>
+        </div>
+      </WcCard>
+
+      <WcCard
+        v-else-if="commandManaged"
+        title="Managed by device commands"
+        subtitle="This section is managed through dedicated commands, not the configuration contract."
+      >
+        <WcEmptyState
+          title="Command-managed section"
+          subtitle="Device user/group management arrives with the dedicated command kinds (T-P20); SSH keys are provisioned via POST /devices/{id}/ssh-keys (T-P11)."
+        />
       </WcCard>
 
       <WcCard v-else title="Section configuration" subtitle="Delivered through the device configuration contract.">
