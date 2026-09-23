@@ -54,7 +54,7 @@ const hasDescriptor = computed(() => descriptor.value !== undefined)
 async function read() {
   loading.value = true
   try {
-    outcome.value = await readConfiguration(props.deviceId)
+    outcome.value = await readConfiguration(props.deviceId, { descriptor: descriptor.value })
   } catch (e) {
     toast(e instanceof Error ? e.message : 'Could not queue the configuration read.', 'error')
   } finally {
@@ -63,9 +63,17 @@ async function read() {
 }
 
 async function save(valuesToWrite: Record<string, unknown>) {
+  if (!descriptor.value) return
   saving.value = true
   try {
-    await writeConfiguration(props.deviceId, valuesToWrite)
+    // T-P17 (6c): read-modify-write — the edited fields overlay the section
+    // as last read by the device; redacted secrets are never sent back.
+    await writeConfiguration(
+      props.deviceId,
+      descriptor.value,
+      valuesToWrite,
+      values.value,
+    )
     toast('Configuration write queued for the device.', 'success')
   } catch (e) {
     toast(e instanceof Error ? e.message : 'Could not queue the configuration write.', 'error')

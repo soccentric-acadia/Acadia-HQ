@@ -41,14 +41,25 @@ export interface SectionGroup {
 export interface SectionDescriptor {
   id: string
   title: string
+  /** The device configuration path this section binds to, dot-separated
+   * (T-P17/SB-6a): reads navigate the device's config tree through it and
+   * writes are sent as nested `{section: object}` at the same path. */
+  config_path: string
   groups: SectionGroup[]
 }
 
+/** The marker the device uses for redacted secrets in configuration reads
+ * (webconfigd redact_secrets) — never written back as a literal (T-P17). */
+export const REDACTED = '[redacted]' as const
+
 export const SECTION_DESCRIPTORS: Record<string, SectionDescriptor> = {
   // Telemetry publishing policy — mirrors WebConfig pages/telemetry.js.
+  // Keyed by the UI section id; config_path is the DEVICE contract path
+  // (T-P17/SB-6a): the device tree is {monitoring: {telemetry: {...}}}.
   telemetry: {
     id: 'telemetry',
     title: 'Telemetry publishing',
+    config_path: 'monitoring.telemetry',
     groups: [
       {
         id: 'publishing',
@@ -85,6 +96,7 @@ export const SECTION_DESCRIPTORS: Record<string, SectionDescriptor> = {
   time: {
     id: 'time',
     title: 'Clock',
+    config_path: 'system.time',
     groups: [
       {
         id: 'time',
