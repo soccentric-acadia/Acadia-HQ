@@ -89,6 +89,18 @@ services:
         condition: service_healthy
     ports:
       - "${ACADIAHQ_GATEWAY_PORT:-50051}:50051"
+    # T-P12 (F10): AgentLink TLS. Mount the gateway certificate/key (and,
+    # for mTLS, the device-CA bundle) and point the gateway settings at them;
+    # devices dial https://<host>:50051 with the HQ CA pinned at
+    # /etc/acadia/hq-ca.pem (provisioned alongside the endpoint, P-A10).
+    # Without these env vars the gateway serves plaintext for local dev and
+    # logs a loud warning.
+    # environment:
+    #   ACADIAHQ_GATEWAY_TLS_CERT_PATH: /etc/acadiahq/tls/gateway.crt
+    #   ACADIAHQ_GATEWAY_TLS_KEY_PATH: /etc/acadiahq/tls/gateway.key
+    #   ACADIAHQ_GATEWAY_TLS_CLIENT_CA_PATH: /etc/acadiahq/tls/device-ca.crt
+    # volumes:
+    #   - ./tls:/etc/acadiahq/tls:ro
 
   web:
     build:

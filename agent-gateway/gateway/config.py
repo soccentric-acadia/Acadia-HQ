@@ -19,6 +19,17 @@ class GatewaySettings(BaseSettings):
     # (task 009, H9). Must be <= command lease so a device still working is
     # not redelivered mid-run.
     command_deadline_ms: int = 60_000
+    # T-P12 (F10): AgentLink TLS. When cert+key are configured the gateway
+    # serves gRPC over TLS on grpc_port; the device (hq-agent) dials
+    # https://<host>:<port> with the HQ CA pinned at
+    # /etc/acadia/hq-ca.pem (provisioned with the HQ endpoint, P-A10).
+    # Without TLS settings the gateway stays plaintext for local dev and
+    # logs a loud warning — production deployments must set both.
+    tls_cert_path: str | None = None
+    tls_key_path: str | None = None
+    # Optional mTLS (T-P12): when set, devices must present a client
+    # certificate signed by this CA on every connection.
+    tls_client_ca_path: str | None = None
 
 
 @lru_cache
