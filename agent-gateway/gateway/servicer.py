@@ -176,6 +176,14 @@ class AgentLinkServicer(_AgentLinkServicer):
                     json_args=json.dumps(payload, sort_keys=True, separators=(",", ":"))
                 ),
             ),
+            # T-P11 (B05): SSH key provisioning rides the generic
+            # operation/json_args fields — no proto bump needed.
+            CommandKind.ssh_keys_set: (
+                "ssh_keys.set",
+                lambda payload: dict(
+                    json_args=json.dumps(payload, sort_keys=True, separators=(",", ":"))
+                ),
+            ),
         }
         while True:
             async with session_factory() as session:

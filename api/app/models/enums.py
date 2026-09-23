@@ -63,6 +63,8 @@ class CommandKind(str, enum.Enum):
     apply_update = "apply_update"
     configuration_read = "configuration_read"
     configuration_write = "configuration_write"
+    # T-P11 (B05): SSH key provisioning for the device operator account.
+    ssh_keys_set = "ssh_keys_set"
 
 
 class CommandState(str, enum.Enum):

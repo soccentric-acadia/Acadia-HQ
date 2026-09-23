@@ -33,6 +33,13 @@ OPERATIONS = (
         "integration_status": "contract_v1_device_integrated",
     },
     {
+        "name": "ssh_keys.set",
+        "daemon": "configuration",
+        "command_kind": "ssh_keys_set",
+        "description": "Provision the device operator account's authorized_keys (T-P11).",
+        "integration_status": "device_integrated",
+    },
+    {
         "name": "configuration.write",
         "daemon": "configuration",
         "command_kind": "configuration_write",

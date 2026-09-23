@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, UTC
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
@@ -10,7 +10,7 @@ from app.config import get_settings
 from app.db.deps import get_db
 from app.models.device import Device
 from app.models.device_credential import DeviceCredential
-from app.models.enums import CredentialKind, PairingState, UserRole
+from app.models.enums import CommandKind, CredentialKind, PairingState, UserRole
 from app.models.pending_command import PendingCommand
 from app.schemas.common import Page
 from app.schemas.device import (
@@ -21,6 +21,7 @@ from app.schemas.device import (
 )
 from app.services import audit
 from app.services.credentials import generate_token, hash_token
+from app.services.device_scope import get_tenant_device_or_404
 from app.services.tenant_repo import TenantContext, TenantRepo
 
 router = APIRouter(prefix="/devices", tags=["devices"])
@@ -208,6 +209,55 @@ async def create_device(
     await db.commit()
     await db.refresh(device)
     return DeviceCreateOut(device=DeviceOut.model_validate(device), pairing_token=raw_token)
+
+
+@router.post("/{device_id}/ssh-keys", status_code=status.HTTP_202_ACCEPTED)
+async def set_ssh_keys(
+    device_id: UUID,
+    body: dict,
+    db: AsyncSession = Depends(get_db),
+    ctx: TenantContext = Depends(require_role(UserRole.admin)),
+):
+    """Provision the device operator account's authorized_keys (T-P11, B05).
+
+    Queues a durable ``ssh_keys.set`` command; the device stores the keys and
+    runs its ssh applier immediately, reporting the apply outcome. The body is
+    ``{"authorized_keys": "<openSSH public keys>"}``.
+    """
+    keys = (body or {}).get("authorized_keys")
+    if not isinstance(keys, str) or len(keys) > 32 * 1024:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "body must be {'authorized_keys': string (<=32 KiB)}",
+        )
+    await get_tenant_device_or_404(db, ctx, device_id)
+    command_id = f"ssh_keys.set:{uuid4()}"
+    correlation_id = command_id
+    payload = {"authorized_keys": keys}
+    db.add(
+        PendingCommand(
+            device_id=device_id,
+            command_id=command_id,
+            kind=CommandKind.ssh_keys_set,
+            payload=payload,
+            correlation_id=correlation_id,
+            expires_at=datetime.now(UTC)
+            + timedelta(seconds=get_settings().command_ttl_seconds),
+        )
+    )
+    await audit.record(
+        db,
+        ctx,
+        "device.ssh_keys.set.request",
+        target_device_id=device_id,
+        payload={"command_id": command_id, "correlation_id": correlation_id},
+    )
+    await db.commit()
+    return {
+        "status": "queued",
+        "command_id": command_id,
+        "correlation_id": correlation_id,
+    }
 
 
 @router.post("/{device_id}/credential/rotate", response_model=DeviceCreateOut)

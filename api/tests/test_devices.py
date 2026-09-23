@@ -1,3 +1,5 @@
+import pytest
+
 from datetime import datetime, timedelta, UTC
 
 from app.models.device import Device
@@ -59,3 +61,53 @@ async def test_device_name_search(client, db_session):
     resp = await client.get("/devices", params={"q": "jetson"})
     names = {d["name"] for d in resp.json()["items"]}
     assert names == {"jetson-lab-1", "jetson-lab-2"}
+
+
+@pytest.mark.asyncio
+async def test_ssh_keys_set_queues_command(client, db_session):
+    """T-P11 (B05): POST /devices/{id}/ssh-keys queues a durable ssh_keys.set
+    command with the authorized_keys payload, admin-gated."""
+    from sqlalchemy import select
+
+    from app.models.pending_command import PendingCommand
+
+    tenant = await make_tenant(db_session)
+    admin = await make_user(db_session, tenant, UserRole.admin)
+    await db_session.commit()
+
+    login_as(client, admin)
+    resp = await client.post("/devices", json={"name": "ssh-device"})
+    assert resp.status_code == 201, resp.text
+    device_id = resp.json()["device"]["id"]
+
+    r = await client.post(
+        f"/devices/{device_id}/ssh-keys",
+        json={"authorized_keys": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI op@laptop"},
+    )
+    assert r.status_code == 202, r.text
+    body = r.json()
+    assert body["status"] == "queued"
+    assert body["command_id"].startswith("ssh_keys.set:")
+
+    row = (
+        await db_session.execute(
+            select(PendingCommand).where(PendingCommand.command_id == body["command_id"])
+        )
+    ).scalar_one()
+    assert row.kind.value == "ssh_keys_set"
+    assert row.payload["authorized_keys"].startswith("ssh-ed25519 ")
+
+
+@pytest.mark.asyncio
+async def test_ssh_keys_set_validates_body(client, db_session):
+    """Non-string keys are rejected before any command row."""
+    tenant = await make_tenant(db_session)
+    admin = await make_user(db_session, tenant, UserRole.admin)
+    await db_session.commit()
+
+    login_as(client, admin)
+    resp = await client.post("/devices", json={"name": "ssh-bad"})
+    device_id = resp.json()["device"]["id"]
+
+    r = await client.post(f"/devices/{device_id}/ssh-keys", json={"authorized_keys": 42})
+    assert r.status_code == 400
