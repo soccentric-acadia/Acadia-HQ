@@ -83,7 +83,9 @@ class Settings(BaseSettings):
         if len(self.session_secret_key) < 32:
             problems.append("session_secret_key too short (<32 chars)")
         if not self.configuration_signing_key_path:
-            problems.append("configuration_signing_key_path is unset (Ed25519 signing key required, F09)")
+            problems.append(
+                "configuration_signing_key_path is unset (Ed25519 signing key required, F09)"
+            )
         elif not os.path.exists(self.configuration_signing_key_path):
             problems.append("configuration_signing_key_path does not exist")
 

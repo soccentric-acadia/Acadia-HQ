@@ -89,8 +89,28 @@ async def test_heartbeat_with_valid_credential_marks_device_online(gateway_stub,
 
     assert got_ack
     await db_session.refresh(device)
-    assert device.online is True
     assert device.last_seen_at is not None
+    # The heartbeat marked the device online; closing the stream (the end of
+    # this frame iterator) marks it offline again — both transitions are
+    # audited. Asserting `online is True` after the stream closed tested the
+    # pre-"stream_closed" semantics (HQ-019).
+    from sqlalchemy import select
+
+    from app.models.audit_log import AuditLog
+
+    actions = [
+        row.action
+        for row in (
+            await db_session.execute(
+                select(AuditLog)
+                .where(AuditLog.target_device_id == device.id)
+                .order_by(AuditLog.created_at)
+            )
+        ).scalars()
+    ]
+    assert actions[:1] == ["device.online"]
+    assert actions[-1] == "device.offline"
+    assert device.online is False
 
 
 async def test_heartbeat_with_invalid_credential_is_rejected(gateway_stub, db_session):

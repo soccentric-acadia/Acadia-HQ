@@ -4,6 +4,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { api } from '@/lib/api'
 import type { LogBundle } from '@/lib/types'
+import { runDeviceCommand } from '@/lib/deviceCommands'
 import { toast } from '@/stores/toasts'
 import WcCallout from '@/components/wc/WcCallout.vue'
 import WcCard from '@/components/wc/WcCard.vue'
@@ -44,6 +45,21 @@ async function download(bundle: LogBundle) {
   }
 }
 
+// T-P20 (J04): ask the device for a fresh support bundle; it appears in the
+// list once the upload completes.
+const requesting = ref(false)
+async function requestBundle() {
+  requesting.value = true
+  const run = await runDeviceCommand(
+    props.deviceId,
+    'Log bundle request',
+    () => api.commands.requestLogBundle(props.deviceId),
+    { timeoutMs: 60000 },
+  )
+  requesting.value = false
+  if (run.ok) await load()
+}
+
 watch(() => props.deviceId, load)
 onMounted(load)
 </script>
@@ -54,6 +70,11 @@ onMounted(load)
   </div>
   <div v-else class="page-surface">
     <WcCard title="Log bundles" subtitle="Diagnostics archives the device has uploaded to HQ.">
+      <div class="row" style="justify-content: flex-end">
+        <button class="btn btn-outline btn-sm" :disabled="requesting" @click="requestBundle">
+          Request log bundle
+        </button>
+      </div>
       <div v-if="error" class="error-text">{{ error }}</div>
       <WcEmptyState
         v-else-if="bundles.length === 0"

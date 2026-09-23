@@ -6,7 +6,6 @@ ACADIAHQ_CONFIGURATION_SIGNING_KEY_PATH) and prints the public key PEM to
 provision onto devices at /etc/acadia/hq-config-pub.pem.
 """
 import sys
-from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey

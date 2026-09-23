@@ -14,7 +14,6 @@ from app.services import audit
 from app.services.configuration import (
     CONFIGURATION_SCHEMA_VERSION,
     SIGNATURE_ALGORITHM,
-    canonical_document,
     sign_payload,
 )
 from app.services.device_scope import get_tenant_device_or_404
@@ -41,9 +40,6 @@ async def _queue(
 ):
     await get_tenant_device_or_404(db, ctx, device_id)
     command_id = f"configuration:{operation}:{uuid4()}"
-    document = canonical_document(
-        device_id=device_id, command_id=command_id, operation=operation, values=values
-    )
     correlation_id = request_id or command_id
     # T-P13 (F09): sign the exact transport payload the device will verify
     # (canonical JSON of the envelope minus the signature fields).

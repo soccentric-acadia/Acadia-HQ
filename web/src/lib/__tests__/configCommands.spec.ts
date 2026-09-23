@@ -33,7 +33,9 @@ describe('configuration contract binding', () => {
   })
 
   it('write nests the section at the config path and drops redacted secrets', async () => {
-    const write = vi.fn().mockResolvedValue({ command_id: 'c2', correlation_id: 'c2' })
+    const write = vi
+      .fn<(id: string, values: Record<string, unknown>) => Promise<unknown>>()
+      .mockResolvedValue({ command_id: 'c2', correlation_id: 'c2' })
     vi.spyOn(api.configuration, 'write').mockImplementation(write as never)
     vi.spyOn(api.devices, 'commandStatus').mockResolvedValue({
       command_id: 'c2',

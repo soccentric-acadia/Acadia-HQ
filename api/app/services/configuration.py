@@ -1,7 +1,6 @@
 import base64
 import functools
 import json
-import os
 from typing import Any
 from uuid import UUID
 

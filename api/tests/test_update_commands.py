@@ -28,7 +28,9 @@ async def test_backups_router_is_mounted_and_queues_take_backup(client, db_sessi
     assert response.status_code == 202, response.json()
     command_id = response.json()["command_id"]
     row = (
-        await db_session.execute(select(PendingCommand).where(PendingCommand.command_id == command_id))
+        await db_session.execute(
+            select(PendingCommand).where(PendingCommand.command_id == command_id)
+        )
     ).scalar_one()
     assert row.kind.value == "take_backup_now"
     assert row.state == CommandState.queued
@@ -52,7 +54,9 @@ async def test_apply_update_queues_signed_artifact_command(client, db_session):
     body = response.json()
     assert body["command_id"].startswith("apply-update:")
     row = (
-        await db_session.execute(select(PendingCommand).where(PendingCommand.command_id == body["command_id"]))
+        await db_session.execute(
+            select(PendingCommand).where(PendingCommand.command_id == body["command_id"])
+        )
     ).scalar_one()
     assert row.kind.value == "apply_update"
     assert row.payload["checksum_sha256"] == "a" * 64

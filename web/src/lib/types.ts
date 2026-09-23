@@ -178,3 +178,28 @@ export interface Operation {
   description: string
   integration_status?: string
 }
+
+/** A durable device command HQ queued (T-P20 producers). */
+export interface QueuedCommand {
+  status?: string
+  ok?: boolean
+  command_id: string
+  correlation_id?: string
+}
+
+export type ServiceAction = 'start' | 'stop' | 'restart' | 'enable' | 'disable'
+
+export type DeviceUserOperation = 'users.list' | 'users.create' | 'users.delete' | 'users.set_role'
+
+export interface DeviceUserCommand {
+  operation: DeviceUserOperation
+  username?: string
+  role?: 'admin' | 'operator' | 'viewer'
+  password?: string
+}
+
+export interface DeviceUserRow {
+  username: string
+  role: string
+  groups: string[]
+}

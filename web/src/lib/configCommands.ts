@@ -11,7 +11,7 @@
 // merge lands (T-P18).
 
 import { api } from '@/lib/api'
-import { REDACTED, type SectionDescriptor } from '@/lib/sectionSchemas'
+import { REDACTED } from '@/lib/sectionSchemas'
 import type { CommandStatus } from '@/lib/types'
 
 export const CONFIG_CONTRACT_PENDING = 'awaiting_configuration_contract'
@@ -133,7 +133,7 @@ export async function writeConfiguration(
   current?: Record<string, unknown> | null,
   options?: { timeoutMs?: number },
 ): Promise<ConfigurationCommandOutcome> {
-  const merged: Record<string, unknown> = { ...(current ?? {}), ...sectionValues }
+  const merged: Record<string, unknown> = { ...current, ...sectionValues }
   for (const [k, v] of Object.entries(merged)) {
     if (v === REDACTED) delete merged[k]
   }

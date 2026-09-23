@@ -13,7 +13,10 @@ import type {
   DeviceListResponse,
   FaultListResponse,
   LogBundleListResponse,
+  DeviceUserCommand,
   Operation,
+  QueuedCommand,
+  ServiceAction,
   User,
   UserRole,
 } from './types'
@@ -48,6 +51,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T
 }
 
+function post(path: string, body?: unknown): Promise<QueuedCommand> {
+  return request<QueuedCommand>(path, {
+    method: 'POST',
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+}
+
 export const api = {
   auth: {
     loginUrl: () => request<{ authorization_url: string }>('/auth/login'),
@@ -75,15 +85,37 @@ export const api = {
       request<DeviceCreateResponse>('/devices', { method: 'POST', body: JSON.stringify({ name }) }),
     telemetry: (id: string) =>
       request<Record<string, { recorded_at: string; value: number }[]>>(`/devices/${id}/telemetry`),
+    // The factory-reset producer lives under /updates (task 009, H10); the
+    // old /factory-reset path never existed.
     factoryReset: (id: string) =>
-      request<{ ok: boolean }>(`/devices/${id}/factory-reset`, { method: 'POST' }),
-    disable: (id: string) => request<Device>(`/devices/${id}/disable`, { method: 'POST' }),
+      request<QueuedCommand>(`/devices/${id}/updates/factory-reset`, { method: 'POST' }),
+    // "Disable" = revoke the device credential: HQ refuses the device from
+    // then on (there is no separate /disable endpoint).
+    disable: (id: string) =>
+      request<{ ok: boolean }>(`/devices/${id}/credential/revoke`, { method: 'POST' }),
     health: (id: string) => request<DeviceHealth>(`/devices/${id}/health`),
     commandStatus: (id: string, commandId: string) =>
       request<CommandStatus>(`/devices/${id}/commands/${encodeURIComponent(commandId)}`),
   },
   operations: {
     list: () => request<{ items: Operation[] }>('/operations'),
+  },
+  // T-P20: device command producers. Each returns the queued command; the
+  // device-reported result arrives via devices.commandStatus polling.
+  commands: {
+    reboot: (id: string) => post(`/devices/${id}/power/reboot`),
+    shutdown: (id: string, confirmation: string) =>
+      post(`/devices/${id}/power/shutdown`, { confirmation }),
+    rebootToApply: (id: string) => post(`/devices/${id}/updates/reboot-to-apply`),
+    confirmUpdate: (id: string) => post(`/devices/${id}/updates/confirm`),
+    rollbackUpdate: (id: string, confirmation: string) =>
+      post(`/devices/${id}/updates/rollback`, { confirmation }),
+    serviceControl: (id: string, unit: string, action: ServiceAction) =>
+      post(`/devices/${id}/services/control`, { unit, action }),
+    requestLogBundle: (id: string) => post(`/devices/${id}/logs/request`),
+    users: (id: string, body: DeviceUserCommand) => post(`/devices/${id}/users/command`, body),
+    runOperation: (id: string, daemon: string, operation: string, args = {}) =>
+      post(`/devices/${id}/operations`, { daemon, operation, args }),
   },
   configuration: {
     // Both endpoints return HTTP 202 with the queued command envelope; the

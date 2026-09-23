@@ -20,6 +20,16 @@ async def test_operation_discovery_returns_canonical_device_operations(client, d
         "configuration.write",
         # T-P11 (B05): SSH key provisioning for the operator account.
         "ssh_keys.set",
+        # T-P20
+        "system.reboot",
+        "system.shutdown",
+        "update.reboot_to_apply",
+        "update.confirm",
+        "update.rollback",
+        "service.control",
+        "log_bundle.request",
+        "users",
+        "operation.run",
     }
     for operation in operations:
         assert operation["daemon"] == "configuration"

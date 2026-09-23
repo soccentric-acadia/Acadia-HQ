@@ -173,7 +173,11 @@ async def get_device_health(
     return {
         "device_id": device.id,
         "score": max(0, min(100, score)),
-        "status": "healthy" if score >= 80 else "degraded" if score >= 50 else "offline",
+        # Presence decides first: an offline device scores exactly 50, which
+        # the score bands alone would report as "degraded".
+        "status": "offline"
+        if not device.online
+        else "healthy" if score >= 80 else "degraded" if score >= 50 else "offline",
         "online": device.online,
         "last_seen_at": device.last_seen_at,
         "factors": factors,

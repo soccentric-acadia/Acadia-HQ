@@ -65,6 +65,17 @@ class CommandKind(str, enum.Enum):
     configuration_write = "configuration_write"
     # T-P11 (B05): SSH key provisioning for the device operator account.
     ssh_keys_set = "ssh_keys_set"
+    # T-P20: remote power, OTA activation, service, log-bundle, device
+    # account and generic spoke-operation commands.
+    reboot = "reboot"
+    shutdown = "shutdown"
+    reboot_to_apply = "reboot_to_apply"
+    confirm_update = "confirm_update"
+    rollback_update = "rollback_update"
+    service_control = "service_control"
+    log_bundle_request = "log_bundle_request"
+    users_command = "users_command"
+    operation_run = "operation_run"
 
 
 class CommandState(str, enum.Enum):

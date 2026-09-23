@@ -20,7 +20,6 @@ from app.models.pending_command import PendingCommand
 from app.services import audit
 from app.services.device_scope import get_tenant_device_or_404
 from app.services.tenant_repo import TenantContext
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/devices/{device_id}/updates", tags=["updates"])
 

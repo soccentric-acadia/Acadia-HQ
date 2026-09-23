@@ -14,7 +14,6 @@ IMPLEMENTATION_PLAN §2.2's "checked on each frame."
 """
 
 import asyncio
-import json
 import logging
 from datetime import datetime, timedelta, UTC
 
@@ -23,24 +22,21 @@ from sqlalchemy import select
 
 from app.db.base import get_session_factory
 from app.models.device import Device
-from app.models.enums import CommandKind, CommandState, PairingState
+from app.models.enums import CommandState, PairingState
 from app.models.pending_command import PendingCommand
 from app.services import audit
 from app.config import get_settings
 from acadiahq.agent_pb2 import (
-    ApplyUpdate,
     Command,
-    FactoryReset,
     HeartbeatAck,
     PairingResult,
-    Restore,
     ServerFrame,
     SignedUploadUrl,
-    TakeBackupNow,
 )
 from acadiahq.agent_pb2_grpc import AgentLinkServicer as _AgentLinkServicer
 
 from gateway import handlers
+from gateway.command_map import build_command_fields, scrub_payload
 from gateway.auth import PairingError, redeem_pairing_token, validate_long_lived_credential
 from gateway.config import get_gateway_settings
 from gateway.connection_manager import manager
@@ -133,58 +129,6 @@ class AgentLinkServicer(_AgentLinkServicer):
         the handoff. ``delivered_at`` is the lease marker; command results
         remain durable even if the stream disappears after delivery.
         """
-        operations = {
-            CommandKind.take_backup_now: (
-                "backup",
-                lambda payload: dict(take_backup_now=TakeBackupNow()),
-            ),
-            CommandKind.restore: (
-                "restore",
-                lambda payload: dict(
-                    restore=Restore(backup_download_url=payload.get("backup_download_url", ""))
-                ),
-            ),
-            CommandKind.factory_reset: (
-                "factory_reset",
-                # The device gate (hq_bridge REQUIRED_FACTORY_RESET_CONFIRMATION):
-                # an HQ factory reset without this confirmation is refused
-                # on-device (task 009, H4).
-                lambda payload: dict(
-                    factory_reset=FactoryReset(),
-                    required_confirmation="FACTORY-RESET",
-                ),
-            ),
-            CommandKind.apply_update: (
-                "apply_update",
-                lambda payload: dict(
-                    apply_update=ApplyUpdate(
-                        artifact_id=payload.get("artifact_id", ""),
-                        artifact_download_url=payload.get("artifact_download_url", ""),
-                        checksum_sha256=payload.get("checksum_sha256", ""),
-                    )
-                ),
-            ),
-            CommandKind.configuration_read: (
-                "configuration.read",
-                lambda payload: dict(
-                    json_args=json.dumps(payload, sort_keys=True, separators=(",", ":"))
-                ),
-            ),
-            CommandKind.configuration_write: (
-                "configuration.write",
-                lambda payload: dict(
-                    json_args=json.dumps(payload, sort_keys=True, separators=(",", ":"))
-                ),
-            ),
-            # T-P11 (B05): SSH key provisioning rides the generic
-            # operation/json_args fields — no proto bump needed.
-            CommandKind.ssh_keys_set: (
-                "ssh_keys.set",
-                lambda payload: dict(
-                    json_args=json.dumps(payload, sort_keys=True, separators=(",", ":"))
-                ),
-            ),
-        }
         while True:
             async with session_factory() as session:
                 now = datetime.now(UTC)
@@ -213,16 +157,24 @@ class AgentLinkServicer(_AgentLinkServicer):
                             PendingCommand.completed_at.is_(None),
                             (PendingCommand.expires_at.is_(None))
                             | (PendingCommand.expires_at > now),
-                            (PendingCommand.lease_until.is_(None))
-                            | (PendingCommand.lease_until < now),
+                            # Deliver queued rows, and re-deliver a row that
+                            # is still `delivering` only once its lease has
+                            # lapsed. A delivering row without a lease was
+                            # already handed to the device and must not be
+                            # re-sent on every reconnect (HQ-019).
+                            (PendingCommand.state == CommandState.queued)
+                            | (
+                                (PendingCommand.state == CommandState.delivering)
+                                & (PendingCommand.lease_until < now)
+                            ),
                         )
                         .order_by(PendingCommand.created_at)
                         .limit(32)
                     )
                 ).scalars().all()
                 for row in rows:
-                    operation = operations.get(row.kind)
-                    if operation is None:
+                    fields = build_command_fields(row.kind, row.payload)
+                    if fields is None:
                         logger.error("unsupported pending command kind %s", row.kind)
                         row.state = CommandState.failed
                         row.result_code = "UNIMPLEMENTED"
@@ -231,7 +183,8 @@ class AgentLinkServicer(_AgentLinkServicer):
                         row.completed_at = now
                         row.lease_until = None
                         continue
-                    operation_name, build_kind = operation
+                    operation_name = fields.pop("operation")
+                    daemon = fields.pop("daemon")
                     row.delivered_at = datetime.now(UTC)
                     row.state = CommandState.delivering
                     row.lease_until = datetime.now(UTC) + timedelta(
@@ -243,17 +196,20 @@ class AgentLinkServicer(_AgentLinkServicer):
                             command=Command(
                                 command_id=row.command_id,
                                 operation=operation_name,
-                                daemon="configuration",
+                                daemon=daemon,
                                 # Explicit actor + device deadline (task 009, H9):
                                 # the device previously defaulted both silently.
                                 actor="hq",
                                 deadline_ms=get_gateway_settings().command_deadline_ms,
                                 correlation_id=row.correlation_id or row.command_id,
                                 idempotency_key=row.command_id,
-                                **build_kind(row.payload or {}),
+                                **fields,
                             )
                         )
                     )
+                    # T-P20: credentials (users.create) never outlive delivery
+                    # in the HQ database.
+                    row.payload = scrub_payload(row.payload)
                 await session.commit()
             await asyncio.sleep(1)
 
