@@ -1,0 +1,26 @@
+# T-P16 (O05): build the real webconfigd binary for the E2E sim-device.
+# Build context = the Acadia-Configuration working tree.
+FROM rust:1.87-slim AS build
+RUN apt-get update && apt-get install -y --no-install-recommends pkg-config protobuf-compiler && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
+COPY Cargo.toml Cargo.lock rust-toolchain.toml ./
+COPY crates ./crates
+COPY schemas ./schemas
+COPY board-manifests ./board-manifests
+COPY vendor ./vendor
+COPY .cargo ./cargo-config
+ENV CARGO_NET_OFFLINE=true
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    cargo build --release -p webconfigd
+
+FROM debian:bookworm-slim AS runtime
+RUN groupadd -r webconfig && useradd -r -M -d /data -s /usr/sbin/nologin webconfig
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates python3 && rm -rf /var/lib/apt/lists/*
+COPY --from=build /build/target/release/webconfigd /usr/bin/webconfigd
+COPY infra/e2e/sim-device/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY board-manifests/acadia.json /usr/share/webconfig/board-manifest.json
+RUN chmod +x /usr/local/bin/entrypoint.sh && mkdir -p /usr/share/webconfig/static
+# Static assets are not needed for the AgentLink E2E; the daemon tolerates a
+# missing static dir (logs a warning).
+EXPOSE 8443 8080
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -1,0 +1,105 @@
+# T-P16 (O05): cross-repo E2E harness — HQ (api + gateway + PG + MinIO)
+# <-> webconfigd (sim-device) over the real AgentLink binaries.
+#
+# The sim-device builds webconfigd from the Acadia-Configuration working
+# tree and runs it as the image's non-root `webconfig` user with a
+# sandbox APPROXIMATION (read-only rootfs, tmpfs state, no-new-privileges).
+# The systemd sandbox directives themselves are verified on HIL — see
+# infra/e2e/README.md for the honest scope table.
+#
+# Usage (from Acadia-HQ):
+#   docker compose -f infra/e2e/docker-compose.e2e.yml up --build -d
+#   .venv/bin/python infra/e2e/run_e2e.py            # drives the flow
+#   docker compose -f infra/e2e/docker-compose.e2e.yml down -v
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: acadiahq
+      POSTGRES_PASSWORD: acadiahq
+      POSTGRES_DB: acadiahq
+    ports: ["55432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U acadiahq"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: acadiahq
+      MINIO_ROOT_PASSWORD: acadiahq-dev-secret
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/e2e/sim-device/Dockerfile.hq-api
+    command: uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000
+    environment:
+      ACADIAHQ_DATABASE_URL: postgresql+asyncpg://acadiahq:acadiahq@postgres:5432/acadiahq
+      ACADIAHQ_S3_ENDPOINT_URL: http://minio:9000
+      ACADIAHQ_REDIS_URL: redis://redis:6379/0
+      ACADIAHQ_CONFIGURATION_SIGNING_KEY_PATH: /etc/acadiahq/tls/config-signing.pem
+      ACADIAHQ_ENV: dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    ports: ["8100:8000"]
+
+  gateway:
+    build:
+      context: ../..
+      dockerfile: infra/e2e/sim-device/Dockerfile.hq-api
+    command: python -m gateway.server
+    environment:
+      ACADIAHQ_DATABASE_URL: postgresql+asyncpg://acadiahq:acadiahq@postgres:5432/acadiahq
+      ACADIAHQ_ENV: dev
+    depends_on:
+      api:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    ports: ["50051:50051"]
+
+  # The simulated device: real webconfigd binary (built from the
+  # Acadia-Configuration tree), real AgentLink client, the image's non-root
+  # user and a filesystem-sandbox approximation.
+  sim-device:
+    build:
+      context: ../../../Acadia-Configuration
+      dockerfile: ../Acadia-HQ/infra/e2e/sim-device/Dockerfile.webconfigd
+    command: /usr/local/bin/entrypoint.sh
+    environment:
+      ACADIAHQ_API_URL: http://api:8000
+      ACADIAHQ_GATEWAY_ADDR: http://gateway:50051  # explicit scheme = plaintext dev gateway; bare host dials https:// (T-P12)
+      E2E_ADMIN_PASSWORD: e2e-password-1
+    depends_on:
+      gateway:
+        condition: service_started
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    tmpfs:
+      - /run
+      - /tmp
+      - /data:uid=999,gid=999,mode=0770
+
+volumes: {}

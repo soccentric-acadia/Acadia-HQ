@@ -1,1 +1,2 @@
 INFO:gateway.server:agent-gateway listening on :50051
+INFO:gateway.stale_sweep:stale sweep: marked 1 device(s) offline

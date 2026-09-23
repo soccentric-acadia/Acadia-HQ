@@ -1,0 +1,19 @@
+# HQ api/gateway image for the E2E harness (T-P16): the same runtime the
+# docker/Dockerfile builds, pinned to the E2E context.
+FROM python:3.12-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /srv/api
+COPY api/pyproject.toml api/README.md ./
+COPY api ./api
+COPY agent-gateway ./agent-gateway
+COPY proto ./proto
+
+RUN pip install --no-cache-dir ./api[gunicorn] && pip install --no-cache-dir ./agent-gateway
+
+# Healthcheck target (the api exposes /healthz in dev)
+HEALTHCHECK --interval=10s --timeout=5s --retries=12 CMD python -c "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/api/v1/meta')" || exit 1
+
+# The Ed25519 configuration-signing key is generated at startup by
+# entrypoint when missing (dev/E2E only) — production provisions it.
