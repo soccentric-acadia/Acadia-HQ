@@ -187,8 +187,11 @@ async def test_configuration_read_is_durable_signed_and_explicitly_blocked(
     assert response.status_code == 202
     body = response.json()
     assert body["status"] == "queued"
-    assert body["integration_status"] == "contract_v1_device_integrated"
-    assert len(body["signature"]) == 64
+    assert body["integration_status"] == "contract_v1_device_integrated_signed"
+    # T-P13: Ed25519 signature — 64 raw bytes, base64-encoded.
+    import base64 as _b64
+
+    assert len(_b64.b64decode(body["signature"])) == 64
 
     # command_id is a string prefix + UUID; look the row up by its unique
     # column (the UUID-PK get() with a string was a known test debt, task 009).
@@ -234,5 +237,5 @@ async def test_configuration_write_requires_operator_and_queues_signed_values(
     assert command.payload["config"] == {"mode": "safe"}
     assert command.payload["origin"] == "hq"
     assert command.payload["schema_version"] == 1
-    assert command.payload["signature_algorithm"] == "HMAC-SHA256"
+    assert command.payload["signature_algorithm"] == "ed25519"
     assert command.payload["signature"] == body["signature"]

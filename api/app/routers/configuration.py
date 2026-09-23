@@ -13,8 +13,9 @@ from app.schemas.configuration import ConfigurationWrite
 from app.services import audit
 from app.services.configuration import (
     CONFIGURATION_SCHEMA_VERSION,
+    SIGNATURE_ALGORITHM,
     canonical_document,
-    sign_document,
+    sign_payload,
 )
 from app.services.device_scope import get_tenant_device_or_404
 from app.services.tenant_repo import TenantContext
@@ -22,10 +23,10 @@ from app.services.tenant_repo import TenantContext
 router = APIRouter(prefix="/devices/{device_id}/configuration", tags=["configuration"])
 
 # The device contract is now implemented (Acadia-Configuration webconfigd
-# validates this exact envelope; task 009, H5). The HMAC-SHA256 signature is a
-# transitional form: webconfigd shape-checks it while Ed25519 key provisioning
-# is not in place, mirroring istate's SignedConfig legacy policy.
-_STATUS = "contract_v1_device_integrated"
+# validates this exact envelope; task 009, H5). T-P13 (F09): the signature is
+# Ed25519 over the canonical transport payload and the device verifies it
+# MANDATORILY against the provisioned HQ public key.
+_STATUS = "contract_v1_device_integrated_signed"
 
 
 async def _queue(
@@ -43,14 +44,19 @@ async def _queue(
     document = canonical_document(
         device_id=device_id, command_id=command_id, operation=operation, values=values
     )
-    signature = sign_document(document)
     correlation_id = request_id or command_id
-    payload = {
+    # T-P13 (F09): sign the exact transport payload the device will verify
+    # (canonical JSON of the envelope minus the signature fields).
+    unsigned_payload = {
         "schema_version": CONFIGURATION_SCHEMA_VERSION,
         "origin": "hq",
         "config": values,
+    }
+    signature = sign_payload(unsigned_payload)
+    payload = {
+        **unsigned_payload,
         "signature": signature,
-        "signature_algorithm": "HMAC-SHA256",
+        "signature_algorithm": SIGNATURE_ALGORITHM,
         "integration_status": _STATUS,
     }
     db.add(
@@ -73,7 +79,7 @@ async def _queue(
             "command_id": command_id,
             "correlation_id": correlation_id,
             "signature": signature,
-            "signature_algorithm": "HMAC-SHA256",
+            "signature_algorithm": SIGNATURE_ALGORITHM,
             "integration_status": _STATUS,
         },
     )
@@ -84,7 +90,7 @@ async def _queue(
         "command_id": command_id,
         "correlation_id": correlation_id,
         "signature": signature,
-        "signature_algorithm": "HMAC-SHA256",
+        "signature_algorithm": SIGNATURE_ALGORITHM,
     }
 
 

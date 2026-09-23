@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 
 from pydantic import model_validator
@@ -29,7 +30,11 @@ class Settings(BaseSettings):
     session_secret_key: str = "dev-only-change-me-in-every-real-deployment"
     session_algorithm: str = "HS256"
     session_ttl_seconds: int = 60 * 60 * 8
-    configuration_signing_key: str = "dev-configuration-signing-key-change-me"
+    # T-P13 (F09): Ed25519 private key (PEM) used to sign the device
+    # configuration transport payload; the device verifies MANDATORILY against
+    # the matching public key provisioned at /etc/acadia/hq-config-pub.pem.
+    # Generate with scripts/generate-config-signing-key.py.
+    configuration_signing_key_path: str = ""
 
     # Object storage (S3-compatible; MinIO in local dev).
     s3_endpoint_url: str = "http://localhost:9000"
@@ -77,10 +82,10 @@ class Settings(BaseSettings):
             problems.append("s3_secret_key is the dev default")
         if len(self.session_secret_key) < 32:
             problems.append("session_secret_key too short (<32 chars)")
-        if self.configuration_signing_key in ("", "dev-configuration-signing-key-change-me"):
-            problems.append("configuration_signing_key is unset/placeholder")
-        if len(self.configuration_signing_key) < 32:
-            problems.append("configuration_signing_key too short (<32 chars)")
+        if not self.configuration_signing_key_path:
+            problems.append("configuration_signing_key_path is unset (Ed25519 signing key required, F09)")
+        elif not os.path.exists(self.configuration_signing_key_path):
+            problems.append("configuration_signing_key_path does not exist")
 
         if problems:
             raise ValueError(

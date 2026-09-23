@@ -1,6 +1,7 @@
-import hashlib
-import hmac
+import base64
+import functools
 import json
+import os
 from typing import Any
 from uuid import UUID
 
@@ -12,10 +13,19 @@ from app.config import get_settings
 # envelope field is `schema_version`, not `config_version` (task 009, H5).
 CONFIGURATION_SCHEMA_VERSION = 1
 
+# T-P13 (F09): the signature algorithm is Ed25519, verified MANDATORILY by
+# the device against the provisioned HQ verification key
+# (/etc/acadia/hq-config-pub.pem or WEBCONFIG_HQ_CONFIG_PUBKEY). The signed
+# bytes are the canonical transport payload itself (the envelope minus the
+# signature fields), so the device can verify exactly what it received.
+SIGNATURE_ALGORITHM = "ed25519"
+
 
 def canonical_document(
     *, device_id: UUID, command_id: str, operation: str, values: dict[str, Any] | None = None
 ) -> bytes:
+    """Kept for audit records (the logical document); NOT the signed bytes —
+    the device verifies the transport payload (see sign_payload)."""
     envelope = {
         "command_id": command_id,
         "device_id": str(device_id),
@@ -26,6 +36,51 @@ def canonical_document(
     return json.dumps(envelope, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
 
 
-def sign_document(document: bytes) -> str:
-    key = get_settings().configuration_signing_key.encode()
-    return hmac.new(key, document, hashlib.sha256).hexdigest()
+def canonical_payload(payload: dict[str, Any]) -> bytes:
+    """The exact bytes HQ signs and the device verifies (T-P13, F09): the
+    envelope minus the signature fields, canonical JSON — sorted keys,
+    compact separators, UTF-8 (ensure_ascii=False matches serde_json's
+    output), and non-finite numbers rejected so the serialization is
+    unambiguous."""
+    doc = {k: v for k, v in payload.items() if k not in ("signature", "signature_algorithm")}
+    return json.dumps(
+        doc, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+    ).encode()
+
+
+@functools.lru_cache(maxsize=4)
+def _load_signing_key(path: str):
+    from cryptography.hazmat.primitives.serialization import load_pem_private_key
+
+    with open(path, "rb") as f:
+        return load_pem_private_key(f.read(), password=None)
+
+
+def signing_public_key_pem() -> str:
+    """The Ed25519 public key to provision onto devices
+    (/etc/acadia/hq-config-pub.pem), for the deployment runbook."""
+    path = get_settings().configuration_signing_key_path
+    if not path:
+        raise RuntimeError("configuration_signing_key_path is not configured")
+    from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+
+    return _load_signing_key(path).public_key().public_bytes(
+        Encoding.PEM, PublicFormat.SubjectPublicKeyInfo
+    ).decode()
+
+
+def sign_payload(payload: dict[str, Any]) -> str:
+    """Sign the canonical transport payload with the HQ Ed25519 key."""
+    path = get_settings().configuration_signing_key_path
+    if not path:
+        raise RuntimeError(
+            "configuration_signing_key_path is not configured — HQ cannot sign "
+            "device configuration (T-P13/F09)"
+        )
+    key = _load_signing_key(path)
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+    if not isinstance(key, Ed25519PrivateKey):
+        raise RuntimeError("configuration_signing_key_path is not an Ed25519 key")
+    sig = key.sign(canonical_payload(payload))
+    return base64.b64encode(sig).decode()
