@@ -21,6 +21,19 @@ device → AgentLink handshake → credential → heartbeats → HQ-signed
 `configuration.write` **verified on-device** → applied → acked →
 `configuration.read` round-trip → `ssh_keys.set` applied.
 
+T-P20 (2026-09-23, 13/13 passed): `system.reboot` acknowledged (the fake
+sysroot never executes it — `scheduled: false`), `users.list` (no hashes),
+`users.create` + `users.delete` applied, `service.control` on an allowlisted
+unit, `update.confirm` acknowledged. The `users.create` password was verified
+scrubbed from `pending_command.payload` after delivery and absent from the
+audit log. `log_bundle.request` needs istate and stays out of this harness
+(INS leg row below).
+
+The driver now reuses an HQ device only when the device itself reports
+`enrolled` (`GET /api/v1/pairing`) and requires a live `online` session —
+the first version trusted a stale HQ `last_seen_at` and hung on a device
+whose pairing token had expired.
+
 ## Native dev slice (what ran here)
 
 ```sh

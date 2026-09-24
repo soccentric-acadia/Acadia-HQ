@@ -188,10 +188,23 @@ def main() -> int:
     api, dev, gw = args.api.rstrip("/"), args.device.rstrip("/"), args.gateway
     ADMIN = {"Cookie": hq_session_cookie()}
 
-    # ── 1. HQ: device + pairing token (idempotent) ──────────────────────────
+    # ── 1. webconfigd: admin session ─────────────────────────────────────────
+    poll(lambda: call("GET", f"{dev}/api/v1/auth/whoami")[0] == 200, 120, 2, "webconfigd up")
+    sess = step("webconfigd: admin session (first-boot or re-login)", lambda: device_admin_session(dev))
+    if sess is None:
+        return 1
+    admin_cookie, csrf = sess
+
+    # Reuse an HQ device only when the device itself is still enrolled: HQ's
+    # record alone is not enough — the device's pairing token may have
+    # expired before it enrolled (the stale-reuse bug of the first harness).
+    _, _, pairing = call("GET", f"{dev}/api/v1/pairing", headers={"Cookie": admin_cookie})
+    device_enrolled = bool(pairing.get("enrolled"))
+
+    # ── 2. HQ: device + pairing token (idempotent) ──────────────────────────
     def device_and_token():
         st, _, items = call("GET", f"{api}/devices", headers=ADMIN)
-        for d in items.get("items", []):
+        for d in items.get("items", []) if device_enrolled else []:
             if d.get("pairing_state") == "authorized" and d.get("last_seen_at"):
                 # The sim device is still paired to this unit (its persisted
                 # credential lives in the sim's data dir) — reuse it, no new
@@ -217,13 +230,6 @@ def main() -> int:
     device, pairing_token = out
     device_id = device["id"]
 
-    # ── 2. webconfigd: admin session ─────────────────────────────────────────
-    poll(lambda: call("GET", f"{dev}/api/v1/auth/whoami")[0] == 200, 120, 2, "webconfigd up")
-    sess = step("webconfigd: admin session (first-boot or re-login)", lambda: device_admin_session(dev))
-    if sess is None:
-        return 1
-    admin_cookie, csrf = sess
-
     # ── 3. provision pairing (only for a fresh device) ──────────────────────
     if pairing_token is not None:
         def _provision():
@@ -245,10 +251,10 @@ def main() -> int:
 
     # ── 4. AgentLink: agent connects, redeems the token, HQ sees it ─────────
     def seen():
+        # A live AgentLink session right now — not a last_seen_at left over
+        # from an earlier run.
         _, _, d = call("GET", f"{api}/devices/{device_id}", headers=ADMIN)
-        return (
-            d.get("pairing_state") in ("enrolled", "authorized") or d.get("online") is True
-        ) and d.get("last_seen_at") is not None
+        return d.get("online") is True and d.get("last_seen_at") is not None
 
     if step(
         "AgentLink: token redeemed, device heartbeating at HQ",
@@ -303,6 +309,50 @@ def main() -> int:
         lambda: wait_command(api, device_id, ssh_out["command_id"], ADMIN, "ssh_keys.set ack"),
     ) is None:
         return 1
+
+    # ── 8. T-P20 command kinds (device-local; istate-free subset) ──────────
+    def command(path, body, desc, check=None):
+        st, _, out = call("POST", f"{api}/devices/{device_id}/{path}", body, headers=ADMIN)
+        if st != 202:
+            raise RuntimeError(f"{path} rejected: {st} {out}")
+        row = wait_command(api, device_id, out["command_id"], ADMIN, desc)
+        if not row:
+            raise RuntimeError(f"{desc}: no terminal success")
+        if check is not None:
+            check(row.get("payload") or {})
+        return row
+
+    def _reboot_is_acked_but_not_executed(payload):
+        # The fake sysroot must never power-cycle the host; on a device the
+        # same outcome carries scheduled=true and the reboot follows ~5 s later.
+        assert payload.get("action") == "reboot" and payload.get("scheduled") is False, payload
+
+    def _users_list_has_admin(payload):
+        names = [u["username"] for u in payload.get("users", [])]
+        assert names, payload
+        assert all("password" not in u and "password_hash" not in u for u in payload["users"])
+
+    def _created(payload):
+        assert "e2e-op" in [u["username"] for u in payload.get("users", [])], payload
+
+    def _deleted(payload):
+        assert "e2e-op" not in [u["username"] for u in payload.get("users", [])], payload
+
+    for desc, path, body, check in [
+        ("T-P20: system.reboot acknowledged (fake root: not executed)", "power/reboot", None,
+         _reboot_is_acked_but_not_executed),
+        ("T-P20: users.list returns device accounts without hashes", "users/command",
+         {"operation": "users.list"}, _users_list_has_admin),
+        ("T-P20: users.create applied on the device", "users/command",
+         {"operation": "users.create", "username": "e2e-op", "role": "operator",
+          "password": "e2e-password"}, _created),
+        ("T-P20: users.delete applied on the device", "users/command",
+         {"operation": "users.delete", "username": "e2e-op"}, _deleted),
+        ("T-P20: service.control on an allowlisted unit", "services/control",
+         {"unit": "sshd.service", "action": "restart"}, None),
+        ("T-P20: update.confirm (mark_good) acknowledged", "updates/confirm", None, None),
+    ]:
+        step(desc, lambda p=path, b=body, d=desc, c=check: command(p, b, d, c))
 
     print(f"\nE2E RESULT: {PASS} passed, {FAIL} failed")
     return 1 if FAIL else 0
