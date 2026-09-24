@@ -23,6 +23,12 @@ export interface Device {
   serial: string | null
   board_rev: string | null
   tags?: string[]
+  // T-P24: last heartbeat snapshot
+  status?: DeviceStatusSnapshot
+  status_updated_at?: string | null
+  image_version?: string | null
+  running_slot?: string | null
+  health_score?: number | null
   created_at: string
 }
 
@@ -259,4 +265,20 @@ export interface RolloutRequest {
   canary_percent?: number
   halt_failure_percent?: number
   auto_activate?: boolean
+}
+
+/** T-P24: DeviceStatus from the device heartbeat (proto field names). */
+export interface DeviceStatusSnapshot {
+  image_version?: string
+  running_slot?: string
+  slot_confirmed?: boolean
+  component_versions?: Record<string, string>
+  health_known?: boolean
+  health_score?: number
+  time_synchronized?: boolean
+  services?: { unit: string; active: string }[]
+  serial?: string
+  hardware_revision?: string
+  istate_state?: string
+  collected_at_unix_ms?: string
 }

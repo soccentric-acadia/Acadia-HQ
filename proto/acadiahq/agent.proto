@@ -48,6 +48,29 @@ message Heartbeat {
   uint64 heartbeat_sequence = 7;
   uint64 sent_at_mono_ns = 8;
   repeated string capabilities = 9;
+  // T-P24 (C03/H03/K07/D07/G01): periodic device snapshot. Absent from
+  // pre-T-P24 agents; HQ keeps the last one it received.
+  DeviceStatus status = 10;
+}
+
+message DeviceStatus {
+  string image_version = 1;                  // /etc/os-release VERSION
+  string running_slot = 2;                   // "A" / "B" ("" = not A/B)
+  bool slot_confirmed = 3;                   // false = trial boot pending confirm
+  map<string, string> component_versions = 4; // webconfigd, instrumentation, ...
+  bool health_known = 5;                     // istate reachable
+  double health_score = 6;                   // istate GetHealthScore, 0..100
+  bool time_synchronized = 7;                // NTP/PTP/GNSS lock (systemd view)
+  repeated ServiceState services = 8;        // manifest service allowlist
+  string serial = 9;                         // factory identity
+  string hardware_revision = 10;
+  string istate_state = 11;                  // provisioning/operational/degraded
+  int64 collected_at_unix_ms = 12;
+}
+
+message ServiceState {
+  string unit = 1;
+  string active = 2;   // systemd ActiveState: active/inactive/failed/...
 }
 
 message TelemetryBatch {

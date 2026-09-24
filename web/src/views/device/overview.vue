@@ -82,7 +82,29 @@ onMounted(load)
           </div>
         </div>
       </WcCard>
-      <WcCard title="Identity" subtitle="Hardware identity recorded at pairing.">
+      <WcCard title="Device status" :subtitle="`Heartbeat snapshot, ${fmtWhen(device.status_updated_at ?? null)}.`">
+        <div v-if="device.status && Object.keys(device.status).length" class="stack">
+          <div class="row"><span class="tile-sub" style="min-width: 110px">Image</span><code>{{ device.image_version ?? '—' }}</code></div>
+          <div class="row">
+            <span class="tile-sub" style="min-width: 110px">Slot</span>
+            <code>{{ device.running_slot ?? '—' }}</code>
+            <span v-if="device.running_slot" class="badge" :class="device.status.slot_confirmed ? 'badge-success' : 'badge-warning'">
+              {{ device.status.slot_confirmed ? 'confirmed' : 'trial boot' }}
+            </span>
+          </div>
+          <div class="row"><span class="tile-sub" style="min-width: 110px">Device health</span><span>{{ device.health_score ?? 'unknown' }}</span></div>
+          <div class="row"><span class="tile-sub" style="min-width: 110px">Clock</span><span>{{ device.status.time_synchronized ? 'synchronized' : 'not synchronized' }}</span></div>
+          <div v-for="(v, name) in device.status.component_versions ?? {}" :key="name" class="row">
+            <span class="tile-sub" style="min-width: 110px">{{ name }}</span><code>{{ v }}</code>
+          </div>
+          <div v-for="s in device.status.services ?? []" :key="s.unit" class="row">
+            <WcStatusDot :state="s.active === 'active' ? 'ok' : s.active === 'failed' ? 'bad' : 'warn'" />
+            <span class="tile-sub">{{ s.unit }}</span><span>{{ s.active }}</span>
+          </div>
+        </div>
+        <div v-else class="muted" style="font-size: var(--text-sm)">No status snapshot yet (device agent predates T-P24 or has not connected).</div>
+      </WcCard>
+      <WcCard title="Identity" subtitle="Factory identity reported by the device.">
         <div class="stack">
           <div class="row"><span class="tile-sub" style="min-width: 110px">Serial</span><code>{{ device.serial ?? '—' }}</code></div>
           <div class="row"><span class="tile-sub" style="min-width: 110px">Board revision</span><code>{{ device.board_rev ?? '—' }}</code></div>

@@ -448,6 +448,22 @@ def main() -> int:
 
     step("typed take_backup_now uploads; UploadComplete finalises the row", backup_round_trip)
 
+    # ── 11. T-P24: heartbeat DeviceStatus snapshot lands on the device ─────
+    def status_snapshot():
+        def has_status():
+            _, _, d = call("GET", f"{api}/devices/{device_id}", headers=ADMIN)
+            status = d.get("status") or {}
+            return status.get("component_versions", {}).get("webconfigd") and d
+
+        d = poll(has_status, timeout=90, desc="heartbeat status snapshot")
+        if not d:
+            raise RuntimeError("no DeviceStatus snapshot reached HQ")
+        if not d["status"].get("services"):
+            raise RuntimeError(f"snapshot without service states: {d['status']}")
+        return d
+
+    step("T-P24: heartbeat DeviceStatus snapshot stored at HQ", status_snapshot)
+
     print(f"\nE2E RESULT: {PASS} passed, {FAIL} failed")
     return 1 if FAIL else 0
 

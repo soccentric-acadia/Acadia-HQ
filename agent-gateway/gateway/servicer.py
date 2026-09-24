@@ -89,6 +89,9 @@ class AgentLinkServicer(_AgentLinkServicer):
             became_online = not device.online
             device.online = True
             device.last_seen_at = datetime.now(UTC)
+            # T-P24: the session-opening heartbeat carries a snapshot too.
+            if first.heartbeat.HasField("status"):
+                handlers.apply_device_status(device, first.heartbeat.status)
             if became_online:
                 await audit.record_system(
                     session, device, "device.online", payload={"reason": "connect"}
@@ -272,6 +275,8 @@ class AgentLinkServicer(_AgentLinkServicer):
             became_online = not device.online
             device.online = True
             device.last_seen_at = datetime.now(UTC)
+            if frame.heartbeat.HasField("status"):
+                handlers.apply_device_status(device, frame.heartbeat.status)
             if became_online:
                 await audit.record_system(
                     session, device, "device.online", payload={"reason": "heartbeat"}

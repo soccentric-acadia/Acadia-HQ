@@ -252,3 +252,32 @@ async def test_configuration_write_requires_operator_and_queues_signed_values(
     assert command.payload["schema_version"] == 1
     assert command.payload["signature_algorithm"] == "ed25519"
     assert command.payload["signature"] == body["signature"]
+
+
+async def test_device_health_uses_the_heartbeat_snapshot(client, db_session):
+    """T-P24: device-reported health, unconfirmed slot, failed units and
+    clock state are explained as factors."""
+    from datetime import UTC, datetime
+
+    tenant = await make_tenant(db_session)
+    admin = await make_user(db_session, tenant, UserRole.admin)
+    device = await _device(db_session, tenant)
+    device.online = True
+    device.last_seen_at = datetime.now(UTC)
+    device.health_score = 40.0
+    device.status = {
+        "running_slot": "B",
+        "slot_confirmed": False,
+        "time_synchronized": False,
+        "services": [{"unit": "instr-istate.service", "active": "failed"}],
+    }
+    await db_session.commit()
+
+    login_as(client, admin)
+    body = (await client.get(f"/devices/{device.id}/health")).json()
+    names = {f["name"]: f for f in body["factors"]}
+    assert names["device_health"]["penalty"] == 30
+    assert names["slot"]["status"] == "unconfirmed"
+    assert names["services"]["units"] == ["instr-istate.service"]
+    assert names["time"]["status"] == "unsynchronized"
+    assert body["score"] == 100 - 30 - 10 - 20 - 5

@@ -32,7 +32,7 @@ class PairingHandshake(_message.Message):
     def __init__(self, pairing_token: _Optional[str] = ...) -> None: ...
 
 class Heartbeat(_message.Message):
-    __slots__ = ("device_id", "credential_token", "sent_at_unix_ms", "agent_version", "protocol_version", "boot_id", "heartbeat_sequence", "sent_at_mono_ns", "capabilities")
+    __slots__ = ("device_id", "credential_token", "sent_at_unix_ms", "agent_version", "protocol_version", "boot_id", "heartbeat_sequence", "sent_at_mono_ns", "capabilities", "status")
     DEVICE_ID_FIELD_NUMBER: _ClassVar[int]
     CREDENTIAL_TOKEN_FIELD_NUMBER: _ClassVar[int]
     SENT_AT_UNIX_MS_FIELD_NUMBER: _ClassVar[int]
@@ -42,6 +42,7 @@ class Heartbeat(_message.Message):
     HEARTBEAT_SEQUENCE_FIELD_NUMBER: _ClassVar[int]
     SENT_AT_MONO_NS_FIELD_NUMBER: _ClassVar[int]
     CAPABILITIES_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
     device_id: str
     credential_token: str
     sent_at_unix_ms: int
@@ -51,7 +52,51 @@ class Heartbeat(_message.Message):
     heartbeat_sequence: int
     sent_at_mono_ns: int
     capabilities: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, device_id: _Optional[str] = ..., credential_token: _Optional[str] = ..., sent_at_unix_ms: _Optional[int] = ..., agent_version: _Optional[str] = ..., protocol_version: _Optional[int] = ..., boot_id: _Optional[str] = ..., heartbeat_sequence: _Optional[int] = ..., sent_at_mono_ns: _Optional[int] = ..., capabilities: _Optional[_Iterable[str]] = ...) -> None: ...
+    status: DeviceStatus
+    def __init__(self, device_id: _Optional[str] = ..., credential_token: _Optional[str] = ..., sent_at_unix_ms: _Optional[int] = ..., agent_version: _Optional[str] = ..., protocol_version: _Optional[int] = ..., boot_id: _Optional[str] = ..., heartbeat_sequence: _Optional[int] = ..., sent_at_mono_ns: _Optional[int] = ..., capabilities: _Optional[_Iterable[str]] = ..., status: _Optional[_Union[DeviceStatus, _Mapping]] = ...) -> None: ...
+
+class DeviceStatus(_message.Message):
+    __slots__ = ("image_version", "running_slot", "slot_confirmed", "component_versions", "health_known", "health_score", "time_synchronized", "services", "serial", "hardware_revision", "istate_state", "collected_at_unix_ms")
+    class ComponentVersionsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    IMAGE_VERSION_FIELD_NUMBER: _ClassVar[int]
+    RUNNING_SLOT_FIELD_NUMBER: _ClassVar[int]
+    SLOT_CONFIRMED_FIELD_NUMBER: _ClassVar[int]
+    COMPONENT_VERSIONS_FIELD_NUMBER: _ClassVar[int]
+    HEALTH_KNOWN_FIELD_NUMBER: _ClassVar[int]
+    HEALTH_SCORE_FIELD_NUMBER: _ClassVar[int]
+    TIME_SYNCHRONIZED_FIELD_NUMBER: _ClassVar[int]
+    SERVICES_FIELD_NUMBER: _ClassVar[int]
+    SERIAL_FIELD_NUMBER: _ClassVar[int]
+    HARDWARE_REVISION_FIELD_NUMBER: _ClassVar[int]
+    ISTATE_STATE_FIELD_NUMBER: _ClassVar[int]
+    COLLECTED_AT_UNIX_MS_FIELD_NUMBER: _ClassVar[int]
+    image_version: str
+    running_slot: str
+    slot_confirmed: bool
+    component_versions: _containers.ScalarMap[str, str]
+    health_known: bool
+    health_score: float
+    time_synchronized: bool
+    services: _containers.RepeatedCompositeFieldContainer[ServiceState]
+    serial: str
+    hardware_revision: str
+    istate_state: str
+    collected_at_unix_ms: int
+    def __init__(self, image_version: _Optional[str] = ..., running_slot: _Optional[str] = ..., slot_confirmed: _Optional[bool] = ..., component_versions: _Optional[_Mapping[str, str]] = ..., health_known: _Optional[bool] = ..., health_score: _Optional[float] = ..., time_synchronized: _Optional[bool] = ..., services: _Optional[_Iterable[_Union[ServiceState, _Mapping]]] = ..., serial: _Optional[str] = ..., hardware_revision: _Optional[str] = ..., istate_state: _Optional[str] = ..., collected_at_unix_ms: _Optional[int] = ...) -> None: ...
+
+class ServiceState(_message.Message):
+    __slots__ = ("unit", "active")
+    UNIT_FIELD_NUMBER: _ClassVar[int]
+    ACTIVE_FIELD_NUMBER: _ClassVar[int]
+    unit: str
+    active: str
+    def __init__(self, unit: _Optional[str] = ..., active: _Optional[str] = ...) -> None: ...
 
 class TelemetryBatch(_message.Message):
     __slots__ = ("samples", "location")

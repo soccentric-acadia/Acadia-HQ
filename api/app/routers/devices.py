@@ -157,6 +157,34 @@ async def get_device_health(
         else:
             factors.append({"name": "heartbeat", "status": "fresh", "penalty": 0})
 
+    # T-P24: factors from the device's own heartbeat snapshot.
+    snapshot = device.status or {}
+    if device.health_score is not None:
+        penalty = 0 if device.health_score >= 80 else 15 if device.health_score >= 50 else 30
+        factors.append(
+            {
+                "name": "device_health",
+                "status": "ok" if penalty == 0 else "low" if penalty == 15 else "critical",
+                "score": device.health_score,
+                "penalty": penalty,
+            }
+        )
+        score -= penalty
+    if snapshot.get("running_slot") and not snapshot.get("slot_confirmed", False):
+        factors.append({"name": "slot", "status": "unconfirmed", "penalty": 10})
+        score -= 10
+    failed_units = [
+        s.get("unit") for s in snapshot.get("services", []) if s.get("active") == "failed"
+    ]
+    if failed_units:
+        factors.append(
+            {"name": "services", "status": "failed", "units": failed_units, "penalty": 20}
+        )
+        score -= 20
+    if snapshot and not snapshot.get("time_synchronized", False):
+        factors.append({"name": "time", "status": "unsynchronized", "penalty": 5})
+        score -= 5
+
     pending = (
         await db.execute(
             select(func.count())

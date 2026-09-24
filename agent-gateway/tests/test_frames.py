@@ -402,3 +402,40 @@ async def test_upload_complete_without_object_fails_the_row(gateway_stub, db_ses
     await db_session.refresh(bundle)
     assert bundle.upload_state == "failed"
     assert "not found" in bundle.upload_error
+
+
+async def test_heartbeat_status_snapshot_is_stored(gateway_stub, db_session):
+    """T-P24: a heartbeat's DeviceStatus lands on the device record."""
+    from acadiahq.agent_pb2 import DeviceStatus, ServiceState
+
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+    hb = _hb(str(device.id), credential)
+    hb.status.CopyFrom(
+        DeviceStatus(
+            image_version="2026.09.23",
+            running_slot="B",
+            slot_confirmed=False,
+            health_known=True,
+            health_score=72.5,
+            time_synchronized=True,
+            serial="ACD-0001",
+            hardware_revision="rev-c",
+            services=[ServiceState(unit="sshd.service", active="active")],
+            component_versions={"webconfigd": "0.1.0"},
+        )
+    )
+
+    async def frames():
+        yield AgentFrame(heartbeat=hb)
+
+    async for _ in gateway_stub.Connect(frames()):
+        pass
+    await db_session.refresh(device)
+    assert device.image_version == "2026.09.23"
+    assert device.running_slot == "B"
+    assert device.health_score == 72.5
+    assert device.serial == "ACD-0001" and device.board_rev == "rev-c"
+    assert device.status["services"] == [{"unit": "sshd.service", "active": "active"}]
+    assert device.status["component_versions"] == {"webconfigd": "0.1.0"}
+    assert device.status_updated_at is not None

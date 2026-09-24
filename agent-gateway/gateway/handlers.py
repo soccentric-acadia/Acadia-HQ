@@ -122,6 +122,24 @@ async def handle_log_upload_request(
     return str(object_id), presigned_upload_url(key, expires_in=expires_in), expires_in
 
 
+def apply_device_status(device: Device, status) -> None:
+    """Store a heartbeat DeviceStatus snapshot (T-P24). Identity fields fill
+    the device record only when the device reports them (factory identity is
+    authoritative over operator-entered values)."""
+    from google.protobuf.json_format import MessageToDict
+
+    snapshot = MessageToDict(status, preserving_proto_field_name=True)
+    device.status = snapshot
+    device.status_updated_at = datetime.now(UTC)
+    device.image_version = status.image_version or None
+    device.running_slot = status.running_slot or None
+    device.health_score = status.health_score if status.health_known else None
+    if status.serial:
+        device.serial = status.serial
+    if status.hardware_revision:
+        device.board_rev = status.hardware_revision
+
+
 async def handle_upload_complete(
     session: AsyncSession, device: Device, msg: UploadComplete
 ) -> str | None:

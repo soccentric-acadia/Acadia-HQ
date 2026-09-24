@@ -22,6 +22,12 @@ class DeviceOut(BaseModel):
     serial: str | None
     board_rev: str | None
     tags: list[str] = []
+    # T-P24: last heartbeat snapshot.
+    status: dict = {}
+    status_updated_at: datetime | None = None
+    image_version: str | None = None
+    running_slot: str | None = None
+    health_score: float | None = None
     created_at: datetime
 
 

@@ -24,13 +24,15 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14\x61\x63\x61\x64iahq/agent.proto\x12\x0e\x61\x63\x61\x64iahq.agent\"\x9f\x03\n\nAgentFrame\x12=\n\x11pairing_handshake\x18\x01 \x01(\x0b\x32 .acadiahq.agent.PairingHandshakeH\x00\x12.\n\theartbeat\x18\x02 \x01(\x0b\x32\x19.acadiahq.agent.HeartbeatH\x00\x12\x39\n\x0ftelemetry_batch\x18\x03 \x01(\x0b\x32\x1e.acadiahq.agent.TelemetryBatchH\x00\x12\x31\n\x0b\x66\x61ult_event\x18\x04 \x01(\x0b\x32\x1a.acadiahq.agent.FaultEventH\x00\x12>\n\x12log_upload_request\x18\x05 \x01(\x0b\x32 .acadiahq.agent.LogUploadRequestH\x00\x12\x31\n\x0b\x63ommand_ack\x18\x06 \x01(\x0b\x32\x1a.acadiahq.agent.CommandAckH\x00\x12\x39\n\x0fupload_complete\x18\x07 \x01(\x0b\x32\x1e.acadiahq.agent.UploadCompleteH\x00\x42\x06\n\x04\x62ody\")\n\x10PairingHandshake\x12\x15\n\rpairing_token\x18\x01 \x01(\t\"\xde\x01\n\tHeartbeat\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x18\n\x10\x63redential_token\x18\x02 \x01(\t\x12\x17\n\x0fsent_at_unix_ms\x18\x03 \x01(\x03\x12\x15\n\ragent_version\x18\x04 \x01(\t\x12\x18\n\x10protocol_version\x18\x05 \x01(\r\x12\x0f\n\x07\x62oot_id\x18\x06 \x01(\t\x12\x1a\n\x12heartbeat_sequence\x18\x07 \x01(\x04\x12\x17\n\x0fsent_at_mono_ns\x18\x08 \x01(\x04\x12\x14\n\x0c\x63\x61pabilities\x18\t \x03(\t\"n\n\x0eTelemetryBatch\x12\x30\n\x07samples\x18\x01 \x03(\x0b\x32\x1f.acadiahq.agent.TelemetrySample\x12*\n\x08location\x18\x02 \x01(\x0b\x32\x18.acadiahq.agent.Location\"\xb3\x01\n\x0fTelemetrySample\x12\x0e\n\x06metric\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x01\x12\x1b\n\x13recorded_at_unix_ms\x18\x03 \x01(\x03\x12\x37\n\x04tags\x18\x04 \x03(\x0b\x32).acadiahq.agent.TelemetrySample.TagsEntry\x1a+\n\tTagsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xb4\x01\n\x08Location\x12\x0b\n\x03lat\x18\x01 \x01(\x01\x12\x0b\n\x03lon\x18\x02 \x01(\x01\x12\x12\n\naccuracy_m\x18\x03 \x01(\x01\x12/\n\x06source\x18\x04 \x01(\x0e\x32\x1f.acadiahq.agent.Location.Source\x12\x1b\n\x13recorded_at_unix_ms\x18\x05 \x01(\x03\",\n\x06Source\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x08\n\x04GNSS\x10\x01\x12\x0b\n\x07NETWORK\x10\x02\"\x8c\x02\n\nFaultEvent\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\x12\x35\n\x08severity\x18\x02 \x01(\x0e\x32#.acadiahq.agent.FaultEvent.Severity\x12\x0f\n\x07message\x18\x03 \x01(\t\x12-\n\x04kind\x18\x04 \x01(\x0e\x32\x1f.acadiahq.agent.FaultEvent.Kind\x12\x12\n\nat_unix_ms\x18\x05 \x01(\x03\x12\x16\n\x0e\x66\x61ult_code_ref\x18\x06 \x01(\t\",\n\x08Severity\x12\x08\n\x04INFO\x10\x00\x12\x08\n\x04WARN\x10\x01\x12\x0c\n\x08\x43RITICAL\x10\x02\"\x1f\n\x04Kind\x12\n\n\x06RAISED\x10\x00\x12\x0b\n\x07\x43LEARED\x10\x01\"\xde\x01\n\x10LogUploadRequest\x12\x33\n\x04kind\x18\x01 \x01(\x0e\x32%.acadiahq.agent.LogUploadRequest.Kind\x12 \n\x18time_range_start_unix_ms\x18\x02 \x01(\x03\x12\x1e\n\x16time_range_end_unix_ms\x18\x03 \x01(\x03\x12\x1b\n\x13size_bytes_estimate\x18\x04 \x01(\x03\x12\x12\n\nclient_ref\x18\x05 \x01(\t\"\"\n\x04Kind\x12\x0e\n\nLOG_BUNDLE\x10\x00\x12\n\n\x06\x42\x41\x43KUP\x10\x01\"i\n\x0eUploadComplete\x12\x13\n\x0brequest_ref\x18\x01 \x01(\t\x12\x0f\n\x07success\x18\x02 \x01(\x08\x12\x12\n\nsize_bytes\x18\x03 \x01(\x03\x12\x0e\n\x06sha256\x18\x04 \x01(\t\x12\r\n\x05\x65rror\x18\x05 \x01(\t\"\xed\x01\n\nCommandAck\x12\x12\n\ncommand_id\x18\x01 \x01(\t\x12\x0f\n\x07success\x18\x02 \x01(\x08\x12\r\n\x05\x65rror\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x61\x65mon\x18\x04 \x01(\t\x12\x11\n\toperation\x18\x05 \x01(\t\x12\x0c\n\x04\x63ode\x18\x06 \x01(\t\x12\x14\n\x0cjson_payload\x18\x07 \x01(\t\x12\x16\n\x0e\x63orrelation_id\x18\x08 \x01(\t\x12\x1b\n\x13\x61\x63\x63\x65pted_at_mono_ns\x18\t \x01(\x04\x12\x1c\n\x14\x63ompleted_at_mono_ns\x18\n \x01(\x04\x12\x11\n\tretryable\x18\x0b \x01(\x08\"\xef\x01\n\x0bServerFrame\x12\x37\n\x0epairing_result\x18\x01 \x01(\x0b\x32\x1d.acadiahq.agent.PairingResultH\x00\x12\x35\n\rheartbeat_ack\x18\x02 \x01(\x0b\x32\x1c.acadiahq.agent.HeartbeatAckH\x00\x12*\n\x07\x63ommand\x18\x03 \x01(\x0b\x32\x17.acadiahq.agent.CommandH\x00\x12<\n\x11signed_upload_url\x18\x04 \x01(\x0b\x32\x1f.acadiahq.agent.SignedUploadUrlH\x00\x42\x06\n\x04\x62ody\"\\\n\rPairingResult\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x11\n\tdevice_id\x18\x03 \x01(\t\x12\x18\n\x10\x63redential_token\x18\x04 \x01(\t\"h\n\x0cHeartbeatAck\x12\x1b\n\x13server_time_unix_ms\x18\x01 \x01(\x03\x12!\n\x19next_heartbeat_interval_s\x18\x02 \x01(\x05\x12\x18\n\x10protocol_version\x18\x03 \x01(\r\"\xa1\x03\n\x07\x43ommand\x12\x12\n\ncommand_id\x18\x01 \x01(\t\x12\x38\n\x0ftake_backup_now\x18\x02 \x01(\x0b\x32\x1d.acadiahq.agent.TakeBackupNowH\x00\x12*\n\x07restore\x18\x03 \x01(\x0b\x32\x17.acadiahq.agent.RestoreH\x00\x12\x35\n\rfactory_reset\x18\x04 \x01(\x0b\x32\x1c.acadiahq.agent.FactoryResetH\x00\x12\x33\n\x0c\x61pply_update\x18\x05 \x01(\x0b\x32\x1b.acadiahq.agent.ApplyUpdateH\x00\x12\x11\n\toperation\x18\x06 \x01(\t\x12\x0e\n\x06\x64\x61\x65mon\x18\x07 \x01(\t\x12\x11\n\tjson_args\x18\x08 \x01(\t\x12\r\n\x05\x61\x63tor\x18\t \x01(\t\x12\x13\n\x0b\x64\x65\x61\x64line_ms\x18\n \x01(\r\x12\x17\n\x0fidempotency_key\x18\x0b \x01(\t\x12\x16\n\x0e\x63orrelation_id\x18\x0c \x01(\t\x12\x1d\n\x15required_confirmation\x18\r \x01(\tB\x06\n\x04kind\"\x0f\n\rTakeBackupNow\"&\n\x07Restore\x12\x1b\n\x13\x62\x61\x63kup_download_url\x18\x01 \x01(\t\"\x0e\n\x0c\x46\x61\x63toryReset\"Z\n\x0b\x41pplyUpdate\x12\x13\n\x0b\x61rtifact_id\x18\x01 \x01(\t\x12\x1d\n\x15\x61rtifact_download_url\x18\x02 \x01(\t\x12\x17\n\x0f\x63hecksum_sha256\x18\x03 \x01(\t\"\x9f\x01\n\x0fSignedUploadUrl\x12\x13\n\x0brequest_ref\x18\x01 \x01(\t\x12\x12\n\nupload_url\x18\x02 \x01(\t\x12\x1a\n\x12\x65xpires_at_unix_ms\x18\x03 \x01(\x03\x12\x12\n\nclient_ref\x18\x04 \x01(\t\x12\x33\n\x04kind\x18\x05 \x01(\x0e\x32%.acadiahq.agent.LogUploadRequest.Kind2S\n\tAgentLink\x12\x46\n\x07\x43onnect\x12\x1a.acadiahq.agent.AgentFrame\x1a\x1b.acadiahq.agent.ServerFrame(\x01\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14\x61\x63\x61\x64iahq/agent.proto\x12\x0e\x61\x63\x61\x64iahq.agent\"\x9f\x03\n\nAgentFrame\x12=\n\x11pairing_handshake\x18\x01 \x01(\x0b\x32 .acadiahq.agent.PairingHandshakeH\x00\x12.\n\theartbeat\x18\x02 \x01(\x0b\x32\x19.acadiahq.agent.HeartbeatH\x00\x12\x39\n\x0ftelemetry_batch\x18\x03 \x01(\x0b\x32\x1e.acadiahq.agent.TelemetryBatchH\x00\x12\x31\n\x0b\x66\x61ult_event\x18\x04 \x01(\x0b\x32\x1a.acadiahq.agent.FaultEventH\x00\x12>\n\x12log_upload_request\x18\x05 \x01(\x0b\x32 .acadiahq.agent.LogUploadRequestH\x00\x12\x31\n\x0b\x63ommand_ack\x18\x06 \x01(\x0b\x32\x1a.acadiahq.agent.CommandAckH\x00\x12\x39\n\x0fupload_complete\x18\x07 \x01(\x0b\x32\x1e.acadiahq.agent.UploadCompleteH\x00\x42\x06\n\x04\x62ody\")\n\x10PairingHandshake\x12\x15\n\rpairing_token\x18\x01 \x01(\t\"\x8c\x02\n\tHeartbeat\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x18\n\x10\x63redential_token\x18\x02 \x01(\t\x12\x17\n\x0fsent_at_unix_ms\x18\x03 \x01(\x03\x12\x15\n\ragent_version\x18\x04 \x01(\t\x12\x18\n\x10protocol_version\x18\x05 \x01(\r\x12\x0f\n\x07\x62oot_id\x18\x06 \x01(\t\x12\x1a\n\x12heartbeat_sequence\x18\x07 \x01(\x04\x12\x17\n\x0fsent_at_mono_ns\x18\x08 \x01(\x04\x12\x14\n\x0c\x63\x61pabilities\x18\t \x03(\t\x12,\n\x06status\x18\n \x01(\x0b\x32\x1c.acadiahq.agent.DeviceStatus\"\xb4\x03\n\x0c\x44\x65viceStatus\x12\x15\n\rimage_version\x18\x01 \x01(\t\x12\x14\n\x0crunning_slot\x18\x02 \x01(\t\x12\x16\n\x0eslot_confirmed\x18\x03 \x01(\x08\x12O\n\x12\x63omponent_versions\x18\x04 \x03(\x0b\x32\x33.acadiahq.agent.DeviceStatus.ComponentVersionsEntry\x12\x14\n\x0chealth_known\x18\x05 \x01(\x08\x12\x14\n\x0chealth_score\x18\x06 \x01(\x01\x12\x19\n\x11time_synchronized\x18\x07 \x01(\x08\x12.\n\x08services\x18\x08 \x03(\x0b\x32\x1c.acadiahq.agent.ServiceState\x12\x0e\n\x06serial\x18\t \x01(\t\x12\x19\n\x11hardware_revision\x18\n \x01(\t\x12\x14\n\x0cistate_state\x18\x0b \x01(\t\x12\x1c\n\x14\x63ollected_at_unix_ms\x18\x0c \x01(\x03\x1a\x38\n\x16\x43omponentVersionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\",\n\x0cServiceState\x12\x0c\n\x04unit\x18\x01 \x01(\t\x12\x0e\n\x06\x61\x63tive\x18\x02 \x01(\t\"n\n\x0eTelemetryBatch\x12\x30\n\x07samples\x18\x01 \x03(\x0b\x32\x1f.acadiahq.agent.TelemetrySample\x12*\n\x08location\x18\x02 \x01(\x0b\x32\x18.acadiahq.agent.Location\"\xb3\x01\n\x0fTelemetrySample\x12\x0e\n\x06metric\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x01\x12\x1b\n\x13recorded_at_unix_ms\x18\x03 \x01(\x03\x12\x37\n\x04tags\x18\x04 \x03(\x0b\x32).acadiahq.agent.TelemetrySample.TagsEntry\x1a+\n\tTagsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xb4\x01\n\x08Location\x12\x0b\n\x03lat\x18\x01 \x01(\x01\x12\x0b\n\x03lon\x18\x02 \x01(\x01\x12\x12\n\naccuracy_m\x18\x03 \x01(\x01\x12/\n\x06source\x18\x04 \x01(\x0e\x32\x1f.acadiahq.agent.Location.Source\x12\x1b\n\x13recorded_at_unix_ms\x18\x05 \x01(\x03\",\n\x06Source\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x08\n\x04GNSS\x10\x01\x12\x0b\n\x07NETWORK\x10\x02\"\x8c\x02\n\nFaultEvent\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\x12\x35\n\x08severity\x18\x02 \x01(\x0e\x32#.acadiahq.agent.FaultEvent.Severity\x12\x0f\n\x07message\x18\x03 \x01(\t\x12-\n\x04kind\x18\x04 \x01(\x0e\x32\x1f.acadiahq.agent.FaultEvent.Kind\x12\x12\n\nat_unix_ms\x18\x05 \x01(\x03\x12\x16\n\x0e\x66\x61ult_code_ref\x18\x06 \x01(\t\",\n\x08Severity\x12\x08\n\x04INFO\x10\x00\x12\x08\n\x04WARN\x10\x01\x12\x0c\n\x08\x43RITICAL\x10\x02\"\x1f\n\x04Kind\x12\n\n\x06RAISED\x10\x00\x12\x0b\n\x07\x43LEARED\x10\x01\"\xde\x01\n\x10LogUploadRequest\x12\x33\n\x04kind\x18\x01 \x01(\x0e\x32%.acadiahq.agent.LogUploadRequest.Kind\x12 \n\x18time_range_start_unix_ms\x18\x02 \x01(\x03\x12\x1e\n\x16time_range_end_unix_ms\x18\x03 \x01(\x03\x12\x1b\n\x13size_bytes_estimate\x18\x04 \x01(\x03\x12\x12\n\nclient_ref\x18\x05 \x01(\t\"\"\n\x04Kind\x12\x0e\n\nLOG_BUNDLE\x10\x00\x12\n\n\x06\x42\x41\x43KUP\x10\x01\"i\n\x0eUploadComplete\x12\x13\n\x0brequest_ref\x18\x01 \x01(\t\x12\x0f\n\x07success\x18\x02 \x01(\x08\x12\x12\n\nsize_bytes\x18\x03 \x01(\x03\x12\x0e\n\x06sha256\x18\x04 \x01(\t\x12\r\n\x05\x65rror\x18\x05 \x01(\t\"\xed\x01\n\nCommandAck\x12\x12\n\ncommand_id\x18\x01 \x01(\t\x12\x0f\n\x07success\x18\x02 \x01(\x08\x12\r\n\x05\x65rror\x18\x03 \x01(\t\x12\x0e\n\x06\x64\x61\x65mon\x18\x04 \x01(\t\x12\x11\n\toperation\x18\x05 \x01(\t\x12\x0c\n\x04\x63ode\x18\x06 \x01(\t\x12\x14\n\x0cjson_payload\x18\x07 \x01(\t\x12\x16\n\x0e\x63orrelation_id\x18\x08 \x01(\t\x12\x1b\n\x13\x61\x63\x63\x65pted_at_mono_ns\x18\t \x01(\x04\x12\x1c\n\x14\x63ompleted_at_mono_ns\x18\n \x01(\x04\x12\x11\n\tretryable\x18\x0b \x01(\x08\"\xef\x01\n\x0bServerFrame\x12\x37\n\x0epairing_result\x18\x01 \x01(\x0b\x32\x1d.acadiahq.agent.PairingResultH\x00\x12\x35\n\rheartbeat_ack\x18\x02 \x01(\x0b\x32\x1c.acadiahq.agent.HeartbeatAckH\x00\x12*\n\x07\x63ommand\x18\x03 \x01(\x0b\x32\x17.acadiahq.agent.CommandH\x00\x12<\n\x11signed_upload_url\x18\x04 \x01(\x0b\x32\x1f.acadiahq.agent.SignedUploadUrlH\x00\x42\x06\n\x04\x62ody\"\\\n\rPairingResult\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x11\n\tdevice_id\x18\x03 \x01(\t\x12\x18\n\x10\x63redential_token\x18\x04 \x01(\t\"h\n\x0cHeartbeatAck\x12\x1b\n\x13server_time_unix_ms\x18\x01 \x01(\x03\x12!\n\x19next_heartbeat_interval_s\x18\x02 \x01(\x05\x12\x18\n\x10protocol_version\x18\x03 \x01(\r\"\xa1\x03\n\x07\x43ommand\x12\x12\n\ncommand_id\x18\x01 \x01(\t\x12\x38\n\x0ftake_backup_now\x18\x02 \x01(\x0b\x32\x1d.acadiahq.agent.TakeBackupNowH\x00\x12*\n\x07restore\x18\x03 \x01(\x0b\x32\x17.acadiahq.agent.RestoreH\x00\x12\x35\n\rfactory_reset\x18\x04 \x01(\x0b\x32\x1c.acadiahq.agent.FactoryResetH\x00\x12\x33\n\x0c\x61pply_update\x18\x05 \x01(\x0b\x32\x1b.acadiahq.agent.ApplyUpdateH\x00\x12\x11\n\toperation\x18\x06 \x01(\t\x12\x0e\n\x06\x64\x61\x65mon\x18\x07 \x01(\t\x12\x11\n\tjson_args\x18\x08 \x01(\t\x12\r\n\x05\x61\x63tor\x18\t \x01(\t\x12\x13\n\x0b\x64\x65\x61\x64line_ms\x18\n \x01(\r\x12\x17\n\x0fidempotency_key\x18\x0b \x01(\t\x12\x16\n\x0e\x63orrelation_id\x18\x0c \x01(\t\x12\x1d\n\x15required_confirmation\x18\r \x01(\tB\x06\n\x04kind\"\x0f\n\rTakeBackupNow\"&\n\x07Restore\x12\x1b\n\x13\x62\x61\x63kup_download_url\x18\x01 \x01(\t\"\x0e\n\x0c\x46\x61\x63toryReset\"Z\n\x0b\x41pplyUpdate\x12\x13\n\x0b\x61rtifact_id\x18\x01 \x01(\t\x12\x1d\n\x15\x61rtifact_download_url\x18\x02 \x01(\t\x12\x17\n\x0f\x63hecksum_sha256\x18\x03 \x01(\t\"\x9f\x01\n\x0fSignedUploadUrl\x12\x13\n\x0brequest_ref\x18\x01 \x01(\t\x12\x12\n\nupload_url\x18\x02 \x01(\t\x12\x1a\n\x12\x65xpires_at_unix_ms\x18\x03 \x01(\x03\x12\x12\n\nclient_ref\x18\x04 \x01(\t\x12\x33\n\x04kind\x18\x05 \x01(\x0e\x32%.acadiahq.agent.LogUploadRequest.Kind2S\n\tAgentLink\x12\x46\n\x07\x43onnect\x12\x1a.acadiahq.agent.AgentFrame\x1a\x1b.acadiahq.agent.ServerFrame(\x01\x30\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'acadiahq.agent_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
+  _globals['_DEVICESTATUS_COMPONENTVERSIONSENTRY']._loaded_options = None
+  _globals['_DEVICESTATUS_COMPONENTVERSIONSENTRY']._serialized_options = b'8\001'
   _globals['_TELEMETRYSAMPLE_TAGSENTRY']._loaded_options = None
   _globals['_TELEMETRYSAMPLE_TAGSENTRY']._serialized_options = b'8\001'
   _globals['_AGENTFRAME']._serialized_start=41
@@ -38,49 +40,55 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_PAIRINGHANDSHAKE']._serialized_start=458
   _globals['_PAIRINGHANDSHAKE']._serialized_end=499
   _globals['_HEARTBEAT']._serialized_start=502
-  _globals['_HEARTBEAT']._serialized_end=724
-  _globals['_TELEMETRYBATCH']._serialized_start=726
-  _globals['_TELEMETRYBATCH']._serialized_end=836
-  _globals['_TELEMETRYSAMPLE']._serialized_start=839
-  _globals['_TELEMETRYSAMPLE']._serialized_end=1018
-  _globals['_TELEMETRYSAMPLE_TAGSENTRY']._serialized_start=975
-  _globals['_TELEMETRYSAMPLE_TAGSENTRY']._serialized_end=1018
-  _globals['_LOCATION']._serialized_start=1021
-  _globals['_LOCATION']._serialized_end=1201
-  _globals['_LOCATION_SOURCE']._serialized_start=1157
-  _globals['_LOCATION_SOURCE']._serialized_end=1201
-  _globals['_FAULTEVENT']._serialized_start=1204
-  _globals['_FAULTEVENT']._serialized_end=1472
-  _globals['_FAULTEVENT_SEVERITY']._serialized_start=1395
-  _globals['_FAULTEVENT_SEVERITY']._serialized_end=1439
-  _globals['_FAULTEVENT_KIND']._serialized_start=1441
-  _globals['_FAULTEVENT_KIND']._serialized_end=1472
-  _globals['_LOGUPLOADREQUEST']._serialized_start=1475
-  _globals['_LOGUPLOADREQUEST']._serialized_end=1697
-  _globals['_LOGUPLOADREQUEST_KIND']._serialized_start=1663
-  _globals['_LOGUPLOADREQUEST_KIND']._serialized_end=1697
-  _globals['_UPLOADCOMPLETE']._serialized_start=1699
-  _globals['_UPLOADCOMPLETE']._serialized_end=1804
-  _globals['_COMMANDACK']._serialized_start=1807
-  _globals['_COMMANDACK']._serialized_end=2044
-  _globals['_SERVERFRAME']._serialized_start=2047
-  _globals['_SERVERFRAME']._serialized_end=2286
-  _globals['_PAIRINGRESULT']._serialized_start=2288
-  _globals['_PAIRINGRESULT']._serialized_end=2380
-  _globals['_HEARTBEATACK']._serialized_start=2382
-  _globals['_HEARTBEATACK']._serialized_end=2486
-  _globals['_COMMAND']._serialized_start=2489
-  _globals['_COMMAND']._serialized_end=2906
-  _globals['_TAKEBACKUPNOW']._serialized_start=2908
-  _globals['_TAKEBACKUPNOW']._serialized_end=2923
-  _globals['_RESTORE']._serialized_start=2925
-  _globals['_RESTORE']._serialized_end=2963
-  _globals['_FACTORYRESET']._serialized_start=2965
-  _globals['_FACTORYRESET']._serialized_end=2979
-  _globals['_APPLYUPDATE']._serialized_start=2981
-  _globals['_APPLYUPDATE']._serialized_end=3071
-  _globals['_SIGNEDUPLOADURL']._serialized_start=3074
-  _globals['_SIGNEDUPLOADURL']._serialized_end=3233
-  _globals['_AGENTLINK']._serialized_start=3235
-  _globals['_AGENTLINK']._serialized_end=3318
+  _globals['_HEARTBEAT']._serialized_end=770
+  _globals['_DEVICESTATUS']._serialized_start=773
+  _globals['_DEVICESTATUS']._serialized_end=1209
+  _globals['_DEVICESTATUS_COMPONENTVERSIONSENTRY']._serialized_start=1153
+  _globals['_DEVICESTATUS_COMPONENTVERSIONSENTRY']._serialized_end=1209
+  _globals['_SERVICESTATE']._serialized_start=1211
+  _globals['_SERVICESTATE']._serialized_end=1255
+  _globals['_TELEMETRYBATCH']._serialized_start=1257
+  _globals['_TELEMETRYBATCH']._serialized_end=1367
+  _globals['_TELEMETRYSAMPLE']._serialized_start=1370
+  _globals['_TELEMETRYSAMPLE']._serialized_end=1549
+  _globals['_TELEMETRYSAMPLE_TAGSENTRY']._serialized_start=1506
+  _globals['_TELEMETRYSAMPLE_TAGSENTRY']._serialized_end=1549
+  _globals['_LOCATION']._serialized_start=1552
+  _globals['_LOCATION']._serialized_end=1732
+  _globals['_LOCATION_SOURCE']._serialized_start=1688
+  _globals['_LOCATION_SOURCE']._serialized_end=1732
+  _globals['_FAULTEVENT']._serialized_start=1735
+  _globals['_FAULTEVENT']._serialized_end=2003
+  _globals['_FAULTEVENT_SEVERITY']._serialized_start=1926
+  _globals['_FAULTEVENT_SEVERITY']._serialized_end=1970
+  _globals['_FAULTEVENT_KIND']._serialized_start=1972
+  _globals['_FAULTEVENT_KIND']._serialized_end=2003
+  _globals['_LOGUPLOADREQUEST']._serialized_start=2006
+  _globals['_LOGUPLOADREQUEST']._serialized_end=2228
+  _globals['_LOGUPLOADREQUEST_KIND']._serialized_start=2194
+  _globals['_LOGUPLOADREQUEST_KIND']._serialized_end=2228
+  _globals['_UPLOADCOMPLETE']._serialized_start=2230
+  _globals['_UPLOADCOMPLETE']._serialized_end=2335
+  _globals['_COMMANDACK']._serialized_start=2338
+  _globals['_COMMANDACK']._serialized_end=2575
+  _globals['_SERVERFRAME']._serialized_start=2578
+  _globals['_SERVERFRAME']._serialized_end=2817
+  _globals['_PAIRINGRESULT']._serialized_start=2819
+  _globals['_PAIRINGRESULT']._serialized_end=2911
+  _globals['_HEARTBEATACK']._serialized_start=2913
+  _globals['_HEARTBEATACK']._serialized_end=3017
+  _globals['_COMMAND']._serialized_start=3020
+  _globals['_COMMAND']._serialized_end=3437
+  _globals['_TAKEBACKUPNOW']._serialized_start=3439
+  _globals['_TAKEBACKUPNOW']._serialized_end=3454
+  _globals['_RESTORE']._serialized_start=3456
+  _globals['_RESTORE']._serialized_end=3494
+  _globals['_FACTORYRESET']._serialized_start=3496
+  _globals['_FACTORYRESET']._serialized_end=3510
+  _globals['_APPLYUPDATE']._serialized_start=3512
+  _globals['_APPLYUPDATE']._serialized_end=3602
+  _globals['_SIGNEDUPLOADURL']._serialized_start=3605
+  _globals['_SIGNEDUPLOADURL']._serialized_end=3764
+  _globals['_AGENTLINK']._serialized_start=3766
+  _globals['_AGENTLINK']._serialized_end=3849
 # @@protoc_insertion_point(module_scope)
