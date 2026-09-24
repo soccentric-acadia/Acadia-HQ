@@ -357,7 +357,7 @@ def main() -> int:
         ("T-P20: users.delete applied on the device", "users/command",
          {"operation": "users.delete", "username": "e2e-op"}, _deleted),
         ("T-P20: service.control on an allowlisted unit", "services/control",
-         {"unit": "sshd.service", "action": "restart"}, None),
+         {"unit": "acadia-client.service", "action": "restart"}, None),
         ("T-P20: update.confirm (mark_good) acknowledged", "updates/confirm", None, None),
     ]:
         step(desc, lambda p=path, b=body, d=desc, c=check: command(p, b, d, c))

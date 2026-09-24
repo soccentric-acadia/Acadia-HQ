@@ -31,7 +31,7 @@ async function control(action: ServiceAction) {
         <input
           v-model="unit"
           class="input"
-          placeholder="e.g. sshd.service"
+          placeholder="e.g. acadia-client.service"
           aria-label="Unit name"
           pattern="[A-Za-z0-9@._+-]+"
         />
