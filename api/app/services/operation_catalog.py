@@ -1,108 +1,34 @@
-"""Operations that HQ can durably deliver through the device gateway."""
+"""Operations that HQ can durably deliver through the device gateway.
 
-OPERATIONS = (
-    {
-        "name": "backup",
-        "daemon": "configuration",
-        "command_kind": "take_backup_now",
-        "description": "Capture and upload a device backup.",
-    },
-    {
-        "name": "restore",
-        "daemon": "configuration",
-        "command_kind": "restore",
-        "description": "Restore a previously uploaded device backup.",
-    },
-    {
-        "name": "factory_reset",
-        "daemon": "configuration",
-        "command_kind": "factory_reset",
-        "description": "Reset the device to factory configuration.",
-    },
-    {
-        "name": "apply_update",
-        "daemon": "configuration",
-        "command_kind": "apply_update",
-        "description": "Install a signed device update artifact.",
-    },
-    {
-        "name": "configuration.read",
-        "daemon": "configuration",
-        "command_kind": "configuration_read",
-        "description": "Read device configuration (device configuration contract v1).",
-        "integration_status": "contract_v1_device_integrated",
-    },
-    {
-        "name": "ssh_keys.set",
-        "daemon": "configuration",
-        "command_kind": "ssh_keys_set",
-        "description": "Provision the device operator account's authorized_keys (T-P11).",
-        "integration_status": "device_integrated",
-    },
-    {
-        "name": "configuration.write",
-        "daemon": "configuration",
-        "command_kind": "configuration_write",
-        "description": "Apply signed device configuration (contract v1, Ed25519-signed, T-P13).",
-        "integration_status": "contract_v1_device_integrated",
-    },
-    {
-        "name": "system.reboot",
-        "daemon": "configuration",
-        "command_kind": "reboot",
-        "description": "Reboot the device; executed after the outcome is acknowledged (T-P20).",
-        "integration_status": "device_integrated",
-    },
-    {
-        "name": "system.shutdown",
-        "daemon": "configuration",
-        "command_kind": "shutdown",
-        "description": "Power the device off; carries required_confirmation SHUTDOWN (T-P20).",
-        "integration_status": "device_integrated",
-    },
-    {
-        "name": "update.reboot_to_apply",
-        "daemon": "configuration",
-        "command_kind": "reboot_to_apply",
-        "description": "Tryboot into the freshly installed slot (T-P20).",
-        "integration_status": "device_integrated",
-    },
-    {
-        "name": "update.confirm",
-        "daemon": "configuration",
-        "command_kind": "confirm_update",
-        "description": "Mark the running slot good (T-P20).",
-        "integration_status": "device_integrated",
-    },
-    {
-        "name": "update.rollback",
-        "daemon": "configuration",
-        "command_kind": "rollback_update",
-        "description": "Re-arm the previous slot and reboot; carries required_confirmation ROLLBACK"
-        " (T-P20).",
-        "integration_status": "device_integrated",
-    },
-    {
-        "name": "service.control",
-        "daemon": "configuration",
-        "command_kind": "service_control",
-        "description": "Start/stop/restart/enable/disable one allowlisted device unit (T-P20).",
-        "integration_status": "device_integrated",
-    },
-    {
-        "name": "log_bundle.request",
-        "daemon": "configuration",
-        "command_kind": "log_bundle_request",
-        "description": "Create a device support bundle and upload it to HQ (T-P20).",
-        "integration_status": "device_integrated",
-    },
-    {
-        "name": "users",
-        "daemon": "configuration",
-        "command_kind": "users_command",
-        "description": "Local device web-UI accounts: users.list/create/delete/set_role (T-P20).",
-        "integration_status": "device_integrated",
-    },
+T-P25 (N04): the catalog is built from two contract files instead of a hand
+copy:
+
+* ``contracts/configuration-operations.json`` — vendored from
+  Acadia-Configuration (owner): the device-local ``configuration`` verbs;
+* ``contracts/instrumentation-operation-catalog.json`` — vendored from
+  Acadia-Instrumentation (generated from the spokes' command tables).
+
+``SPOKE_OPERATIONS`` below is HQ *policy* (which spoke verbs HQ may run and
+the minimum role); tests assert every entry exists in the vendored catalog.
+"""
+
+import json
+from pathlib import Path
+
+_CONTRACTS = Path(__file__).resolve().parent.parent / "contracts"
+
+
+def _load(name: str) -> dict:
+    return json.loads((_CONTRACTS / name).read_text(encoding="utf-8"))
+
+
+CONFIGURATION_CATALOG = _load("configuration-operations.json")
+INSTRUMENTATION_CATALOG = _load("instrumentation-operation-catalog.json")
+
+OPERATIONS = tuple(
+    {**op, "integration_status": "device_integrated"}
+    for op in CONFIGURATION_CATALOG["operations"]
+) + (
     {
         "name": "operation.run",
         "daemon": "configuration",
@@ -111,6 +37,12 @@ OPERATIONS = (
         "integration_status": "device_integrated",
     },
 )
+
+
+def spoke_catalog() -> dict[str, list[dict]]:
+    """Instrumentation spoke verbs, from the generated catalog."""
+    return INSTRUMENTATION_CATALOG["spokes"]
+
 
 # T-P20 (N05): the Instrumentation spoke operations HQ may run through the
 # generic ``operation.run`` command, with the minimum role for each. Anything

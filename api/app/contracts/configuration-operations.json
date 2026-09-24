@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "source": "Acadia-Configuration hq_command_handler.rs (device-local verbs of the `configuration` pseudo-daemon)",
+  "operations": [
+    {
+      "name": "backup",
+      "daemon": "configuration",
+      "command_kind": "take_backup_now",
+      "description": "Capture the redacted device backup and upload it to HQ."
+    },
+    {
+      "name": "restore",
+      "daemon": "configuration",
+      "command_kind": "restore",
+      "description": "Restore a previously uploaded device backup."
+    },
+    {
+      "name": "factory_reset",
+      "daemon": "configuration",
+      "command_kind": "factory_reset",
+      "description": "Reset device settings; reboots after the outcome is acknowledged.",
+      "required_confirmation": "FACTORY-RESET"
+    },
+    {
+      "name": "apply_update",
+      "daemon": "configuration",
+      "command_kind": "apply_update",
+      "description": "Download, SHA-256-verify and install a signed update to the inactive slot."
+    },
+    {
+      "name": "configuration.read",
+      "daemon": "configuration",
+      "command_kind": "configuration_read",
+      "description": "Read the device configuration document (contract v1)."
+    },
+    {
+      "name": "configuration.write",
+      "daemon": "configuration",
+      "command_kind": "configuration_write",
+      "description": "Ed25519-signed configuration write; merges, applies and reports per-applier outcomes."
+    },
+    {
+      "name": "ssh_keys.set",
+      "daemon": "configuration",
+      "command_kind": "ssh_keys_set",
+      "description": "Provision the operator account's authorized_keys."
+    },
+    {
+      "name": "system.reboot",
+      "daemon": "configuration",
+      "command_kind": "reboot",
+      "description": "Reboot the device (executed after the outcome is acknowledged)."
+    },
+    {
+      "name": "system.shutdown",
+      "daemon": "configuration",
+      "command_kind": "shutdown",
+      "description": "Power the device off.",
+      "required_confirmation": "SHUTDOWN"
+    },
+    {
+      "name": "update.reboot_to_apply",
+      "daemon": "configuration",
+      "command_kind": "reboot_to_apply",
+      "description": "Tryboot into the freshly installed slot."
+    },
+    {
+      "name": "update.confirm",
+      "daemon": "configuration",
+      "command_kind": "confirm_update",
+      "description": "Mark the running slot good."
+    },
+    {
+      "name": "update.rollback",
+      "daemon": "configuration",
+      "command_kind": "rollback_update",
+      "description": "Re-arm the previous slot and reboot.",
+      "required_confirmation": "ROLLBACK"
+    },
+    {
+      "name": "service.control",
+      "daemon": "configuration",
+      "command_kind": "service_control",
+      "description": "Start/stop/restart/enable/disable one allowlisted unit."
+    },
+    {
+      "name": "log_bundle.request",
+      "daemon": "configuration",
+      "command_kind": "log_bundle_request",
+      "description": "Create a logmanager support bundle and upload it to HQ."
+    },
+    {
+      "name": "users.list",
+      "daemon": "configuration",
+      "command_kind": "users_command",
+      "description": "List local web-UI accounts (no hashes)."
+    },
+    {
+      "name": "users.create",
+      "daemon": "configuration",
+      "command_kind": "users_command",
+      "description": "Create a local web-UI account."
+    },
+    {
+      "name": "users.delete",
+      "daemon": "configuration",
+      "command_kind": "users_command",
+      "description": "Delete a local web-UI account (last-admin guarded)."
+    },
+    {
+      "name": "users.set_role",
+      "daemon": "configuration",
+      "command_kind": "users_command",
+      "description": "Change a local web-UI account's role."
+    }
+  ]
+}
