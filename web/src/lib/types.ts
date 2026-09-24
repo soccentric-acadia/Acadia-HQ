@@ -120,6 +120,10 @@ export interface LogBundle {
   uploaded_at: string
   time_range_start: string
   time_range_end: string
+  /** T-P22: pending until the device reports the upload and HQ verified it. */
+  upload_state: 'pending' | 'complete' | 'failed' | 'unverified'
+  sha256?: string | null
+  upload_error?: string | null
 }
 
 export interface LogBundleListResponse {
@@ -133,6 +137,10 @@ export interface Backup {
   size_bytes: number
   created_at: string
   restored_at: string | null
+  /** T-P22: pending until the device reports the upload and HQ verified it. */
+  upload_state: 'pending' | 'complete' | 'failed' | 'unverified'
+  sha256?: string | null
+  upload_error?: string | null
 }
 
 export interface BackupListResponse {

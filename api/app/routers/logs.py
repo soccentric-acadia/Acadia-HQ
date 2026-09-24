@@ -53,4 +53,8 @@ async def download_log_bundle(
     ).scalar_one_or_none()
     if bundle is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "log bundle not found")
+    if bundle.upload_state not in ("complete", "unverified"):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, f"log bundle upload is {bundle.upload_state}"
+        )
     return DownloadUrlOut(download_url=presigned_download_url(bundle.storage_url))

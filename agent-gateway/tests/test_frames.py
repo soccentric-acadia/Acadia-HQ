@@ -336,3 +336,69 @@ async def test_command_ack_failure_records_error_and_payload(gateway_stub, db_se
     assert command.state == CommandState.failed
     assert command.result_code == "INTERNAL"
     assert command.result_error == "spoke not connected"
+
+
+async def _upload_round_trip(gateway_stub, device, credential, *, put: bool, report_size=None):
+    """LogUploadRequest → SignedUploadUrl (client_ref echoed) → optional real
+    PUT to storage → UploadComplete (T-P22)."""
+    import asyncio
+    import hashlib
+    import urllib.request
+
+    from acadiahq.agent_pb2 import LogUploadRequest, UploadComplete
+
+    body = b"bundle-bytes" * 100
+    got_url: asyncio.Queue = asyncio.Queue()
+    seen = {}
+
+    async def frames():
+        yield AgentFrame(heartbeat=_hb(str(device.id), credential))
+        yield AgentFrame(
+            log_upload_request=LogUploadRequest(
+                kind=LogUploadRequest.LOG_BUNDLE, size_bytes_estimate=len(body), client_ref="c-1"
+            )
+        )
+        url = await asyncio.wait_for(got_url.get(), 10)
+        seen["url"] = url
+        if put:
+            req = urllib.request.Request(url.upload_url, data=body, method="PUT")
+            await asyncio.to_thread(urllib.request.urlopen, req)
+        yield AgentFrame(
+            upload_complete=UploadComplete(
+                request_ref=url.request_ref,
+                success=True,
+                size_bytes=report_size if report_size is not None else len(body),
+                sha256=hashlib.sha256(body).hexdigest(),
+            )
+        )
+
+    async for frame in gateway_stub.Connect(frames()):
+        if frame.HasField("signed_upload_url"):
+            await got_url.put(frame.signed_upload_url)
+    return seen["url"]
+
+
+async def test_upload_complete_finalises_the_row(gateway_stub, db_session):
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+    url = await _upload_round_trip(gateway_stub, device, credential, put=True)
+    assert url.client_ref == "c-1"
+    bundle = (
+        await db_session.execute(select(LogBundle).where(LogBundle.device_id == device.id))
+    ).scalar_one()
+    await db_session.refresh(bundle)
+    assert bundle.upload_state == "complete"
+    assert bundle.size_bytes == len(b"bundle-bytes" * 100)
+    assert bundle.sha256 and bundle.completed_at is not None
+
+
+async def test_upload_complete_without_object_fails_the_row(gateway_stub, db_session):
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+    await _upload_round_trip(gateway_stub, device, credential, put=False)
+    bundle = (
+        await db_session.execute(select(LogBundle).where(LogBundle.device_id == device.id))
+    ).scalar_one()
+    await db_session.refresh(bundle)
+    assert bundle.upload_state == "failed"
+    assert "not found" in bundle.upload_error

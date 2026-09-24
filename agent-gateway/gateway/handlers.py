@@ -18,8 +18,19 @@ from app.models.fault import Fault
 from app.models.log_bundle import LogBundle
 from app.models.telemetry import TelemetrySample
 from app.config import get_settings
-from app.services.storage import new_object_id, object_key, presigned_upload_url
-from acadiahq.agent_pb2 import FaultEvent, Location, LogUploadRequest, TelemetryBatch
+from app.services.storage import (
+    new_object_id,
+    object_key,
+    object_size,
+    presigned_upload_url,
+)
+from acadiahq.agent_pb2 import (
+    FaultEvent,
+    Location,
+    LogUploadRequest,
+    TelemetryBatch,
+    UploadComplete,
+)
 
 logger = logging.getLogger("gateway.handlers")
 
@@ -72,10 +83,11 @@ async def handle_telemetry_batch(
 async def handle_log_upload_request(
     session: AsyncSession, device: Device, req: LogUploadRequest
 ) -> tuple[str, str, int]:
-    """Creates the LogBundle/Backup row eagerly (optimistic -- there is no
-    upload-complete callback in this proto version, see gateway/servicer.py)
-    and returns (request_ref, presigned_put_url, expires_in_s) for the
-    SignedUploadUrl response frame.
+    """Creates the LogBundle/Backup row in ``upload_state="pending"`` and
+    returns (request_ref, presigned_put_url, expires_in_s) for the
+    SignedUploadUrl response frame. The row becomes ``complete``/``failed``
+    on the device's UploadComplete (T-P22, see handle_upload_complete); rows
+    whose upload never reports back are failed by the stale sweep.
     """
     object_id = new_object_id()
     kind = "backup" if req.kind == LogUploadRequest.BACKUP else "log_bundle"
@@ -108,6 +120,62 @@ async def handle_log_upload_request(
 
     expires_in = 900
     return str(object_id), presigned_upload_url(key, expires_in=expires_in), expires_in
+
+
+async def handle_upload_complete(
+    session: AsyncSession, device: Device, msg: UploadComplete
+) -> str | None:
+    """Finalise a backup/log-bundle row (T-P22). A reported success is
+    trusted only after HQ sees the object in storage at the reported size.
+    Returns the resulting state, or None for an unknown request_ref."""
+    try:
+        object_id = uuid.UUID(msg.request_ref)
+    except ValueError:
+        logger.warning("upload_complete with malformed request_ref %r", msg.request_ref)
+        return None
+    row = await session.get(Backup, object_id)
+    if row is None:
+        row = await session.get(LogBundle, object_id)
+    if row is None or row.device_id != device.id:
+        logger.warning("upload_complete for unknown request_ref %s", msg.request_ref)
+        return None
+    if row.upload_state not in ("pending", "unverified"):
+        return row.upload_state  # duplicate report: first outcome wins
+    now = datetime.now(UTC)
+    if msg.success:
+        stored = object_size(row.storage_url)
+        if stored is None:
+            row.upload_state, row.upload_error = "failed", "object not found in storage"
+        elif msg.size_bytes and stored != msg.size_bytes:
+            row.upload_state = "failed"
+            row.upload_error = f"stored size {stored} != reported {msg.size_bytes}"
+        else:
+            row.upload_state, row.upload_error = "complete", None
+            row.size_bytes = stored
+            row.sha256 = msg.sha256 or None
+            if isinstance(row, LogBundle):
+                row.uploaded_at = now
+    else:
+        row.upload_state, row.upload_error = "failed", msg.error or "device reported failure"
+    row.completed_at = now
+    return row.upload_state
+
+
+async def fail_stale_uploads(session: AsyncSession, older_than: datetime) -> int:
+    """Pending uploads whose presigned URL long expired without a report."""
+    count = 0
+    for model, stamp in ((Backup, Backup.created_at), (LogBundle, LogBundle.uploaded_at)):
+        rows = (
+            await session.execute(
+                select(model).where(model.upload_state == "pending", stamp < older_than)
+            )
+        ).scalars().all()
+        for row in rows:
+            row.upload_state = "failed"
+            row.upload_error = "upload never reported complete"
+            row.completed_at = datetime.now(UTC)
+            count += 1
+    return count
 
 
 async def _evaluate_fault_alarms(session: AsyncSession, device: Device, fault: Fault) -> None:

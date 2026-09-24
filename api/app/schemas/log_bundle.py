@@ -15,6 +15,10 @@ class LogBundleOut(BaseModel):
     uploaded_at: datetime
     time_range_start: datetime
     time_range_end: datetime
+    upload_state: str
+    sha256: str | None = None
+    upload_error: str | None = None
+    completed_at: datetime | None = None
 
 
 class LogBundleListOut(BaseModel):

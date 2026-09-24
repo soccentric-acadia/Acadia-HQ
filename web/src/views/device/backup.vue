@@ -89,18 +89,19 @@ onMounted(load)
       <div v-else class="table-wrap">
         <table class="table">
           <thead>
-            <tr><th>Created</th><th>Size</th><th>Restored</th><th></th></tr>
+            <tr><th>Created</th><th>Size</th><th>Upload</th><th>Restored</th><th></th></tr>
           </thead>
           <tbody>
             <tr v-for="b in backups" :key="b.id">
               <td>{{ new Date(b.created_at).toLocaleString() }}</td>
               <td><code>{{ fmtBytes(b.size_bytes) }}</code></td>
+              <td :title="b.upload_error ?? ''">{{ b.upload_state }}</td>
               <td>{{ b.restored_at ? new Date(b.restored_at).toLocaleString() : '—' }}</td>
               <td>
                 <div class="table-actions">
                   <button
                     class="btn btn-destructive-outline btn-sm"
-                    :disabled="busy"
+                    :disabled="busy || !['complete', 'unverified'].includes(b.upload_state)"
                     @click="restoreTarget = b"
                   >
                     Restore

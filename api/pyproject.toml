@@ -17,8 +17,8 @@ dependencies = [
     "python-jose[cryptography]>=3.3",
     "boto3>=1.35",
     "arq>=0.26",
-    "grpcio>=1.66",
-    "protobuf>=5.28",
+    "grpcio>=1.83.1",  # agent_pb2*_grpc generated with 1.83.1 (T-P22)
+    "protobuf>=7.35.1",  # agent_pb2 gencode runtime check (T-P22)
 ]
 
 [project.optional-dependencies]

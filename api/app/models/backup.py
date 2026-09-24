@@ -19,3 +19,11 @@ class Backup(Base, UUIDPKMixin):
     size_bytes: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     restored_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # T-P22 (L07/J05/J06, HQ-024): "pending" until the device reports the
+    # upload (UploadComplete) and HQ confirmed the object exists at the
+    # reported size; then "complete" or "failed". Rows from before T-P22 are
+    # "unverified" (created optimistically on the upload request).
+    upload_state: Mapped[str] = mapped_column(default="pending", index=True)
+    sha256: Mapped[str | None] = mapped_column(nullable=True)
+    upload_error: Mapped[str | None] = mapped_column(nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

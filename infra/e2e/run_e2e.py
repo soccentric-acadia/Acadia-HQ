@@ -423,22 +423,30 @@ def main() -> int:
 
     # ── 10. take_backup_now → device uploads through a presigned URL ───────
     def backup_round_trip():
+        _, _, before = call("GET", f"{api}/devices/{device_id}/backups", headers=ADMIN)
+        known = {r["id"] for r in before.get("items", [])}
         st, _, out = call("POST", f"{api}/devices/{device_id}/backups", headers=ADMIN)
         if st != 202:
             raise RuntimeError(f"backup queue: {st} {out}")
         if not wait_command(api, device_id, out["command_id"], ADMIN, "backup ack"):
             raise RuntimeError("backup command not acknowledged")
 
-        def listed():
+        def completed():
+            # T-P22: the row is final only after the device's UploadComplete
+            # and HQ's storage check — no more optimistic rows.
             _, _, items = call("GET", f"{api}/devices/{device_id}/backups", headers=ADMIN)
-            return items.get("items") or None
+            rows = [r for r in items.get("items") or [] if r["id"] not in known]
+            failed = [r for r in rows if r.get("upload_state") == "failed"]
+            if failed:
+                raise RuntimeError(f"backup upload failed: {failed[0].get('upload_error')}")
+            return [r for r in rows if r.get("upload_state") == "complete"] or None
 
-        rows = poll(listed, timeout=60, desc="backup row")
+        rows = poll(completed, timeout=60, desc="backup upload complete")
         if not rows:
-            raise RuntimeError("no backup row after the upload")
+            raise RuntimeError("backup upload never reported complete")
         return rows
 
-    step("typed take_backup_now executes on-device and uploads", backup_round_trip)
+    step("typed take_backup_now uploads; UploadComplete finalises the row", backup_round_trip)
 
     print(f"\nE2E RESULT: {PASS} passed, {FAIL} failed")
     return 1 if FAIL else 0

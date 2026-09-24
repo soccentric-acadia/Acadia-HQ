@@ -299,8 +299,14 @@ class AgentLinkServicer(_AgentLinkServicer):
                     request_ref=request_ref,
                     upload_url=url,
                     expires_at_unix_ms=_now_ms() + expires_in * 1000,
+                    # T-P22: echo the device's correlation id and the kind.
+                    client_ref=frame.log_upload_request.client_ref,
+                    kind=frame.log_upload_request.kind,
                 )
             )
+        if frame.HasField("upload_complete"):
+            await handlers.handle_upload_complete(session, device, frame.upload_complete)
+            return None
         if frame.HasField("command_ack"):
             ack = frame.command_ack
             await handlers.handle_command_ack(

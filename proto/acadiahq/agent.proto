@@ -24,6 +24,9 @@ message AgentFrame {
     FaultEvent fault_event = 4;
     LogUploadRequest log_upload_request = 5;
     CommandAck command_ack = 6;
+    // T-P22 (L07/J05/J06, HQ-024): the device reports the outcome of a
+    // presigned upload; HQ finalises the backup/log-bundle row on it.
+    UploadComplete upload_complete = 7;
   }
 }
 
@@ -102,6 +105,18 @@ message LogUploadRequest {
   int64 time_range_start_unix_ms = 2;
   int64 time_range_end_unix_ms = 3;
   int64 size_bytes_estimate = 4;
+  // T-P22: device-chosen id echoed in SignedUploadUrl so the URL is matched
+  // to the right blob (was positional FIFO). Empty from pre-T-P22 devices.
+  string client_ref = 5;
+}
+
+// T-P22: outcome of the PUT to a SignedUploadUrl.
+message UploadComplete {
+  string request_ref = 1;   // SignedUploadUrl.request_ref (HQ object id)
+  bool success = 2;
+  int64 size_bytes = 3;     // bytes actually uploaded
+  string sha256 = 4;        // hex digest of the uploaded blob
+  string error = 5;         // set when success == false
 }
 
 // Device's response after executing a pushed Command.
@@ -184,4 +199,7 @@ message SignedUploadUrl {
   string request_ref = 1; // echoes back which LogUploadRequest this answers
   string upload_url = 2;
   int64 expires_at_unix_ms = 3;
+  // T-P22: echoes LogUploadRequest.client_ref / kind.
+  string client_ref = 4;
+  LogUploadRequest.Kind kind = 5;
 }

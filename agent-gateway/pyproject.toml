@@ -4,8 +4,8 @@ version = "0.1.0"
 description = "Acadia-HQ agent-gateway: gRPC bidi endpoint for device connections (pairing, heartbeat, telemetry, faults, commands)"
 requires-python = ">=3.12"
 dependencies = [
-    "grpcio>=1.66",
-    "protobuf>=5.28",
+    "grpcio>=1.83.1",  # agent_pb2*_grpc generated with 1.83.1 (T-P22)
+    "protobuf>=7.35.1",  # agent_pb2 gencode runtime check (T-P22)
     "acadiahq-api",
     "arq>=0.26",
 ]
@@ -14,7 +14,7 @@ dependencies = [
 dev = [
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
-    "grpcio-tools>=1.66",
+    "grpcio-tools>=1.83.1",
     "ruff>=0.7",
 ]
 

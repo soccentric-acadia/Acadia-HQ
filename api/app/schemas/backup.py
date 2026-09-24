@@ -14,6 +14,10 @@ class BackupOut(BaseModel):
     size_bytes: int
     created_at: datetime
     restored_at: datetime | None
+    upload_state: str
+    sha256: str | None = None
+    upload_error: str | None = None
+    completed_at: datetime | None = None
 
 
 class BackupListOut(BaseModel):

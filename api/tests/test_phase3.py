@@ -146,14 +146,27 @@ async def test_log_bundle_list_and_download_url(client, db_session):
         uploaded_at=now,
         time_range_start=now - timedelta(hours=1),
         time_range_end=now,
+        upload_state="complete",  # T-P22: only completed uploads are downloadable
     )
+    pending = LogBundle(
+        device_id=device.id,
+        storage_url="log_bundle/x/pending",
+        size_bytes=1,
+        uploaded_at=now,
+        time_range_start=now,
+        time_range_end=now,
+    )
+    db_session.add(pending)
     db_session.add(bundle)
     await db_session.commit()
     await db_session.refresh(bundle)
 
     login_as(client, admin)
     resp = await client.get(f"/devices/{device.id}/logs")
-    assert len(resp.json()["items"]) == 1
+    assert len(resp.json()["items"]) == 2
+    await db_session.refresh(pending)
+    blocked = await client.get(f"/devices/{device.id}/logs/{pending.id}/download")
+    assert blocked.status_code == 409
 
     resp = await client.get(f"/devices/{device.id}/logs/{bundle.id}/download")
     assert resp.status_code == 200

@@ -84,7 +84,7 @@ onMounted(load)
       <div v-else class="table-wrap">
         <table class="table">
           <thead>
-            <tr><th>Time range</th><th>Uploaded</th><th>Size</th><th></th></tr>
+            <tr><th>Time range</th><th>Uploaded</th><th>Size</th><th>Upload</th><th></th></tr>
           </thead>
           <tbody>
             <tr v-for="b in bundles" :key="b.id">
@@ -94,9 +94,16 @@ onMounted(load)
               </td>
               <td>{{ new Date(b.uploaded_at).toLocaleString() }}</td>
               <td><code>{{ fmtBytes(b.size_bytes) }}</code></td>
+              <td :title="b.upload_error ?? ''">{{ b.upload_state }}</td>
               <td>
                 <div class="table-actions">
-                  <button class="btn btn-outline btn-sm" @click="download(b)">Download</button>
+                  <button
+                    class="btn btn-outline btn-sm"
+                    :disabled="!['complete', 'unverified'].includes(b.upload_state)"
+                    @click="download(b)"
+                  >
+                    Download
+                  </button>
                 </div>
               </td>
             </tr>

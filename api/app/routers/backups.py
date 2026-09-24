@@ -83,7 +83,15 @@ async def restore_backup(
     if backup is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "backup not found")
 
-    download_url = presigned_download_url(backup.storage_url)
+    if backup.upload_state not in ("complete", "unverified"):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, f"backup upload is {backup.upload_state}; nothing to restore"
+        )
+    # The URL must outlive the command: an offline device fetches it when it
+    # reconnects, up to the command TTL (was a fixed 300 s).
+    download_url = presigned_download_url(
+        backup.storage_url, expires_in=get_settings().command_ttl_seconds + 3600
+    )
     command_id = f"restore:{backup_id}"
     expires_at = datetime.now(UTC) + timedelta(seconds=get_settings().command_ttl_seconds)
     db.add(

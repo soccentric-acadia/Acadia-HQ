@@ -14,9 +14,13 @@ from app.db.base import get_session_factory
 from app.models.device import Device
 from app.services import audit
 
+from gateway import handlers
+
 from gateway.config import get_gateway_settings
 
 logger = logging.getLogger("gateway.stale_sweep")
+
+STALE_UPLOAD_AFTER = timedelta(hours=1)
 
 
 async def sweep_once() -> int:
@@ -36,6 +40,13 @@ async def sweep_once() -> int:
             await audit.record_system(
                 session, device, "device.offline", payload={"reason": "heartbeat_timeout"}
             )
+        # T-P22: a presigned upload URL lives 15 min; a row still pending an
+        # hour later will never complete.
+        failed = await handlers.fail_stale_uploads(
+            session, datetime.now(UTC) - STALE_UPLOAD_AFTER
+        )
+        if failed:
+            logger.info("stale sweep: failed %d never-completed upload(s)", failed)
         await session.commit()
         return len(devices)
 
