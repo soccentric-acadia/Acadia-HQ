@@ -85,11 +85,11 @@ db-down: ## stop them (data persists in docker volumes)
 	$(COMPOSE) down
 
 migrate: ## alembic upgrade head
-	ACADIAHQ_DATABASE_URL=$(DATABASE_URL) $(VENV)/bin/alembic upgrade head
+	ACADIAHQ_ENV=dev ACADIAHQ_DATABASE_URL=$(DATABASE_URL) $(VENV)/bin/alembic upgrade head
 
 seed:
 	@test -n "$(EMAIL)" || { echo "usage: make seed EMAIL=you@example.com"; exit 1; }
-	cd api && ACADIAHQ_DATABASE_URL=$(DATABASE_URL) $(PY) -m scripts.seed_dev --email $(EMAIL)
+	cd api && ACADIAHQ_ENV=dev ACADIAHQ_DATABASE_URL=$(DATABASE_URL) $(PY) -m scripts.seed_dev --email $(EMAIL)
 
 # Each service is launched as `(cd dir && exec env VARS nohup cmd) &` --
 # the `exec` makes the subshell replace its own process image with the
@@ -112,10 +112,10 @@ run: db-up migrate ## start db + api + agent-gateway + web in the background
 		exit 1; \
 	fi
 	@echo "starting api, agent-gateway, web..."
-	@(cd api && exec env ACADIAHQ_DATABASE_URL=$(DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
+	@(cd api && exec env ACADIAHQ_ENV=dev ACADIAHQ_DATABASE_URL=$(DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
 		ACADIAHQ_OIDC_ISSUER=$(ACADIAHQ_OIDC_ISSUER) \
 		nohup $(PY) -m uvicorn app.main:app --host 0.0.0.0 --port 8000 > $(RUN_DIR)/api.log 2>&1) & echo $$! > $(RUN_DIR)/api.pid
-	@(cd agent-gateway && exec env ACADIAHQ_DATABASE_URL=$(DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
+	@(cd agent-gateway && exec env ACADIAHQ_ENV=dev ACADIAHQ_DATABASE_URL=$(DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
 		nohup $(PY) -m gateway.server > $(RUN_DIR)/gateway.log 2>&1) & echo $$! > $(RUN_DIR)/gateway.pid
 	@WATCH_OK=1; \
 		node -e 'try{const w=require("fs").watch(__filename);w.close()}catch(e){process.exit(1)}' 2>/dev/null || WATCH_OK=0; \
@@ -153,11 +153,11 @@ logs: ## tail logs for the background services
 test: test-api test-gateway test-web ## run api + agent-gateway + web test suites
 
 test-api:
-	cd api && ACADIAHQ_TEST_DATABASE_URL=$(TEST_DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
+	cd api && ACADIAHQ_ENV=test ACADIAHQ_TEST_DATABASE_URL=$(TEST_DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
 		$(VENV)/bin/python -m pytest -q
 
 test-gateway:
-	cd agent-gateway && ACADIAHQ_TEST_DATABASE_URL=$(TEST_DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
+	cd agent-gateway && ACADIAHQ_ENV=test ACADIAHQ_TEST_DATABASE_URL=$(TEST_DATABASE_URL) ACADIAHQ_S3_ENDPOINT_URL=$(S3_ENDPOINT_URL) \
 		$(VENV)/bin/python -m pytest -q
 
 test-web:

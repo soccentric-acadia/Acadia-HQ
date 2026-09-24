@@ -119,12 +119,12 @@ def hq_session_cookie() -> str:
 
     Requires the harness database to be migrated (alembic upgrade head) and
     seeded (api/scripts/seed_dev.py --email e2e@example.com) — the README
-    covers both. The driver then mints the session JWT the API validates for
-    that invited admin (dev harness; production users come through OIDC).
+    covers both. The driver then opens a server-side session for that invited
+    admin (dev harness; production users come through OIDC).
     """
     from app.auth.deps import SESSION_COOKIE_NAME
-    from app.auth.session import issue_session_token
     from app.db.base import get_session_factory
+    from app.services import sessions
     from app.models.enums import UserRole
     from app.models.user import User
     from sqlalchemy import select
@@ -137,7 +137,9 @@ def hq_session_cookie() -> str:
                     select(User).where(User.role == UserRole.admin).limit(1)
                 )
             ).scalar_one()
-            token = issue_session_token(user.id, user.tenant_id, user.role.value)
+            # T-P34: sessions are server-side rows; open a real one.
+            token = await sessions.create_session(session, user)
+            await session.commit()
             return f"{SESSION_COOKIE_NAME}={token}"
 
     return asyncio.run(_mint())

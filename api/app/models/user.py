@@ -1,4 +1,4 @@
-from sqlalchemy import Enum, UniqueConstraint
+from sqlalchemy import Boolean, Enum, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -17,3 +17,6 @@ class User(Base, TenantScopedMixin):
     # OIDC provider's `sub` claim. Nullable so a pre-invited user row can
     # exist before the person has ever logged in.
     auth_subject_id: Mapped[str | None] = mapped_column(index=True, unique=True, nullable=True)
+    # T-P34 (B08): a deactivated user cannot log in and every session they
+    # hold is revoked; the row (and its audit trail) is kept.
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)

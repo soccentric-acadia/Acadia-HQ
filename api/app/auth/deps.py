@@ -1,8 +1,7 @@
-from uuid import UUID
-
 from fastapi import Depends, HTTPException, Request, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.session import InvalidSession, verify_session_token
+from app.db.deps import get_db
 from app.models.enums import UserRole
 from app.services.tenant_repo import TenantContext
 
@@ -11,19 +10,20 @@ SESSION_COOKIE_NAME = "acadiahq_session"
 _ROLE_RANK = {UserRole.viewer: 0, UserRole.operator: 1, UserRole.admin: 2}
 
 
-async def get_current_context(request: Request) -> TenantContext:
+async def get_current_context(
+    request: Request, db: AsyncSession = Depends(get_db)
+) -> TenantContext:
+    """T-P34 (HQ-005/006): the cookie must name a live server-side session;
+    tenant and role come from the user row, not from the token."""
+    from app.services import sessions
+
     token = request.cookies.get(SESSION_COOKIE_NAME)
     if not token:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "not authenticated")
-    try:
-        claims = verify_session_token(token)
-    except InvalidSession as exc:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid session") from exc
-    return TenantContext(
-        tenant_id=UUID(claims["tenant_id"]),
-        user_id=UUID(claims["sub"]),
-        role=claims["role"],
-    )
+    ctx = await sessions.resolve(db, token)
+    if ctx is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid session")
+    return ctx
 
 
 def require_role(minimum: UserRole):

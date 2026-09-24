@@ -5,7 +5,8 @@ from tests.factories import login_as, make_tenant, make_user
 async def test_operation_discovery_returns_canonical_device_operations(client, db_session):
     tenant = await make_tenant(db_session)
     viewer = await make_user(db_session, tenant, UserRole.viewer)
-    login_as(client, viewer)
+    await db_session.commit()
+    await login_as(client, viewer)
 
     response = await client.get("/operations")
 

@@ -51,7 +51,7 @@ async def test_artifact_upload_verifies_sha256(client, db_session):
     tenant = await make_tenant(db_session)
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
-    login_as(client, admin)
+    await login_as(client, admin)
     art, bad = await _artifact(client, version="9.9.9", body=b"tampered")
     assert bad.status_code == 422
     listed = (await client.get("/updates/artifacts")).json()["items"]
@@ -68,7 +68,7 @@ async def test_rollout_requires_uploaded_artifact(client, db_session):
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
     await _devices(db_session, tenant, 2)
-    login_as(client, admin)
+    await login_as(client, admin)
     art, _ = await _artifact(client, version="2.0.0", body=b"x", sha=SHA)  # mismatch
     r = await client.post("/updates/rollouts", json={"artifact_id": art["id"], "target": "all"})
     assert r.status_code == 400
@@ -80,7 +80,7 @@ async def test_canary_passes_then_remainder_queued_and_activated(client, db_sess
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
     devices = await _devices(db_session, tenant, 10)
-    login_as(client, admin)
+    await login_as(client, admin)
     art, _ = await _artifact(client)
     r = await client.post(
         "/updates/rollouts",
@@ -118,7 +118,7 @@ async def test_canary_failure_halts_rollout(client, db_session):
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
     await _devices(db_session, tenant, 5)
-    login_as(client, admin)
+    await login_as(client, admin)
     art, _ = await _artifact(client)
     rollout = (
         await client.post(
@@ -154,7 +154,7 @@ async def test_device_group_rollout_targets_tag(client, db_session):
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
     devices = await _devices(db_session, tenant, 3)
-    login_as(client, admin)
+    await login_as(client, admin)
     r = await client.put(f"/devices/{devices[0].id}/tags", json={"tags": ["canary", "lab"]})
     assert r.status_code == 200 and r.json()["tags"] == ["canary", "lab"]
     bad = await client.put(f"/devices/{devices[1].id}/tags", json={"tags": ["no spaces"]})
@@ -175,9 +175,9 @@ async def test_artifacts_are_tenant_scoped(client, db_session):
     a1 = await make_user(db_session, t1, UserRole.admin)
     a2 = await make_user(db_session, t2, UserRole.admin)
     await db_session.commit()
-    login_as(client, a1)
+    await login_as(client, a1)
     art, _ = await _artifact(client)
-    login_as(client, a2)
+    await login_as(client, a2)
     assert (await client.get("/updates/artifacts")).json()["items"] == []
     r = await client.put(f"/updates/artifacts/{art['id']}/content", content=BUNDLE)
     assert r.status_code == 404
@@ -187,7 +187,7 @@ async def test_operator_cannot_create_rollouts(client, db_session):
     tenant = await make_tenant(db_session)
     op = await make_user(db_session, tenant, UserRole.operator)
     await db_session.commit()
-    login_as(client, op)
+    await login_as(client, op)
     r = await client.post(
         "/updates/artifacts",
         json={"version": "1", "target_board_rev": "r", "checksum_sha256": SHA},

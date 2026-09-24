@@ -4,7 +4,6 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import SESSION_COOKIE_NAME
-from app.auth.session import issue_session_token
 from app.models.enums import UserRole
 from app.models.tenant import Tenant
 from app.models.user import User
@@ -31,6 +30,14 @@ async def make_user(
     return user
 
 
-def login_as(client: AsyncClient, user: User) -> None:
-    token = issue_session_token(user.id, user.tenant_id, user.role.value)
+async def login_as(client: AsyncClient, user: User) -> None:
+    """Open a real server-side session for `user` (T-P34) and set its cookie.
+    Uses its own DB session so callers need not pass one; the user row must
+    already be committed."""
+    from app.db.base import get_session_factory
+    from app.services import sessions
+
+    async with get_session_factory()() as db:
+        token = await sessions.create_session(db, await db.get(User, user.id))
+        await db.commit()
     client.cookies.set(SESSION_COOKIE_NAME, token)

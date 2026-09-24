@@ -22,6 +22,8 @@ from app.config import get_settings
 class OIDCIdentity:
     subject: str
     email: str
+    # T-P34 (HQ-001): whether the IdP asserts the address is verified.
+    email_verified: bool = False
 
 
 class OIDCError(Exception):
@@ -57,7 +59,7 @@ class OIDCClient:
                 self._jwks_fetched_at = time.monotonic()
         return self._jwks
 
-    def authorization_url(self, state: str, redirect_uri: str) -> str:
+    def authorization_url(self, state: str, redirect_uri: str, nonce: str | None = None) -> str:
         client = AsyncOAuth2Client(
             client_id=self.settings.oidc_client_id,
             redirect_uri=redirect_uri,
@@ -66,7 +68,10 @@ class OIDCClient:
         # authlib builds the URL synchronously against a known authorize
         # endpoint; discovery is only needed for token exchange/JWKS.
         authorize_endpoint = f"{self.settings.oidc_issuer}/protocol/openid-connect/auth"
-        url, _ = client.create_authorization_url(authorize_endpoint, state=state)
+        # T-P34 (HQ-002): the nonce binds the returned id_token to this
+        # browser's login attempt (replay protection, OIDC core §3.1.2.1).
+        extra = {"nonce": nonce} if nonce else {}
+        url, _ = client.create_authorization_url(authorize_endpoint, state=state, **extra)
         return url
 
     async def exchange_code(self, code: str, redirect_uri: str) -> dict:
@@ -84,7 +89,9 @@ class OIDCClient:
         )
         return token
 
-    async def verify_id_token(self, id_token: str, access_token: str) -> OIDCIdentity:
+    async def verify_id_token(
+        self, id_token: str, access_token: str, nonce: str | None = None
+    ) -> OIDCIdentity:
         jwks = await self._get_jwks()
         try:
             claims = jose_jwt.decode(
@@ -102,7 +109,15 @@ class OIDCClient:
         except Exception as exc:  # noqa: BLE001 - surfaced as a uniform auth failure
             raise OIDCError(f"invalid id_token: {exc}") from exc
 
+        if nonce is not None:
+            import secrets
+
+            got = claims.get("nonce")
+            if not isinstance(got, str) or not secrets.compare_digest(got, nonce):
+                raise OIDCError("id_token nonce mismatch")
         email = claims.get("email")
         if not email:
             raise OIDCError("id_token missing email claim")
-        return OIDCIdentity(subject=claims["sub"], email=email)
+        return OIDCIdentity(
+            subject=claims["sub"], email=email, email_verified=claims.get("email_verified") is True
+        )

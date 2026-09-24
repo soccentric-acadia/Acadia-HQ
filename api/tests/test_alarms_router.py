@@ -30,7 +30,7 @@ async def test_post_alarm_then_get_decodes_4_fields(client, db_session):
     await db_session.refresh(device)
     device_id = str(device.id)
 
-    login_as(client, admin)
+    await login_as(client, admin)
 
     triggered_at = datetime(2026, 7, 30, 12, 0, 5, tzinfo=UTC)
     posted = {
@@ -80,7 +80,7 @@ async def test_post_alarm_boundary_values(client, db_session):
     await db_session.refresh(device)
     device_id = str(device.id)
 
-    login_as(client, admin)
+    await login_as(client, admin)
 
     for code_hex, expected in [
         ("0x00000000", (0, 0, 0, 0)),
@@ -111,7 +111,7 @@ async def test_cross_tenant_device_404(client, db_session):
     await db_session.commit()
     await db_session.refresh(device_b)
 
-    login_as(client, admin_a)
+    await login_as(client, admin_a)
     resp = await client.post(
         f"/devices/{device_b.id}/alarms",
         json={
@@ -134,7 +134,7 @@ async def test_clear_device_alarm_resolves(client, db_session):
     await db_session.refresh(device)
     device_id = str(device.id)
 
-    login_as(client, admin)
+    await login_as(client, admin)
 
     posted = await client.post(
         f"/devices/{device_id}/alarms",
@@ -168,11 +168,11 @@ async def test_operator_can_ingest_viewer_cannot(client, db_session):
         "triggered_at": datetime.now(UTC).isoformat(),
     }
 
-    login_as(client, op)
+    await login_as(client, op)
     resp = await client.post(f"/devices/{device.id}/alarms", json=payload)
     assert resp.status_code == 201, resp.text
 
-    login_as(client, viewer)
+    await login_as(client, viewer)
     resp = await client.post(f"/devices/{device.id}/alarms", json=payload)
     assert resp.status_code == 403, resp.text
 
@@ -186,6 +186,6 @@ async def test_clear_unknown_alarm_404(client, db_session):
     await db_session.commit()
     await db_session.refresh(device)
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.post(f"/devices/{device.id}/alarms/{uuid4()}/clear")
     assert resp.status_code == 404, resp.text

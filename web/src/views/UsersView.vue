@@ -18,6 +18,20 @@ const role = ref<UserRole>('viewer')
 const inviting = ref(false)
 const inviteError = ref('')
 
+// T-P34 (B08): role change, deactivate/reactivate, remove an unused invite.
+// The API refuses to touch your own account or the last active admin.
+const ROLES: UserRole[] = ['viewer', 'operator', 'admin']
+const actionError = ref('')
+async function act(fn: () => Promise<unknown>) {
+  actionError.value = ''
+  try {
+    await fn()
+    await load()
+  } catch (e) {
+    actionError.value = e instanceof ApiError ? e.message : 'Action failed.'
+  }
+}
+
 async function load() {
   loading.value = true
   users.value = await api.users.list()
@@ -51,6 +65,7 @@ onMounted(load)
       <Button @click="inviteOpen = true">Invite user</Button>
     </div>
 
+    <p v-if="actionError" class="mb-4 text-sm text-danger">{{ actionError }}</p>
     <Card v-if="loading" class="p-6 text-sm text-muted-foreground">Loading…</Card>
     <Table v-else>
       <thead class="border-b border-border bg-surface-muted text-xs uppercase text-muted-foreground">
@@ -58,13 +73,45 @@ onMounted(load)
           <th class="px-4 py-2 font-medium">Email</th>
           <th class="px-4 py-2 font-medium">Role</th>
           <th class="px-4 py-2 font-medium">Joined</th>
+          <th class="px-4 py-2 font-medium">Status</th>
+          <th class="px-4 py-2 font-medium"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="u in users" :key="u.id" class="border-b border-border last:border-0">
           <td class="px-4 py-2">{{ u.email }}</td>
-          <td class="px-4 py-2"><Badge tone="accent">{{ u.role }}</Badge></td>
+          <td class="px-4 py-2">
+            <select
+              :value="u.role"
+              class="h-8 rounded-md border border-border bg-surface px-2 text-sm"
+              :aria-label="`Role for ${u.email}`"
+              @change="act(() => api.users.setRole(u.id, ($event.target as HTMLSelectElement).value as UserRole))"
+            >
+              <option v-for="r in ROLES" :key="r" :value="r">{{ r }}</option>
+            </select>
+          </td>
           <td class="px-4 py-2 text-muted-foreground">{{ new Date(u.created_at).toLocaleDateString() }}</td>
+          <td class="px-4 py-2">
+            <Badge :tone="u.is_active === false ? 'neutral' : 'success'">
+              {{ u.is_active === false ? 'Deactivated' : 'Active' }}
+            </Badge>
+          </td>
+          <td class="px-4 py-2 text-right">
+            <Button
+              v-if="u.is_active !== false"
+              variant="secondary"
+              size="sm"
+              @click="act(() => api.users.deactivate(u.id))"
+            >
+              Deactivate
+            </Button>
+            <Button v-else variant="secondary" size="sm" @click="act(() => api.users.reactivate(u.id))">
+              Reactivate
+            </Button>
+            <Button variant="secondary" size="sm" class="ml-2" @click="act(() => api.users.remove(u.id))">
+              Remove
+            </Button>
+          </td>
         </tr>
       </tbody>
     </Table>

@@ -30,6 +30,9 @@ class GatewaySettings(BaseSettings):
     # Optional mTLS (T-P12): when set, devices must present a client
     # certificate signed by this CA on every connection.
     tls_client_ca_path: str | None = None
+    # T-P34 (HQ-030): production refuses a plaintext listener unless TLS is
+    # terminated in front of the gateway and the operator says so explicitly.
+    allow_insecure_behind_tls_terminator: bool = False
 
 
 @lru_cache

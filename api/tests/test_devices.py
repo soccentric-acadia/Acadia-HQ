@@ -23,7 +23,7 @@ async def test_device_list_sorted_online_then_recent_then_name(client, db_sessio
     )
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.get("/devices")
     assert resp.status_code == 200
     names = [d["name"] for d in resp.json()["items"]]
@@ -35,7 +35,7 @@ async def test_create_device_writes_audit_log(client, db_session):
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.post("/devices", json={"name": "unit-1"})
     assert resp.status_code == 201
     assert resp.json()["device"]["pairing_state"] == "pending"
@@ -57,7 +57,7 @@ async def test_device_name_search(client, db_session):
     )
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.get("/devices", params={"q": "jetson"})
     names = {d["name"] for d in resp.json()["items"]}
     assert names == {"jetson-lab-1", "jetson-lab-2"}
@@ -75,7 +75,7 @@ async def test_ssh_keys_set_queues_command(client, db_session):
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.post("/devices", json={"name": "ssh-device"})
     assert resp.status_code == 201, resp.text
     device_id = resp.json()["device"]["id"]
@@ -105,7 +105,7 @@ async def test_ssh_keys_set_validates_body(client, db_session):
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.post("/devices", json={"name": "ssh-bad"})
     device_id = resp.json()["device"]["id"]
 

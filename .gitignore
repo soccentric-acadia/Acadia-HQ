@@ -13,3 +13,6 @@ build/
 Plan.md
 Task.md
 .venv*/
+
+# T-P34 (HQ-014): local run state (logs leak paths/stack traces)
+.run/

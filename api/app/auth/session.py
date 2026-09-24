@@ -10,11 +10,16 @@ class InvalidSession(Exception):
     pass
 
 
-def issue_session_token(user_id: uuid.UUID, tenant_id: uuid.UUID, role: str) -> str:
+def issue_session_token(
+    user_id: uuid.UUID, tenant_id: uuid.UUID, role: str, sid: uuid.UUID
+) -> str:
+    """Sign a session cookie. `sid` names the server-side UserSession row
+    (T-P34); `role` is informational — authorization reads the user row."""
     settings = get_settings()
     now = int(time.time())
     claims = {
         "sub": str(user_id),
+        "sid": str(sid),
         "tenant_id": str(tenant_id),
         "role": role,
         "iat": now,

@@ -1,4 +1,6 @@
 import os
+
+os.environ.setdefault("ACADIAHQ_ENV", "test")  # T-P34: production is the default
 import tempfile
 
 # T-P13 (F09): the API must sign device configuration with a real Ed25519

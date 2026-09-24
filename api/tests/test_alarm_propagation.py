@@ -26,7 +26,7 @@ async def _setup(db_session, client, role=UserRole.operator):
     db_session.add(alarm)
     await db_session.commit()
     await db_session.refresh(alarm)
-    login_as(client, user)
+    await login_as(client, user)
     return device, alarm
 
 

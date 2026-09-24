@@ -17,6 +17,7 @@ class UserOut(BaseModel):
     id: UUID
     email: str
     role: UserRole
+    is_active: bool = True
     created_at: datetime
     # auth_subject_id deliberately excluded -- internal auth linkage, not
     # application data (see python/fastapi.md: never leak internal auth state).

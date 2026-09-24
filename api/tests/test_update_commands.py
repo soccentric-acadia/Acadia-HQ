@@ -22,7 +22,7 @@ async def test_backups_router_is_mounted_and_queues_take_backup(client, db_sessi
     tenant = await make_tenant(db_session)
     operator = await make_user(db_session, tenant, UserRole.operator)
     device = await _device(db_session, tenant)
-    login_as(client, operator)
+    await login_as(client, operator)
 
     response = await client.post(f"/devices/{device.id}/backups")
     assert response.status_code == 202, response.json()
@@ -40,7 +40,7 @@ async def test_apply_update_queues_signed_artifact_command(client, db_session):
     tenant = await make_tenant(db_session)
     operator = await make_user(db_session, tenant, UserRole.operator)
     device = await _device(db_session, tenant)
-    login_as(client, operator)
+    await login_as(client, operator)
 
     response = await client.post(
         f"/devices/{device.id}/updates/apply",
@@ -66,7 +66,7 @@ async def test_factory_reset_queues_command_with_device_confirmation(client, db_
     tenant = await make_tenant(db_session)
     admin = await make_user(db_session, tenant, UserRole.admin)
     device = await _device(db_session, tenant)
-    login_as(client, admin)
+    await login_as(client, admin)
 
     response = await client.post(f"/devices/{device.id}/updates/factory-reset")
     assert response.status_code == 202, response.json()
@@ -84,7 +84,7 @@ async def test_factory_reset_requires_admin(client, db_session):
     tenant = await make_tenant(db_session)
     operator = await make_user(db_session, tenant, UserRole.operator)
     device = await _device(db_session, tenant)
-    login_as(client, operator)
+    await login_as(client, operator)
 
     response = await client.post(f"/devices/{device.id}/updates/factory-reset")
     assert response.status_code == 403

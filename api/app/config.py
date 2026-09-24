@@ -8,7 +8,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="ACADIAHQ_", env_file=".env", extra="ignore")
 
-    env: str = "dev"
+    # T-P34 (HQ-007): fail closed — a deployment that forgets the variable is
+    # production (and must supply real secrets). Dev/test opt in explicitly
+    # (ACADIAHQ_ENV=dev | test; the Makefile and test conftests set it).
+    env: str = "production"
 
     database_url: str = "postgresql+asyncpg://acadiahq:acadiahq@localhost:5432/acadiahq"
 
@@ -25,6 +28,16 @@ class Settings(BaseSettings):
     # app is reachable at more than one hostname (localhost, LAN IP, mDNS
     # name), which is exactly what the LAN-access setup needs.
     oidc_redirect_fallback_host: str = "localhost:5173"
+    # T-P34 (HQ-003/004): the public https origin HQ is served from, e.g.
+    # https://hq.example.com. Required in production; the OIDC redirect_uri
+    # is built from it instead of the client-controllable Host /
+    # X-Forwarded-* headers (those are honoured only in dev/test).
+    public_base_url: str = ""
+    # T-P34 (HQ-001): linking a first login to an invited user by email
+    # requires the IdP to assert email_verified.
+    oidc_require_email_verified: bool = True
+    # T-P34 (HQ-012): per-client-IP budget for /auth/* (requests/minute).
+    auth_rate_limit_per_minute: int = 30
 
     # Session JWT issued by the API after OIDC login, stored in an httpOnly cookie.
     session_secret_key: str = "dev-only-change-me-in-every-real-deployment"
@@ -82,6 +95,13 @@ class Settings(BaseSettings):
             problems.append("s3_secret_key is the dev default")
         if len(self.session_secret_key) < 32:
             problems.append("session_secret_key too short (<32 chars)")
+        if not self.public_base_url.startswith("https://"):
+            problems.append("public_base_url must be the https origin HQ is served from")
+        if any(
+            not o.startswith("https://") or any(h in o for h in localhost_refs)
+            for o in self.cors_allow_origins
+        ):
+            problems.append("cors_allow_origins must be https, non-localhost origins")
         if not self.configuration_signing_key_path:
             problems.append(
                 "configuration_signing_key_path is unset (Ed25519 signing key required, F09)"

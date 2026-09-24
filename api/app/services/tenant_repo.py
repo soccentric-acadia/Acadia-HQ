@@ -23,6 +23,9 @@ class TenantContext:
     tenant_id: UUID
     user_id: UUID
     role: str
+    # T-P34: the server-side session this request authenticated with (None
+    # for system/test contexts that are not cookie sessions).
+    sid: UUID | None = None
 
 
 class TenantRepo:

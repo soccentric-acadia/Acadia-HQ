@@ -7,6 +7,7 @@ on:
     branches: [master, develop]
 
 env:
+  ACADIAHQ_ENV: test
   ACADIAHQ_TEST_DATABASE_URL: postgresql+asyncpg://acadiahq:acadiahq@postgres/acadiahq_test
   ACADIAHQ_DATABASE_URL: postgresql+asyncpg://acadiahq:acadiahq@postgres/acadiahq
   ACADIAHQ_S3_ENDPOINT_URL: http://localhost:9000
@@ -37,8 +38,9 @@ jobs:
           apt-get install -y --no-install-recommends build-essential curl
       - name: Create test database
         run: |
-          until pg_isready -h postgres -U acadiahq -d acadiahq >/dev/null 2>&1; do sleep 1; done
-          PGPASSWORD=acadiahq createdb -h postgres -U acadiahq acadiahq_test || true
+          # T-P34 (HQ-020): fail loudly — the old `|| true` hid setup errors.
+          timeout 60 bash -c 'until pg_isready -h postgres -U acadiahq -d acadiahq >/dev/null 2>&1; do sleep 1; done'
+          PGPASSWORD=acadiahq createdb -h postgres -U acadiahq acadiahq_test
       - name: Install API + gateway (editable, dev)
         run: |
           pip install --upgrade pip
@@ -51,6 +53,8 @@ jobs:
       - name: Run migrations
         run: alembic -c alembic.ini upgrade head
         env:
+          # T-P34 (HQ-007): production is the default; CI opts into test.
+          ACADIAHQ_ENV: test
           ACADIAHQ_DATABASE_URL: postgresql+asyncpg://acadiahq:acadiahq@postgres/acadiahq
       - name: Test API
         run: cd api && python -m pytest -q

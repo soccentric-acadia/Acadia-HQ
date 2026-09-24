@@ -1,6 +1,0 @@
-/mnt/data/workspace/project-managers/Projects/Acadia/Project/Acadia-HQ/.venv/lib/python3.12/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
-  from ._compat import httpx2
-INFO:     Started server process [39739]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)

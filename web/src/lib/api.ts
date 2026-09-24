@@ -211,6 +211,12 @@ export const api = {
     list: () => request<User[]>('/users'),
     invite: (email: string, role: UserRole) =>
       request<User>('/users/invite', { method: 'POST', body: JSON.stringify({ email, role }) }),
+    // T-P34 (B08)
+    setRole: (id: string, role: UserRole) =>
+      request<User>(`/users/${id}`, { method: 'PATCH', body: JSON.stringify({ role }) }),
+    deactivate: (id: string) => request<User>(`/users/${id}/deactivate`, { method: 'POST' }),
+    reactivate: (id: string) => request<User>(`/users/${id}/reactivate`, { method: 'POST' }),
+    remove: (id: string) => request<void>(`/users/${id}`, { method: 'DELETE' }),
   },
   auditLog: {
     list: (params: { limit?: number; offset?: number } = {}) => {

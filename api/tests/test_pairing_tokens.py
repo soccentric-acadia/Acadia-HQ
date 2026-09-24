@@ -8,7 +8,7 @@ async def test_create_device_returns_a_pairing_token(client, db_session):
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.post("/devices", json={"name": "unit-1"})
     assert resp.status_code == 201
     assert resp.json()["pairing_token"]
@@ -19,7 +19,7 @@ async def test_rotate_credential_issues_new_token_and_resets_to_pending(client, 
     admin = await make_user(db_session, tenant, UserRole.admin)
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     created = (await client.post("/devices", json={"name": "unit-1"})).json()
     first_token = created["pairing_token"]
     device_id = created["device"]["id"]
@@ -37,11 +37,11 @@ async def test_operator_cannot_rotate_or_revoke_credentials(client, db_session):
     operator = await make_user(db_session, tenant, UserRole.operator)
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     created = (await client.post("/devices", json={"name": "unit-1"})).json()
     device_id = created["device"]["id"]
 
-    login_as(client, operator)
+    await login_as(client, operator)
     assert (await client.post(f"/devices/{device_id}/credential/rotate")).status_code == 403
     assert (await client.post(f"/devices/{device_id}/credential/revoke")).status_code == 403
 
@@ -54,7 +54,7 @@ async def test_revoke_credential_marks_device_revoked(client, db_session):
     await db_session.commit()
     await db_session.refresh(device)
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.post(f"/devices/{device.id}/credential/revoke")
     assert resp.status_code == 200
 

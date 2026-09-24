@@ -5,6 +5,7 @@ import grpc
 
 from acadiahq.agent_pb2_grpc import add_AgentLinkServicer_to_server
 
+from app.config import get_settings
 from gateway.config import get_gateway_settings
 from gateway.servicer import AgentLinkServicer
 from gateway.stale_sweep import run_forever
@@ -12,6 +13,24 @@ from gateway.stale_sweep import run_forever
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("gateway.server")
 
+
+
+def plaintext_refused(env: str, settings) -> str | None:
+    """Why a plaintext AgentLink listener is refused, or None when allowed
+    (T-P34, HQ-030): device credentials and commands must not cross the
+    network in cleartext in production."""
+    if settings.tls_cert_path and settings.tls_key_path:
+        return None
+    if env in ("dev", "test"):
+        return None
+    if settings.allow_insecure_behind_tls_terminator:
+        return None
+    return (
+        "agent-gateway: refusing to serve PLAINTEXT gRPC with ACADIAHQ_ENV="
+        f"{env!r}. Set ACADIAHQ_GATEWAY_TLS_CERT_PATH/TLS_KEY_PATH, or — only if TLS "
+        "is terminated in front of the gateway — "
+        "ACADIAHQ_GATEWAY_ALLOW_INSECURE_BEHIND_TLS_TERMINATOR=true."
+    )
 
 async def serve() -> None:
     settings = get_gateway_settings()
@@ -47,6 +66,10 @@ async def serve() -> None:
             )
             logger.info("agent-gateway listening on TLS :%d", settings.grpc_port)
     else:
+        # T-P34 (HQ-030): fail closed in production.
+        refuse = plaintext_refused(get_settings().env, settings)
+        if refuse:
+            raise SystemExit(refuse)
         # Insecure for local dev only. Production must set
         # ACADIAHQ_GATEWAY_TLS_CERT_PATH/TLS_KEY_PATH (or terminate TLS at a
         # reverse proxy) -- the proto's own security notes (ARCHITECTURE.md §3)

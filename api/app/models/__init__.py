@@ -11,6 +11,7 @@ from app.models.telemetry import TelemetrySample
 from app.models.tenant import Tenant
 from app.models.update import UpdateArtifact, UpdateRollout, UpdateRolloutDevice
 from app.models.user import User
+from app.models.user_session import UserSession
 
 __all__ = [
     "Alarm",
@@ -29,4 +30,5 @@ __all__ = [
     "UpdateRollout",
     "UpdateRolloutDevice",
     "User",
+    "UserSession",
 ]

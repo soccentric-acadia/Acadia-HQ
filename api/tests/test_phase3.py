@@ -46,7 +46,7 @@ async def test_telemetry_groups_by_metric_and_excludes_location(client, db_sessi
     )
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.get(f"/devices/{device.id}/telemetry")
     assert resp.status_code == 200
     body = resp.json()
@@ -60,7 +60,7 @@ async def test_telemetry_404s_for_other_tenants_device(client, db_session):
     admin_a = await make_user(db_session, tenant_a, UserRole.admin)
     device_b = await _device(db_session, tenant_b)
 
-    login_as(client, admin_a)
+    await login_as(client, admin_a)
     resp = await client.get(f"/devices/{device_b.id}/telemetry")
     assert resp.status_code == 404
 
@@ -83,7 +83,7 @@ async def test_fault_feed_newest_first(client, db_session):
     )
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.get(f"/devices/{device.id}/faults")
     codes = [f["code"] for f in resp.json()["items"]]
     assert codes == ["NEW", "OLD"]
@@ -96,13 +96,13 @@ async def test_alarm_rule_create_and_list_is_tenant_scoped(client, db_session):
     admin_b = await make_user(db_session, tenant_b, UserRole.admin)
     await db_session.commit()
 
-    login_as(client, admin_a)
+    await login_as(client, admin_a)
     condition = {"kind": "fault_code", "severity": "critical"}
     body = {"name": "critical-faults", "condition": condition}
     resp = await client.post("/alarm-rules", json=body)
     assert resp.status_code == 201
 
-    login_as(client, admin_b)
+    await login_as(client, admin_b)
     resp = await client.get("/alarm-rules")
     assert resp.json() == []
 
@@ -124,7 +124,7 @@ async def test_acknowledge_and_resolve_alarm(client, db_session):
     await db_session.commit()
     await db_session.refresh(alarm)
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.post(f"/alarms/{alarm.id}/acknowledge")
     assert resp.status_code == 200
     assert resp.json()["state"] == "acknowledged"
@@ -161,7 +161,7 @@ async def test_log_bundle_list_and_download_url(client, db_session):
     await db_session.commit()
     await db_session.refresh(bundle)
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.get(f"/devices/{device.id}/logs")
     assert len(resp.json()["items"]) == 2
     await db_session.refresh(pending)
@@ -178,7 +178,7 @@ async def test_device_health_explains_offline_state(client, db_session):
     admin = await make_user(db_session, tenant, UserRole.admin)
     device = await _device(db_session, tenant)
 
-    login_as(client, admin)
+    await login_as(client, admin)
     resp = await client.get(f"/devices/{device.id}/health")
 
     assert resp.status_code == 200
@@ -194,7 +194,7 @@ async def test_configuration_read_is_durable_signed_and_explicitly_blocked(
     tenant = await make_tenant(db_session)
     viewer = await make_user(db_session, tenant, UserRole.viewer)
     device = await _device(db_session, tenant)
-    login_as(client, viewer)
+    await login_as(client, viewer)
 
     response = await client.get(f"/devices/{device.id}/configuration")
     assert response.status_code == 202
@@ -233,7 +233,7 @@ async def test_configuration_write_requires_operator_and_queues_signed_values(
     tenant = await make_tenant(db_session)
     operator = await make_user(db_session, tenant, UserRole.operator)
     device = await _device(db_session, tenant)
-    login_as(client, operator)
+    await login_as(client, operator)
 
     response = await client.put(
         f"/devices/{device.id}/configuration", json={"values": {"mode": "safe"}}
@@ -273,7 +273,7 @@ async def test_device_health_uses_the_heartbeat_snapshot(client, db_session):
     }
     await db_session.commit()
 
-    login_as(client, admin)
+    await login_as(client, admin)
     body = (await client.get(f"/devices/{device.id}/health")).json()
     names = {f["name"]: f for f in body["factors"]}
     assert names["device_health"]["penalty"] == 30

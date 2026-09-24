@@ -20,7 +20,7 @@ async def test_post_then_get_sample_is_field_for_field_equal(client, db_session)
     await db_session.refresh(device)
     device_id = str(device.id)
 
-    login_as(client, admin)
+    await login_as(client, admin)
 
     recorded_at = datetime(2026, 7, 30, 12, 0, 5, tzinfo=UTC)
     posted = {
@@ -70,7 +70,7 @@ async def test_get_sample_404_for_unknown_id(client, db_session):
     await db_session.commit()
     await db_session.refresh(device)
 
-    login_as(client, admin)
+    await login_as(client, admin)
 
     resp = await client.get(f"/devices/{device.id}/telemetry/{uuid4()}")
     assert resp.status_code == 404
@@ -93,11 +93,11 @@ async def test_operator_can_ingest_viewer_cannot(client, db_session):
         "tags": {"unit": "MiB"},
     }
 
-    login_as(client, op)
+    await login_as(client, op)
     resp = await client.post(f"/devices/{device.id}/telemetry", json=payload)
     assert resp.status_code == 201, resp.text
 
-    login_as(client, viewer)
+    await login_as(client, viewer)
     resp = await client.post(f"/devices/{device.id}/telemetry", json=payload)
     assert resp.status_code == 403, resp.text
 

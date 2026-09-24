@@ -31,7 +31,7 @@ async def _setup(db_session, client, role=UserRole.admin):
     tenant = await make_tenant(db_session)
     user = await make_user(db_session, tenant, role)
     device = await _device(db_session, tenant)
-    login_as(client, user)
+    await login_as(client, user)
     return device
 
 
