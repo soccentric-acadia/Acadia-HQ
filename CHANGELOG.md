@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-09-24 — Integration-production pass (T-P20…T-P35, backlog)
+
+- T-P20: device command API for power, updates, services, users and log bundles, with a SPOKE_OPERATIONS allowlist. Also fixes the command dispatcher (HQ-019) and the offline health status.
+- T-P21: OTA artifact store with HQ-side SHA-256 verification, and staged rollouts (canary, halt, resume, auto-activate) with a Remote updates UI.
+- T-P22…T-P25:
+  - upload rows are finalised by UploadComplete;
+  - SigV4 presigning;
+  - alarm ack/clear propagates to the device;
+  - DeviceStatus snapshot and health factors;
+  - operation catalog taken from vendored contracts.
+- T-P34:
+  - server-side sessions;
+  - OIDC nonce and email_verified checks;
+  - rate limiting and WebSocket origin check;
+  - user lifecycle management;
+  - production is the default environment;
+  - the gateway refuses plaintext in production;
+  - compose images pinned by digest.
+- HQ-018: API and gateway tests start an ephemeral Postgres when none is reachable.
+- Validation: api 81, gateway 38, web 37, lint clean, E2E 15/15.
+
 ## 2026-09-21 — Cross-repo API surface audit: API gap closure (task 009)
 
 ### Added
