@@ -10,8 +10,8 @@ describe('CommandPalette', () => {
       global: { stubs: { teleport: true } },
     })
     const items = wrapper.findAll('.cmdk-item')
-    // 36 sections + 2 actions
-    expect(items.length).toBe(38)
+    // 36 sections − 2 deferred (ptp, 5g; T-P00e) + 2 actions
+    expect(items.length).toBe(36)
   })
 
   it('hides admin-only sections from non-admin users (sidebar parity)', () => {

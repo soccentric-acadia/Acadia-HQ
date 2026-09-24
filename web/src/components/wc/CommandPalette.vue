@@ -3,7 +3,7 @@
 // plus device actions, keyboard-driven (arrows + enter, esc to close).
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { Search } from 'lucide-vue-next'
-import { DEVICE_SECTIONS } from '@/lib/deviceSections'
+import { DEFERRED_SECTIONS, DEVICE_SECTIONS } from '@/lib/deviceSections'
 
 const props = withDefaults(
   defineProps<{
@@ -34,7 +34,9 @@ const ACTIONS: PaletteItem[] = [
 
 const items = computed<PaletteItem[]>(() => {
   const q = query.value.trim().toLowerCase()
-  const sections = DEVICE_SECTIONS.filter((s) => props.admin || !s.adminOnly).map((s) => ({
+  const sections = DEVICE_SECTIONS.filter(
+    (s) => (props.admin || !s.adminOnly) && !DEFERRED_SECTIONS.has(s.id),
+  ).map((s) => ({
     id: s.id,
     label: s.label,
     hint: `${s.category} · Section`,

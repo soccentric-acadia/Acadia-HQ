@@ -407,14 +407,21 @@ export const DEVICE_SECTIONS: DeviceSection[] = [
 
 export const SECTION_IDS = DEVICE_SECTIONS.map((s) => s.id)
 
+/** T-P00e (X-013): sections of features the Acadia board manifest defers
+ * from this release (`deferred_features`: ptp, cellular). Registered for
+ * WebConfig parity but hidden and unroutable — the device refuses to enable
+ * them anyway. */
+export const DEFERRED_SECTIONS: ReadonlySet<string> = new Set(['ptp', '5g'])
+
 export const sectionMeta = (id: string): DeviceSection | undefined =>
-  DEVICE_SECTIONS.find((s) => s.id === id)
+  DEFERRED_SECTIONS.has(id) ? undefined : DEVICE_SECTIONS.find((s) => s.id === id)
 
 /** Category-grouped order, same grouping WebConfig's Sidebar renders. */
 export function sectionsByCategory(adminOnly: boolean): [SectionCategory, DeviceSection[]][] {
   const groups = new Map<SectionCategory, DeviceSection[]>()
   for (const section of DEVICE_SECTIONS) {
     if (section.adminOnly && !adminOnly) continue
+    if (DEFERRED_SECTIONS.has(section.id)) continue
     const list = groups.get(section.category) ?? []
     list.push(section)
     groups.set(section.category, list)

@@ -3,7 +3,7 @@
 // checked-in snapshot of that file; scripts/check-section-parity.mjs re-diffs
 // against the live sibling repository when it is available.
 import { describe, expect, it } from 'vitest'
-import { DEVICE_SECTIONS, SECTION_IDS, sectionsByCategory } from '@/lib/deviceSections'
+import { DEVICE_SECTIONS, SECTION_IDS, sectionMeta, sectionsByCategory } from '@/lib/deviceSections'
 
 // WebConfig NAV snapshot (registry.js), flattened to [id, label, category].
 const WEBCONFIG_NAV: [string, string, string][] = [
@@ -108,6 +108,14 @@ describe('device section registry', () => {
       'Security',
       'Hardware',
     ])
+  })
+
+  it('hides sections of deferred features (T-P00e)', () => {
+    const visible = sectionsByCategory(true).flatMap(([, list]) => list.map((s) => s.id))
+    expect(visible).not.toContain('ptp')
+    expect(visible).not.toContain('5g')
+    expect(sectionMeta('ptp')).toBeUndefined()
+    expect(sectionMeta('time')).toBeDefined()
   })
 
   it('hides admin-only sections from non-admin users', () => {
