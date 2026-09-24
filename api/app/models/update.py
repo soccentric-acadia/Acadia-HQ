@@ -1,13 +1,13 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, UniqueConstraint
+from sqlalchemy import BigInteger, DateTime, Enum, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 from app.models.enums import DeviceRolloutStatus, RolloutStatus, RolloutTarget
-from app.models.mixins import TenantScopedMixin, UUIDPKMixin
+from app.models.mixins import TenantScopedMixin, TimestampMixin, UUIDPKMixin
 
 
 class UpdateArtifact(Base, TenantScopedMixin):
@@ -18,9 +18,12 @@ class UpdateArtifact(Base, TenantScopedMixin):
     target_board_rev: Mapped[str]
     storage_url: Mapped[str]
     checksum_sha256: Mapped[str]
+    # T-P21: set once HQ received the bundle and verified its SHA-256.
+    size_bytes: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    uploaded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
-class UpdateRollout(Base, UUIDPKMixin):
+class UpdateRollout(Base, UUIDPKMixin, TimestampMixin):
     __tablename__ = "update_rollout"
 
     artifact_id: Mapped[uuid.UUID] = mapped_column(
@@ -35,6 +38,10 @@ class UpdateRollout(Base, UUIDPKMixin):
     )
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # T-P21 staged-rollout policy: {"canary_percent", "halt_failure_percent",
+    # "auto_activate"} — see app/services/rollouts.py.
+    policy: Mapped[dict] = mapped_column(JSONB, default=dict)
+    halted_reason: Mapped[str | None] = mapped_column(nullable=True)
 
 
 class UpdateRolloutDevice(Base):
@@ -51,3 +58,6 @@ class UpdateRolloutDevice(Base):
     )
     applied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     error: Mapped[str | None] = mapped_column(nullable=True)
+    # T-P21: 0 = canary wave, 1 = remainder.
+    wave: Mapped[int] = mapped_column(Integer, default=0)
+    command_id: Mapped[str | None] = mapped_column(nullable=True)

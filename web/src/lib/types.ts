@@ -22,6 +22,7 @@ export interface Device {
   last_seen_at: string | null
   serial: string | null
   board_rev: string | null
+  tags?: string[]
   created_at: string
 }
 
@@ -202,4 +203,52 @@ export interface DeviceUserRow {
   username: string
   role: string
   groups: string[]
+}
+
+/** T-P21: an OTA artifact in the HQ store. */
+export interface UpdateArtifact {
+  id: string
+  version: string
+  target_board_rev: string
+  checksum_sha256: string
+  size_bytes: number | null
+  uploaded_at: string | null
+  created_at: string
+}
+
+export type RolloutStatus = 'pending' | 'in_progress' | 'halted' | 'completed' | 'failed'
+
+export interface RolloutDevice {
+  device_id: string
+  wave: number
+  status: 'pending' | 'applying' | 'succeeded' | 'failed'
+  error: string | null
+  applied_at: string | null
+  command_id: string | null
+}
+
+export interface Rollout {
+  id: string
+  artifact_id: string
+  artifact_version: string | null
+  target: 'all' | 'specific_devices' | 'device_group'
+  target_selector: Record<string, unknown>
+  status: RolloutStatus
+  policy: { canary_percent: number; halt_failure_percent: number; auto_activate: boolean }
+  halted_reason: string | null
+  created_at: string
+  started_at: string | null
+  completed_at: string | null
+  summary: Record<string, number>
+  devices: RolloutDevice[]
+}
+
+export interface RolloutRequest {
+  artifact_id: string
+  target: Rollout['target']
+  device_ids?: string[]
+  tag?: string
+  canary_percent?: number
+  halt_failure_percent?: number
+  auto_activate?: boolean
 }

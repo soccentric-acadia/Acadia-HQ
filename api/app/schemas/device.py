@@ -21,6 +21,7 @@ class DeviceOut(BaseModel):
     last_seen_at: datetime | None
     serial: str | None
     board_rev: str | None
+    tags: list[str] = []
     created_at: datetime
 
 

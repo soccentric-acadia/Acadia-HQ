@@ -17,7 +17,6 @@ from app.models.enums import AlarmState, CommandState, FaultSeverity
 from app.models.fault import Fault
 from app.models.log_bundle import LogBundle
 from app.models.telemetry import TelemetrySample
-from app.models.update import DeviceRolloutStatus, RolloutStatus, UpdateRollout, UpdateRolloutDevice
 from app.config import get_settings
 from app.services.storage import new_object_id, object_key, presigned_upload_url
 from acadiahq.agent_pb2 import FaultEvent, Location, LogUploadRequest, TelemetryBatch
@@ -215,29 +214,12 @@ async def handle_command_ack(
                 pending.result_payload = {"raw": json_payload}
 
     if command_id.startswith("update:"):
-        rollout_id = uuid.UUID(command_id.split(":", 2)[1])
-        row = await session.get(
-            UpdateRolloutDevice, {"rollout_id": rollout_id, "device_id": device.id}
-        )
-        if row is None:
-            logger.warning("command_ack for unknown rollout row %s", command_id)
-            return
-        row.status = DeviceRolloutStatus.succeeded if success else DeviceRolloutStatus.failed
-        row.applied_at = datetime.now(UTC)
-        row.error = None if success else error
+        # T-P21: the staged-rollout engine records the result, queues the
+        # activation reboot and advances the canary gate.
+        from app.services import rollouts
 
-        siblings = (
-            await session.execute(
-                select(UpdateRolloutDevice).where(UpdateRolloutDevice.rollout_id == rollout_id)
-            )
-        ).scalars().all()
-        terminal = (DeviceRolloutStatus.succeeded, DeviceRolloutStatus.failed)
-        all_terminal = all(s.status in terminal for s in siblings)
-        if all_terminal:
-            rollout = await session.get(UpdateRollout, rollout_id)
-            if rollout:
-                rollout.status = RolloutStatus.completed
-                rollout.completed_at = datetime.now(UTC)
+        rollout_id = uuid.UUID(command_id.split(":", 2)[1])
+        await rollouts.record_device_result(session, rollout_id, device.id, success, error)
     elif command_id.startswith("restore:"):
         backup_id = uuid.UUID(command_id.split(":", 2)[1])
         backup = await session.get(Backup, backup_id)

@@ -14,6 +14,9 @@ import type {
   FaultListResponse,
   LogBundleListResponse,
   DeviceUserCommand,
+  Rollout,
+  RolloutRequest,
+  UpdateArtifact,
   Operation,
   QueuedCommand,
   ServiceAction,
@@ -99,6 +102,29 @@ export const api = {
   },
   operations: {
     list: () => request<{ items: Operation[] }>('/operations'),
+  },
+  // T-P21: OTA artifact store + staged rollouts + device tags.
+  fleetUpdates: {
+    artifacts: () => request<{ items: UpdateArtifact[] }>('/updates/artifacts'),
+    createArtifact: (body: { version: string; target_board_rev: string; checksum_sha256: string }) =>
+      request<UpdateArtifact>('/updates/artifacts', { method: 'POST', body: JSON.stringify(body) }),
+    // Raw body upload: HQ hashes the stream and refuses a SHA-256 mismatch.
+    uploadContent: (id: string, file: Blob) =>
+      request<UpdateArtifact>(`/updates/artifacts/${id}/content`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/octet-stream' },
+        body: file,
+      }),
+    rollouts: () => request<{ items: Rollout[] }>('/updates/rollouts'),
+    createRollout: (body: RolloutRequest) =>
+      request<Rollout>('/updates/rollouts', { method: 'POST', body: JSON.stringify(body) }),
+    drive: (id: string, action: 'start' | 'halt' | 'resume') =>
+      request<Rollout>(`/updates/rollouts/${id}/${action}`, { method: 'POST' }),
+    setTags: (deviceId: string, tags: string[]) =>
+      request<{ tags: string[] }>(`/devices/${deviceId}/tags`, {
+        method: 'PUT',
+        body: JSON.stringify({ tags }),
+      }),
   },
   // T-P20: device command producers. Each returns the queued command; the
   // device-reported result arrives via devices.commandStatus polling.

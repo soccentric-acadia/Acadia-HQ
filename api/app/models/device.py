@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, Enum, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -29,6 +30,8 @@ class Device(Base, TenantScopedMixin):
     # (pending) devices.
     serial: Mapped[str | None] = mapped_column(nullable=True)
     board_rev: Mapped[str | None] = mapped_column(nullable=True)
+    # T-P21 (N06): operator-assigned tags for grouping and rollout targeting.
+    tags: Mapped[list[str]] = mapped_column(JSONB, default=list)
 
     credentials: Mapped[list["DeviceCredential"]] = relationship(
         back_populates="device", cascade="all, delete-orphan"

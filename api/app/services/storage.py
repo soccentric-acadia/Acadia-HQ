@@ -43,5 +43,12 @@ def presigned_download_url(key: str, expires_in: int = 300) -> str:
     )
 
 
+def upload_file(path: str, key: str) -> None:
+    """Store a local file (T-P21 artifact content) — boto3 switches to a
+    multipart upload for large bundles."""
+    settings = get_settings()
+    _client().upload_file(path, settings.s3_bucket, key)
+
+
 def new_object_id() -> uuid.UUID:
     return uuid.uuid4()

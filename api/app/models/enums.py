@@ -40,6 +40,8 @@ class RolloutTarget(str, enum.Enum):
 class RolloutStatus(str, enum.Enum):
     pending = "pending"
     in_progress = "in_progress"
+    # T-P21: stopped by the canary failure gate or an operator; resumable.
+    halted = "halted"
     completed = "completed"
     failed = "failed"
 

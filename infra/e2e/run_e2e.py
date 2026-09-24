@@ -184,6 +184,12 @@ def main() -> int:
         default=os.environ.get("ACADIAHQ_CONFIGURATION_SIGNING_KEY_PATH", ""),
         help="HQ Ed25519 private key PEM (must match the device's provisioned pubkey)",
     )
+    ap.add_argument(
+        "--device-data-dir",
+        default=os.environ.get("E2E_DEVICE_DATA_DIR", "/tmp/e2e/devdata"),
+        help="webconfigd WEBCONFIG_DATA_DIR (the fake-root mock update backend reads a "
+        "manifest next to the downloaded bundle)",
+    )
     args = ap.parse_args()
     api, dev, gw = args.api.rstrip("/"), args.device.rstrip("/"), args.gateway
     ADMIN = {"Cookie": hq_session_cookie()}
@@ -353,6 +359,86 @@ def main() -> int:
         ("T-P20: update.confirm (mark_good) acknowledged", "updates/confirm", None, None),
     ]:
         step(desc, lambda p=path, b=body, d=desc, c=check: command(p, b, d, c))
+
+    # ── 9. T-P21: artifact → staged rollout → device install → activation ──
+    def ota_rollout():
+        import hashlib
+        import urllib.request
+
+        bundle = os.urandom(64 * 1024)
+        sha = hashlib.sha256(bundle).hexdigest()
+        version = f"e2e-{uuid.uuid4().hex[:8]}"
+        st, _, art = call(
+            "POST",
+            f"{api}/updates/artifacts",
+            {"version": version, "target_board_rev": "rev-c", "checksum_sha256": sha},
+            headers=ADMIN,
+        )
+        if st != 201:
+            raise RuntimeError(f"artifact create: {st} {art}")
+        req = urllib.request.Request(
+            f"{api}/updates/artifacts/{art['id']}/content",
+            data=bundle,
+            method="PUT",
+            headers={**ADMIN, "Content-Type": "application/octet-stream"},
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            assert resp.status == 200, resp.status
+        # The fake-root mock backend validates a manifest beside the bundle.
+        uploads = os.path.join(args.device_data_dir, "webconfig", "hq-uploads")
+        os.makedirs(uploads, exist_ok=True)
+        with open(os.path.join(uploads, "hq-artifact.bundle.manifest.json"), "w") as f:
+            json.dump({"platform": "acadia", "variant": None, "version": version}, f)
+        st, _, ro = call(
+            "POST",
+            f"{api}/updates/rollouts",
+            {"artifact_id": art["id"], "target": "specific_devices",
+             "device_ids": [device_id], "canary_percent": 100},
+            headers=ADMIN,
+        )
+        if st != 201:
+            raise RuntimeError(f"rollout create: {st} {ro}")
+        st, _, started = call("POST", f"{api}/updates/rollouts/{ro['id']}/start", headers=ADMIN)
+        if st != 200:
+            raise RuntimeError(f"rollout start: {st} {started}")
+
+        def completed():
+            _, _, r = call("GET", f"{api}/updates/rollouts/{ro['id']}", headers=ADMIN)
+            if r.get("status") in ("failed", "halted"):
+                raise RuntimeError(f"rollout {r['status']}: {r['devices']}")
+            return r.get("status") == "completed" and r
+
+        final = poll(completed, timeout=180, desc="rollout completed")
+        if not final:
+            raise RuntimeError("rollout did not complete")
+        activation = wait_command(
+            api, device_id, f"update-activate:{ro['id']}:{device_id}", ADMIN,
+            "reboot_to_apply ack",
+        )
+        if not activation:
+            raise RuntimeError("activation reboot_to_apply not acknowledged")
+        return final
+
+    step("T-P21: verified artifact rolled out, installed, activation acked", ota_rollout)
+
+    # ── 10. take_backup_now → device uploads through a presigned URL ───────
+    def backup_round_trip():
+        st, _, out = call("POST", f"{api}/devices/{device_id}/backups", headers=ADMIN)
+        if st != 202:
+            raise RuntimeError(f"backup queue: {st} {out}")
+        if not wait_command(api, device_id, out["command_id"], ADMIN, "backup ack"):
+            raise RuntimeError("backup command not acknowledged")
+
+        def listed():
+            _, _, items = call("GET", f"{api}/devices/{device_id}/backups", headers=ADMIN)
+            return items.get("items") or None
+
+        rows = poll(listed, timeout=60, desc="backup row")
+        if not rows:
+            raise RuntimeError("no backup row after the upload")
+        return rows
+
+    step("typed take_backup_now executes on-device and uploads", backup_round_trip)
 
     print(f"\nE2E RESULT: {PASS} passed, {FAIL} failed")
     return 1 if FAIL else 0

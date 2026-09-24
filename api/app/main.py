@@ -16,6 +16,7 @@ from app.routers import (
     device_commands,
     devices,
     faults,
+    fleet_updates,
     logs,
     operations,
     telemetry,
@@ -64,6 +65,7 @@ def create_app() -> FastAPI:
     app.include_router(backups.router)
     app.include_router(updates.router)
     app.include_router(device_commands.router)
+    app.include_router(fleet_updates.router)
     app.include_router(users.router)
     app.include_router(audit_log.router)
     app.include_router(telemetry.router)
