@@ -6,13 +6,17 @@ import grpc
 import pytest_asyncio
 
 from app.db.base import Base, configure_for_tests, get_engine, get_session_factory
+from app.db.test_database import resolve_test_database_url
 from acadiahq.agent_pb2_grpc import AgentLinkStub, add_AgentLinkServicer_to_server
 from gateway.servicer import AgentLinkServicer
 
-TEST_DB_URL = os.environ.get(
-    "ACADIAHQ_TEST_DATABASE_URL",
-    "postgresql+asyncpg://acadiahq:acadiahq@localhost:55432/acadiahq_test",
+# HQ-018: the configured database when reachable, else an ephemeral
+# container (app/db/test_database.py). Exported so every consumer in the
+# session (alembic parity test included) sees the same URL.
+TEST_DB_URL = resolve_test_database_url(
+    "postgresql+asyncpg://acadiahq:acadiahq@localhost:5432/acadiahq_test"
 )
+os.environ["ACADIAHQ_TEST_DATABASE_URL"] = TEST_DB_URL
 
 
 @pytest_asyncio.fixture(autouse=True)
