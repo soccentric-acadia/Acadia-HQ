@@ -92,23 +92,15 @@ onMounted(load)
                     v-if="a.state === 'active'"
                     class="btn btn-outline btn-sm"
                     :disabled="busy"
-                    @click="act(() => api.alarms.acknowledge(a.id), 'Alarm acknowledged.')"
+                    @click="act(() => api.alarms.acknowledgeDevice(props.deviceId, a.id), 'Alarm acknowledged on HQ and the device.')"
                   >
                     Acknowledge
-                  </button>
-                  <button
-                    v-if="a.state === 'acknowledged'"
-                    class="btn btn-outline btn-sm"
-                    :disabled="busy"
-                    @click="act(() => api.alarms.resolve(a.id), 'Alarm resolved.')"
-                  >
-                    Resolve
                   </button>
                   <button
                     v-if="a.state !== 'resolved'"
                     class="btn btn-ghost btn-sm"
                     :disabled="busy"
-                    @click="act(() => api.alarms.clear(props.deviceId, a.id), 'Alarm cleared.')"
+                    @click="act(() => api.alarms.clear(props.deviceId, a.id), 'Alarm cleared on HQ and the device.')"
                   >
                     Clear
                   </button>

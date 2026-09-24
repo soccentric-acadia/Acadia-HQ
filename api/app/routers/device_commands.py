@@ -10,20 +10,18 @@ Destructive verbs require the operator to type the same confirmation word
 the device demands (SHUTDOWN, ROLLBACK), so a stray click cannot queue them.
 """
 
-from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.deps import require_role
-from app.config import get_settings
 from app.db.deps import get_db
 from app.models.enums import CommandKind, UserRole
-from app.models.pending_command import PendingCommand
 from app.services import audit
+from app.services.commands import queue_command
 from app.services.device_scope import get_tenant_device_or_404
 from app.services.operation_catalog import SPOKE_OPERATIONS
 from app.services.tenant_repo import TenantContext
@@ -43,17 +41,7 @@ async def _queue(
     audit_payload: dict[str, Any] | None = None,
 ) -> dict[str, str]:
     await get_tenant_device_or_404(db, ctx, device_id)
-    command_id = f"{label}:{uuid4()}"
-    db.add(
-        PendingCommand(
-            device_id=device_id,
-            command_id=command_id,
-            kind=kind,
-            payload=payload or {},
-            correlation_id=command_id,
-            expires_at=datetime.now(UTC) + timedelta(seconds=get_settings().command_ttl_seconds),
-        )
-    )
+    command_id = queue_command(db, device_id, kind, label, payload)
     await audit.record(
         db,
         ctx,

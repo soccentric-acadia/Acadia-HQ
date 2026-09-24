@@ -174,6 +174,12 @@ export const api = {
     resolve: (id: string) => request<Alarm>(`/alarms/${id}/resolve`, { method: 'POST' }),
     clear: (deviceId: string, alarmId: string) =>
       request<DeviceAlarm>(`/devices/${deviceId}/alarms/${alarmId}/clear`, { method: 'POST' }),
+    // T-P23: device-reported alarms are acknowledged under the device (the
+    // /alarms/{id} routes are the rule-based alarm table).
+    acknowledgeDevice: (deviceId: string, alarmId: string) =>
+      request<DeviceAlarm>(`/devices/${deviceId}/alarms/${alarmId}/acknowledge`, {
+        method: 'POST',
+      }),
   },
   alarmRules: {
     list: () => request<AlarmRule[]>('/alarm-rules'),
@@ -182,6 +188,10 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ name, condition }),
       }),
+    // T-P23 (I05)
+    update: (id: string, changes: Partial<Pick<AlarmRule, 'name' | 'condition' | 'enabled'>>) =>
+      request<AlarmRule>(`/alarm-rules/${id}`, { method: 'PATCH', body: JSON.stringify(changes) }),
+    remove: (id: string) => request<void>(`/alarm-rules/${id}`, { method: 'DELETE' }),
   },
   logs: {
     list: (deviceId: string) => request<LogBundleListResponse>(`/devices/${deviceId}/logs`),

@@ -35,6 +35,9 @@ class DeviceAlarmOut(BaseModel):
     state: AlarmState
     triggered_at: datetime
     resolved_at: datetime | None
+    # T-P23: the command that propagates an HQ ack/clear to the device's
+    # alarms spoke (poll GET /devices/{id}/commands/{command_id}).
+    device_command_id: str | None = None
 
 
 class DeviceAlarmListOut(BaseModel):

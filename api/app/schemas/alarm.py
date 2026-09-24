@@ -25,6 +25,15 @@ class AlarmRuleCreate(BaseModel):
     enabled: bool = True
 
 
+class AlarmRuleUpdate(BaseModel):
+    """T-P23 (I05): partial update of an alarm rule."""
+
+    name: str | None = None
+    condition: dict | None = None
+    notify_channels: dict | None = None
+    enabled: bool | None = None
+
+
 class AlarmRuleOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

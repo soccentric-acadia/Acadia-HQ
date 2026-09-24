@@ -10,11 +10,12 @@ from app.db.deps import get_db
 from app.models.alarm import Alarm, AlarmRule
 from app.models.device import Device
 from app.models.device_alarm import DeviceAlarm
-from app.models.enums import AlarmState, UserRole
-from app.schemas.alarm import AlarmOut, AlarmRuleCreate, AlarmRuleOut
+from app.models.enums import AlarmState, CommandKind, UserRole
+from app.schemas.alarm import AlarmOut, AlarmRuleCreate, AlarmRuleOut, AlarmRuleUpdate
 from app.schemas.common import Page
 from app.schemas.device_alarm import DeviceAlarmIn, DeviceAlarmListOut, DeviceAlarmOut
 from app.services import audit
+from app.services.commands import queue_command
 from app.services.device_scope import get_tenant_device_or_404
 from app.services.tenant_repo import TenantContext, TenantRepo
 
@@ -198,10 +199,65 @@ async def clear_device_alarm(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "alarm not found")
     row.state = AlarmState.resolved
     row.resolved_at = datetime.now(UTC)
-    await audit.record(db, ctx, "alarm.clear", target_device_id=device_id)
+    # T-P23 (I04): propagate to the device's alarms spoke, or the device
+    # keeps the alarm active and re-reports it.
+    command_id = _propagate(db, row, "clear", ctx)
+    await audit.record(
+        db, ctx, "alarm.clear", target_device_id=device_id, payload={"command_id": command_id}
+    )
     await db.commit()
     await db.refresh(row)
-    return DeviceAlarmOut.model_validate(row)
+    out = DeviceAlarmOut.model_validate(row)
+    out.device_command_id = command_id
+    return out
+
+
+def _propagate(db: AsyncSession, row: DeviceAlarm, operation: str, ctx: TenantContext) -> str:
+    """Queue alarms.<operation> for the device (generic spoke operation)."""
+    args: dict = {"id": row.alarm_code}
+    if operation == "clear":
+        args["owner"] = f"hq:{ctx.user_id}"
+    return queue_command(
+        db,
+        row.device_id,
+        CommandKind.operation_run,
+        f"operation.alarms.{operation}",
+        {"daemon": "alarms", "operation": operation, "args": args},
+    )
+
+
+@device_alarms_router.post("/{alarm_id}/acknowledge", response_model=DeviceAlarmOut)
+async def acknowledge_device_alarm(
+    device_id: UUID,
+    alarm_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    ctx: TenantContext = Depends(require_role(UserRole.operator)),
+):
+    """T-P23 (I04): acknowledge a device-reported alarm at HQ and on the
+    device (alarms spoke ``ack``)."""
+    await get_tenant_device_or_404(db, ctx, device_id)
+    row = (
+        await db.execute(
+            select(DeviceAlarm).where(
+                DeviceAlarm.id == alarm_id, DeviceAlarm.device_id == device_id
+            )
+        )
+    ).scalar_one_or_none()
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "alarm not found")
+    if row.state == AlarmState.resolved:
+        raise HTTPException(status.HTTP_409_CONFLICT, "alarm is already cleared")
+    row.state = AlarmState.acknowledged
+    command_id = _propagate(db, row, "ack", ctx)
+    await audit.record(
+        db, ctx, "alarm.acknowledge", target_device_id=device_id,
+        payload={"command_id": command_id},
+    )
+    await db.commit()
+    await db.refresh(row)
+    out = DeviceAlarmOut.model_validate(row)
+    out.device_command_id = command_id
+    return out
 
 
 @alarm_rules_router.get("", response_model=list[AlarmRuleOut])
@@ -234,3 +290,55 @@ async def create_alarm_rule(
     await db.commit()
     await db.refresh(rule)
     return AlarmRuleOut.model_validate(rule)
+
+
+async def _rule_or_404(db: AsyncSession, ctx: TenantContext, rule_id: UUID) -> AlarmRule:
+    rule = await db.get(AlarmRule, rule_id)
+    if rule is None or rule.tenant_id != ctx.tenant_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "alarm rule not found")
+    return rule
+
+
+@alarm_rules_router.patch("/{rule_id}", response_model=AlarmRuleOut)
+async def update_alarm_rule(
+    rule_id: UUID,
+    body: AlarmRuleUpdate,
+    db: AsyncSession = Depends(get_db),
+    ctx: TenantContext = Depends(require_role(UserRole.operator)),
+):
+    """T-P23 (I05): update name/condition/channels/enabled."""
+    rule = await _rule_or_404(db, ctx, rule_id)
+    changes = body.model_dump(exclude_none=True)
+    for key, value in changes.items():
+        setattr(rule, key, value)
+    await audit.record(
+        db, ctx, "alarm_rule.update", payload={"rule_id": str(rule_id), "fields": sorted(changes)}
+    )
+    await db.commit()
+    await db.refresh(rule)
+    return AlarmRuleOut.model_validate(rule)
+
+
+@alarm_rules_router.delete("/{rule_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_alarm_rule(
+    rule_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    ctx: TenantContext = Depends(require_role(UserRole.admin)),
+):
+    """T-P23 (I05): delete a rule (admin). A rule that already raised
+    alarms is kept — the FK cascades, so deleting it would erase that alarm
+    history; disable it instead."""
+    rule = await _rule_or_404(db, ctx, rule_id)
+    raised = (
+        await db.execute(
+            select(func.count()).select_from(Alarm).where(Alarm.alarm_rule_id == rule_id)
+        )
+    ).scalar_one()
+    if raised:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            f"rule has raised {raised} alarm(s); disable it to keep their history",
+        )
+    await db.delete(rule)
+    await audit.record(db, ctx, "alarm_rule.delete", payload={"rule_id": str(rule_id)})
+    await db.commit()

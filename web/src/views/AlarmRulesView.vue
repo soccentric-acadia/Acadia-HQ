@@ -50,6 +50,28 @@ async function create() {
   }
 }
 
+// T-P23 (I05): update / delete. A rule that already raised alarms cannot be
+// deleted (its history would cascade away) — the API says so; disable it.
+const actionError = ref('')
+async function toggle(rule: AlarmRule) {
+  actionError.value = ''
+  try {
+    await api.alarmRules.update(rule.id, { enabled: !rule.enabled })
+    await load()
+  } catch (e) {
+    actionError.value = e instanceof ApiError ? e.message : 'Could not update the rule.'
+  }
+}
+async function remove(rule: AlarmRule) {
+  actionError.value = ''
+  try {
+    await api.alarmRules.remove(rule.id)
+    await load()
+  } catch (e) {
+    actionError.value = e instanceof ApiError ? e.message : 'Could not delete the rule.'
+  }
+}
+
 onMounted(load)
 </script>
 
@@ -63,6 +85,7 @@ onMounted(load)
       A fault existing does not automatically raise an alarm -- rules decide what's worth surfacing.
     </p>
 
+    <p v-if="actionError" class="mb-4 text-sm text-danger">{{ actionError }}</p>
     <Card v-if="loading" class="p-6 text-sm text-muted-foreground">Loading…</Card>
     <Card v-else-if="rules.length === 0" class="p-6 text-sm text-muted-foreground">
       No alarm rules configured yet.
@@ -73,6 +96,7 @@ onMounted(load)
           <th class="px-4 py-2 font-medium">Name</th>
           <th class="px-4 py-2 font-medium">Condition</th>
           <th class="px-4 py-2 font-medium">Status</th>
+          <th v-if="auth.hasRole('operator')" class="px-4 py-2 font-medium"></th>
         </tr>
       </thead>
       <tbody>
@@ -81,6 +105,14 @@ onMounted(load)
           <td class="px-4 py-2"><code class="text-xs">{{ JSON.stringify(r.condition) }}</code></td>
           <td class="px-4 py-2">
             <Badge :tone="r.enabled ? 'success' : 'neutral'">{{ r.enabled ? 'Enabled' : 'Disabled' }}</Badge>
+          </td>
+          <td v-if="auth.hasRole('operator')" class="px-4 py-2 text-right">
+            <Button variant="secondary" size="sm" @click="toggle(r)">
+              {{ r.enabled ? 'Disable' : 'Enable' }}
+            </Button>
+            <Button v-if="auth.hasRole('admin')" variant="secondary" size="sm" class="ml-2" @click="remove(r)">
+              Delete
+            </Button>
           </td>
         </tr>
       </tbody>
