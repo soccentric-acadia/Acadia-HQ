@@ -31,7 +31,7 @@ export async function runDeviceCommand(
   const ok = status?.state === 'succeeded'
   if (!opts.quiet) {
     if (ok) toast(`${label}: done.`, 'success')
-    else if (!status || status.state === 'queued' || status.state === 'delivering')
+    else if (!status || status.state === 'queued' || status.state === 'delivered')
       toast(`${label}: queued — the device runs it when it next connects.`, 'info')
     else toast(`${label}: ${status.error ?? status.code ?? status.state}`, 'error')
   }

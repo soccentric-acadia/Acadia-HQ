@@ -43,7 +43,7 @@ describe('api paths', () => {
       '/api/devices/d1/updates/factory-reset',
       '/api/devices/d1/credential/revoke',
     ])
-    expect(JSON.parse(fetchMock.mock.calls[1][1]?.body as string)).toEqual({
+    expect(JSON.parse(fetchMock.mock.calls[1]?.[1]?.body as string)).toEqual({
       confirmation: 'SHUTDOWN',
     })
     vi.unstubAllGlobals()

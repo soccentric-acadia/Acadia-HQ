@@ -16,7 +16,12 @@ import {
   writeConfiguration,
   type ConfigurationCommandOutcome,
 } from '@/lib/configCommands'
-import { SECTION_DESCRIPTORS, type SectionDescriptor } from '@/lib/sectionSchemas'
+import {
+  COMMAND_MANAGED_SECTIONS,
+  READ_ONLY_SECTIONS,
+  SECTION_DESCRIPTORS,
+  type SectionDescriptor,
+} from '@/lib/sectionSchemas'
 import { toast } from '@/stores/toasts'
 import SchemaForm from '@/components/wc/SchemaForm.vue'
 import WcCallout from '@/components/wc/WcCallout.vue'
