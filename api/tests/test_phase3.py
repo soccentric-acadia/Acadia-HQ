@@ -252,6 +252,29 @@ async def test_configuration_write_requires_operator_and_queues_signed_values(
     assert command.payload["schema_version"] == 1
     assert command.payload["signature_algorithm"] == "ed25519"
     assert command.payload["signature"] == body["signature"]
+    assert command.payload["signing_key_id"]
+
+    # This uses the generated test Ed25519 key from conftest and verifies the
+    # exact cross-repository canonical field set that webconfigd consumes.
+    import base64
+
+    from cryptography.hazmat.primitives.serialization import load_pem_public_key
+
+    from app.services.configuration import canonical_payload, signing_public_key_pem
+
+    public_key = load_pem_public_key(signing_public_key_pem().encode())
+    public_key.verify(
+        base64.b64decode(command.payload["signature"]),
+        canonical_payload(command.payload),
+    )
+    changed_key_id = {**command.payload, "signing_key_id": "substituted-key"}
+    import pytest
+
+    with pytest.raises(Exception):
+        public_key.verify(
+            base64.b64decode(command.payload["signature"]),
+            canonical_payload(changed_key_id),
+        )
 
 
 async def test_device_health_uses_the_heartbeat_snapshot(client, db_session):

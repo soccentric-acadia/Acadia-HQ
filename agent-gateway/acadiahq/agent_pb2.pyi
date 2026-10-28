@@ -250,26 +250,32 @@ class ServerFrame(_message.Message):
     def __init__(self, pairing_result: _Optional[_Union[PairingResult, _Mapping]] = ..., heartbeat_ack: _Optional[_Union[HeartbeatAck, _Mapping]] = ..., command: _Optional[_Union[Command, _Mapping]] = ..., signed_upload_url: _Optional[_Union[SignedUploadUrl, _Mapping]] = ...) -> None: ...
 
 class PairingResult(_message.Message):
-    __slots__ = ("success", "error", "device_id", "credential_token")
+    __slots__ = ("success", "error", "device_id", "credential_token", "credential_expires_at_unix_ms")
     SUCCESS_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     DEVICE_ID_FIELD_NUMBER: _ClassVar[int]
     CREDENTIAL_TOKEN_FIELD_NUMBER: _ClassVar[int]
+    CREDENTIAL_EXPIRES_AT_UNIX_MS_FIELD_NUMBER: _ClassVar[int]
     success: bool
     error: str
     device_id: str
     credential_token: str
-    def __init__(self, success: _Optional[bool] = ..., error: _Optional[str] = ..., device_id: _Optional[str] = ..., credential_token: _Optional[str] = ...) -> None: ...
+    credential_expires_at_unix_ms: int
+    def __init__(self, success: _Optional[bool] = ..., error: _Optional[str] = ..., device_id: _Optional[str] = ..., credential_token: _Optional[str] = ..., credential_expires_at_unix_ms: _Optional[int] = ...) -> None: ...
 
 class HeartbeatAck(_message.Message):
-    __slots__ = ("server_time_unix_ms", "next_heartbeat_interval_s", "protocol_version")
+    __slots__ = ("server_time_unix_ms", "next_heartbeat_interval_s", "protocol_version", "renewed_credential_token", "credential_expires_at_unix_ms")
     SERVER_TIME_UNIX_MS_FIELD_NUMBER: _ClassVar[int]
     NEXT_HEARTBEAT_INTERVAL_S_FIELD_NUMBER: _ClassVar[int]
     PROTOCOL_VERSION_FIELD_NUMBER: _ClassVar[int]
+    RENEWED_CREDENTIAL_TOKEN_FIELD_NUMBER: _ClassVar[int]
+    CREDENTIAL_EXPIRES_AT_UNIX_MS_FIELD_NUMBER: _ClassVar[int]
     server_time_unix_ms: int
     next_heartbeat_interval_s: int
     protocol_version: int
-    def __init__(self, server_time_unix_ms: _Optional[int] = ..., next_heartbeat_interval_s: _Optional[int] = ..., protocol_version: _Optional[int] = ...) -> None: ...
+    renewed_credential_token: str
+    credential_expires_at_unix_ms: int
+    def __init__(self, server_time_unix_ms: _Optional[int] = ..., next_heartbeat_interval_s: _Optional[int] = ..., protocol_version: _Optional[int] = ..., renewed_credential_token: _Optional[str] = ..., credential_expires_at_unix_ms: _Optional[int] = ...) -> None: ...
 
 class Command(_message.Message):
     __slots__ = ("command_id", "take_backup_now", "restore", "factory_reset", "apply_update", "operation", "daemon", "json_args", "actor", "deadline_ms", "idempotency_key", "correlation_id", "required_confirmation")

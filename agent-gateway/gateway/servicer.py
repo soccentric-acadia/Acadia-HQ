@@ -18,7 +18,7 @@ import logging
 from datetime import datetime, timedelta, UTC
 
 import grpc
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select, update
 
 from app.db.base import get_session_factory
 from app.models.device import Device
@@ -37,7 +37,12 @@ from acadiahq.agent_pb2_grpc import AgentLinkServicer as _AgentLinkServicer
 
 from gateway import handlers
 from gateway.command_map import build_command_fields, scrub_payload
-from gateway.auth import PairingError, redeem_pairing_token, validate_long_lived_credential
+from gateway.auth import (
+    PairingError,
+    redeem_pairing_token,
+    renew_long_lived_credential,
+    validate_long_lived_credential,
+)
 from gateway.config import get_gateway_settings
 from gateway.connection_manager import manager
 
@@ -96,6 +101,9 @@ class AgentLinkServicer(_AgentLinkServicer):
                 await audit.record_system(
                     session, device, "device.online", payload={"reason": "connect"}
                 )
+            renewal = await renew_long_lived_credential(
+                session, device_id, first.heartbeat.credential_token
+            )
             await session.commit()
 
         settings = get_gateway_settings()
@@ -109,6 +117,8 @@ class AgentLinkServicer(_AgentLinkServicer):
                     server_time_unix_ms=_now_ms(),
                     next_heartbeat_interval_s=settings.device_heartbeat_interval_s,
                     protocol_version=SUPPORTED_PROTOCOL_VERSION,
+                    renewed_credential_token=renewal[0] if renewal else "",
+                    credential_expires_at_unix_ms=_datetime_ms(renewal[1]) if renewal else 0,
                 )
             )
             async for out in self._pump(request_iterator, queue, device_id, session_factory):
@@ -135,24 +145,27 @@ class AgentLinkServicer(_AgentLinkServicer):
         while True:
             async with session_factory() as session:
                 now = datetime.now(UTC)
-                expired = (
-                    await session.execute(
-                        select(PendingCommand).where(
-                            PendingCommand.device_id == device_id,
-                            PendingCommand.completed_at.is_(None),
-                            PendingCommand.expires_at.is_not(None),
-                            PendingCommand.expires_at <= now,
-                        )
+                await session.execute(
+                    update(PendingCommand)
+                    .where(
+                        PendingCommand.device_id == device_id,
+                        PendingCommand.completed_at.is_(None),
+                        PendingCommand.state.in_(
+                            (CommandState.queued, CommandState.delivering)
+                        ),
+                        PendingCommand.expires_at.is_not(None),
+                        PendingCommand.expires_at <= now,
                     )
-                ).scalars().all()
-                for row in expired:
-                    row.state = CommandState.expired
-                    row.result_code = "DEADLINE_EXCEEDED"
-                    row.result_error = "command deadline exceeded"
-                    row.retryable = False
-                    row.completed_at = now
-                    row.lease_until = None
-                rows = (
+                    .values(
+                        state=CommandState.expired,
+                        result_code="DEADLINE_EXCEEDED",
+                        result_error="command deadline exceeded",
+                        retryable=False,
+                        completed_at=now,
+                        lease_until=None,
+                    )
+                )
+                candidates = (
                     await session.execute(
                         select(PendingCommand)
                         .where(
@@ -175,7 +188,11 @@ class AgentLinkServicer(_AgentLinkServicer):
                         .limit(32)
                     )
                 ).scalars().all()
-                for row in rows:
+                frames = []
+                for candidate in candidates:
+                    row = await self._claim_pending_command(session, candidate.command_id, now)
+                    if row is None:
+                        continue
                     fields = build_command_fields(row.kind, row.payload)
                     if fields is None:
                         logger.error("unsupported pending command kind %s", row.kind)
@@ -188,13 +205,7 @@ class AgentLinkServicer(_AgentLinkServicer):
                         continue
                     operation_name = fields.pop("operation")
                     daemon = fields.pop("daemon")
-                    row.delivered_at = datetime.now(UTC)
-                    row.state = CommandState.delivering
-                    row.lease_until = datetime.now(UTC) + timedelta(
-                        seconds=get_settings().command_lease_seconds
-                    )
-                    row.attempt_count += 1
-                    await queue.put(
+                    frames.append(
                         ServerFrame(
                             command=Command(
                                 command_id=row.command_id,
@@ -214,7 +225,50 @@ class AgentLinkServicer(_AgentLinkServicer):
                     # in the HQ database.
                     row.payload = scrub_payload(row.payload)
                 await session.commit()
+                # Only enqueue frames whose conditional database claim was
+                # committed. A cancellation that wins the race therefore
+                # never reaches a live AgentLink stream.
+                for frame in frames:
+                    await queue.put(frame)
             await asyncio.sleep(1)
+
+    @staticmethod
+    async def _claim_pending_command(session, command_id: str, now: datetime):
+        """Atomically lease one deliverable command, or return ``None``.
+
+        The predicate is intentionally repeated from candidate selection:
+        multiple live gateway streams can inspect the same row, but only the
+        transaction that changes its state from queued (or an expired lease)
+        gets a row back and may enqueue it.
+        """
+        claimed_at = datetime.now(UTC)
+        result = await session.execute(
+            update(PendingCommand)
+            .where(
+                PendingCommand.command_id == command_id,
+                PendingCommand.completed_at.is_(None),
+                or_(
+                    PendingCommand.expires_at.is_(None),
+                    PendingCommand.expires_at > now,
+                ),
+                or_(
+                    PendingCommand.state == CommandState.queued,
+                    and_(
+                        PendingCommand.state == CommandState.delivering,
+                        PendingCommand.lease_until < now,
+                    ),
+                ),
+            )
+            .values(
+                delivered_at=claimed_at,
+                state=CommandState.delivering,
+                lease_until=claimed_at
+                + timedelta(seconds=get_settings().command_lease_seconds),
+                attempt_count=PendingCommand.attempt_count + 1,
+            )
+            .returning(PendingCommand)
+        )
+        return result.scalar_one_or_none()
 
     async def _pump(self, request_iterator, queue, device_id, session_factory):
         """Interleave inbound device frames with outbound queued commands."""
@@ -230,10 +284,10 @@ class AgentLinkServicer(_AgentLinkServicer):
                     if frame is None:
                         return
                     async with session_factory() as session:
-                        still_allowed = await self._reauth(session, device_id, frame)
-                        if not still_allowed:
+                        renewal = await self._reauth(session, device_id, frame)
+                        if renewal is False:
                             return
-                        response = await self._dispatch(session, device_id, frame)
+                        response = await self._dispatch(session, device_id, frame, renewal)
                         await session.commit()
                     if response is not None:
                         yield response
@@ -245,25 +299,39 @@ class AgentLinkServicer(_AgentLinkServicer):
             inbound_task.cancel()
             outbound_task.cancel()
 
-    async def _reauth(self, session, device_id: str, frame) -> bool:
+    async def _reauth(self, session, device_id: str, frame):
         if frame.HasField("heartbeat"):
             device = await validate_long_lived_credential(
                 session, device_id, frame.heartbeat.credential_token
             )
-            return device is not None
+            if device is None:
+                return False
+            return await renew_long_lived_credential(
+                session, device_id, frame.heartbeat.credential_token
+            )
         # Non-heartbeat frames carry no token; cheaply confirm the device
         # hasn't been disabled/revoked mid-connection.
 
         device = await session.get(Device, device_id)
-        return device is not None and device.pairing_state not in (
+        return None if device is not None and device.pairing_state not in (
             PairingState.disabled,
             PairingState.revoked,
-        )
+        ) else False
 
-    async def _dispatch(self, session, device_id: str, frame) -> ServerFrame | None:
+    async def _dispatch(self, session, device_id: str, frame, renewal=None) -> ServerFrame | None:
 
         device = await session.get(Device, device_id)
         if device is None:
+            if renewal:
+                return ServerFrame(
+                    heartbeat_ack=HeartbeatAck(
+                        server_time_unix_ms=_now_ms(),
+                        next_heartbeat_interval_s=get_gateway_settings().device_heartbeat_interval_s,
+                        protocol_version=SUPPORTED_PROTOCOL_VERSION,
+                        renewed_credential_token=renewal[0],
+                        credential_expires_at_unix_ms=_datetime_ms(renewal[1]),
+                    )
+                )
             return None
 
         if frame.HasField("heartbeat"):
@@ -332,20 +400,27 @@ class AgentLinkServicer(_AgentLinkServicer):
 
     async def _handle_pairing(self, session, raw_token: str):
         try:
-            device, long_lived = await redeem_pairing_token(session, raw_token)
+            device, long_lived, expires_at = await redeem_pairing_token(session, raw_token)
             await session.commit()
         except PairingError as exc:
             yield ServerFrame(pairing_result=PairingResult(success=False, error=str(exc)))
             return
         yield ServerFrame(
             pairing_result=PairingResult(
-                success=True, device_id=str(device.id), credential_token=long_lived
+                success=True,
+                device_id=str(device.id),
+                credential_token=long_lived,
+                credential_expires_at_unix_ms=_datetime_ms(expires_at),
             )
         )
 
 
 def _now_ms() -> int:
     return int(datetime.now(UTC).timestamp() * 1000)
+
+
+def _datetime_ms(value: datetime) -> int:
+    return int(value.timestamp() * 1000)
 
 
 async def _anext_or_none(iterator):

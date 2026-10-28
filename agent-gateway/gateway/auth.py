@@ -3,7 +3,7 @@ validation. Mirrors the password/token discipline the REST API uses --
 only hashes are ever stored or compared (app.services.credentials).
 """
 
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.device import Device
 from app.models.device_credential import DeviceCredential
 from app.models.enums import CredentialKind, PairingState
+from app.config import get_settings
 from app.services.credentials import generate_token, hash_token
 
 
@@ -20,7 +21,9 @@ class PairingError(Exception):
     the pairing endpoint into a token-guessing oracle."""
 
 
-async def redeem_pairing_token(session: AsyncSession, raw_token: str) -> tuple[Device, str]:
+async def redeem_pairing_token(
+    session: AsyncSession, raw_token: str
+) -> tuple[Device, str, datetime]:
     token_hash = hash_token(raw_token)
     cred = (
         await session.execute(
@@ -45,16 +48,61 @@ async def redeem_pairing_token(session: AsyncSession, raw_token: str) -> tuple[D
     cred.revoked_at = now  # single-use: consume it immediately
 
     long_lived_raw = generate_token()
+    expires_at = now + timedelta(seconds=get_settings().device_credential_ttl_seconds)
     session.add(
         DeviceCredential(
             device_id=device.id,
             kind=CredentialKind.long_lived,
             token_hash=hash_token(long_lived_raw),
+            expires_at=expires_at,
         )
     )
     device.pairing_state = PairingState.authorized
     await session.flush()
-    return device, long_lived_raw
+    return device, long_lived_raw, expires_at
+
+
+async def renew_long_lived_credential(
+    session: AsyncSession, device_id: str, raw_token: str
+) -> tuple[str, datetime] | None:
+    """Rotate a still-authenticated credential shortly before expiry.
+
+    The caller has already authenticated the heartbeat. Revoking the old
+    hash and inserting the replacement occur in the same database transaction,
+    so a lost acknowledgement is harmless: the device reconnects with the old
+    credential and is rejected, then follows its explicit re-enrollment path.
+    """
+    now = datetime.now(UTC)
+    cred = (
+        await session.execute(
+            select(DeviceCredential).where(
+                DeviceCredential.device_id == device_id,
+                DeviceCredential.token_hash == hash_token(raw_token),
+                DeviceCredential.kind == CredentialKind.long_lived,
+                DeviceCredential.revoked_at.is_(None),
+                (DeviceCredential.expires_at.is_(None)) | (DeviceCredential.expires_at > now),
+            )
+        )
+    ).scalar_one_or_none()
+    if cred is None:
+        return None
+
+    window = timedelta(seconds=get_settings().device_credential_renewal_window_seconds)
+    if cred.expires_at is not None and cred.expires_at > now + window:
+        return None
+
+    replacement = generate_token()
+    expires_at = now + timedelta(seconds=get_settings().device_credential_ttl_seconds)
+    cred.revoked_at = now
+    session.add(
+        DeviceCredential(
+            device_id=cred.device_id,
+            kind=CredentialKind.long_lived,
+            token_hash=hash_token(replacement),
+            expires_at=expires_at,
+        )
+    )
+    return replacement, expires_at
 
 
 async def validate_long_lived_credential(
@@ -72,6 +120,7 @@ async def validate_long_lived_credential(
                 DeviceCredential.token_hash == token_hash,
                 DeviceCredential.kind == CredentialKind.long_lived,
                 DeviceCredential.revoked_at.is_(None),
+                (DeviceCredential.expires_at.is_(None) | (DeviceCredential.expires_at > datetime.now(UTC))),
             )
         )
     ).scalar_one_or_none()

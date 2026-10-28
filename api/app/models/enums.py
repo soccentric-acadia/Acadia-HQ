@@ -86,3 +86,4 @@ class CommandState(str, enum.Enum):
     succeeded = "succeeded"
     failed = "failed"
     expired = "expired"
+    cancelled = "cancelled"

@@ -4,7 +4,7 @@ bundles, device accounts, allowlisted spoke operations)."""
 import pytest
 from sqlalchemy import select
 
-from app.models.enums import CommandState, UserRole
+from app.models.enums import CommandKind, CommandState, UserRole
 from app.models.pending_command import PendingCommand
 from tests.factories import login_as, make_tenant, make_user
 
@@ -136,3 +136,48 @@ async def test_spoke_operations_are_allowlisted_and_role_gated(client, db_sessio
         f"/devices/{device.id}/operations", json={"daemon": "networkd", "operation": "ssh-open"}
     )
     assert admin_only.status_code == 403
+
+
+async def test_command_cancel_reports_claimed_and_terminal_states(client, db_session):
+    device = await _setup(db_session, client)
+    delivering = PendingCommand(
+        device_id=device.id,
+        command_id="cancel:delivering",
+        kind=CommandKind.reboot,
+        state=CommandState.delivering,
+    )
+    terminal = PendingCommand(
+        device_id=device.id,
+        command_id="cancel:terminal",
+        kind=CommandKind.reboot,
+        state=CommandState.succeeded,
+    )
+    db_session.add_all((delivering, terminal))
+    await db_session.commit()
+
+    claimed = await client.post(f"/devices/{device.id}/commands/{delivering.command_id}/cancel")
+    assert claimed.status_code == 409
+
+    completed = await client.post(f"/devices/{device.id}/commands/{terminal.command_id}/cancel")
+    assert completed.status_code == 200
+    assert completed.json() == {"command_id": terminal.command_id, "state": "succeeded"}
+
+
+async def test_queued_command_cancellation_is_terminal_and_idempotent(client, db_session):
+    device = await _setup(db_session, client)
+    command = PendingCommand(
+        device_id=device.id,
+        command_id="cancel:queued",
+        kind=CommandKind.reboot,
+        state=CommandState.queued,
+    )
+    db_session.add(command)
+    await db_session.commit()
+
+    first = await client.post(f"/devices/{device.id}/commands/{command.command_id}/cancel")
+    second = await client.post(f"/devices/{device.id}/commands/{command.command_id}/cancel")
+
+    assert first.json() == {"command_id": command.command_id, "state": "cancelled"}
+    assert second.json() == first.json()
+    await db_session.refresh(command)
+    assert command.completed_at is not None

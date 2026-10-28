@@ -1,3 +1,7 @@
+import hashlib
+import json
+from pathlib import Path
+
 from app.models.enums import UserRole
 from tests.factories import login_as, make_tenant, make_user
 
@@ -49,3 +53,39 @@ def test_every_catalog_command_kind_is_deliverable():
     for op in OPERATIONS:
         kind = CommandKind(op["command_kind"])
         assert kind in GATEWAY_MAP, op["name"]
+
+
+def test_instrumentation_production_lock_matches_vendored_catalog():
+    contracts = Path(__file__).resolve().parents[1] / "app" / "contracts"
+    lock = json.loads(
+        (contracts / "instrumentation-production-contract-lock-v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    catalog = (contracts / "instrumentation-operation-catalog.json").read_bytes()
+
+    assert lock["proto_schema_version"] == 3
+    assert lock["descriptor"]["sha256"] == (
+        "8bd9d5e5ecb9b92770f0fc869181b67ab259a5a2428dc9cdb62fefc34fa3b469"
+    )
+    assert hashlib.sha256(catalog).hexdigest() == lock["operation_catalog"]["sha256"]
+
+
+def test_command_authorization_matrix_has_terminal_and_destructive_guards():
+    matrix_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "contracts"
+        / "command-authorization-matrix-v1.json"
+    )
+    matrix = json.loads(matrix_path.read_text(encoding="utf-8"))
+    assert matrix["command_identifier"]["field"] == "command_id"
+    assert set(matrix["terminal_states"]) == {"succeeded", "failed", "expired", "cancelled"}
+    assert matrix["transitions"]["terminal"] == []
+    operations = {row["operation"]: row for row in matrix["operations"]}
+    assert operations["backup.restore"]["confirmation"] == "RESTORE"
+    assert operations["system.factory_reset"]["confirmation"] == "FACTORY-RESET"
+    assert operations["update.apply"]["confirmation"] == "APPLY-UPDATE"
+    assert operations["update.rollback"]["confirmation"] == "ROLLBACK"
+    assert operations["service.control"]["confirmation"] == "SERVICE-CONTROL"
+    assert all(row["gateway_actor"] == "hq" for row in operations.values())

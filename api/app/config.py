@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     # the matching public key provisioned at /etc/acadia/hq-config-pub.pem.
     # Generate with scripts/generate-config-signing-key.py.
     configuration_signing_key_path: str = ""
+    # Stable public identifier for the active configuration signing key. It
+    # travels inside the signed envelope so devices can reject a revoked key.
+    configuration_signing_key_id: str = "default"
 
     # Object storage (S3-compatible; MinIO in local dev).
     s3_endpoint_url: str = "http://localhost:9000"
@@ -65,6 +68,12 @@ class Settings(BaseSettings):
 
     # Pairing tokens.
     pairing_token_ttl_seconds: int = 15 * 60
+    # Device gateway credentials are renewable, short-lived credentials. A
+    # finite lifetime limits the impact of a copied persistent data partition.
+    device_credential_ttl_seconds: int = 30 * 24 * 60 * 60
+    # Renew on an authenticated heartbeat during this window. The device keeps
+    # using its existing credential until HQ returns the replacement.
+    device_credential_renewal_window_seconds: int = 7 * 24 * 60 * 60
     command_ttl_seconds: int = 60 * 60
     command_lease_seconds: int = 30
     command_max_attempts: int = 3

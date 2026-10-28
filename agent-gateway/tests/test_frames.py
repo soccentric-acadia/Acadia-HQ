@@ -1,12 +1,16 @@
+import asyncio
 import time
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 
+from app.db.base import get_session_factory
 from app.models.alarm import Alarm, AlarmRule
 from app.models.enums import CommandKind, CommandState
 from app.models.fault import Fault
 from app.models.log_bundle import LogBundle
 from app.models.pending_command import PendingCommand
+from app.services.commands import cancel_queued_command
 from app.models.telemetry import TelemetrySample
 from acadiahq.agent_pb2 import (
     AgentFrame,
@@ -17,12 +21,66 @@ from acadiahq.agent_pb2 import (
     TelemetrySample as PbTelemetrySample,
 )
 from tests.factories import make_authorized_device_with_credential, make_tenant
+from gateway.servicer import AgentLinkServicer
 
 
 def _hb(device_id: str, credential: str) -> Heartbeat:
     return Heartbeat(
         device_id=device_id, credential_token=credential, sent_at_unix_ms=int(time.time() * 1000)
     )
+
+
+async def test_claim_cancel_race_has_exactly_one_winner(db_session):
+    """A cancelled command cannot be placed on a gateway queue.
+
+    Separate sessions begin together to exercise the real Postgres row lock:
+    the claim and cancellation updates each predicate their state transition,
+    so one returns a row and the other returns no row regardless of lock
+    acquisition order.
+    """
+    tenant = await make_tenant(db_session)
+    device, _ = await make_authorized_device_with_credential(db_session, tenant)
+    command = PendingCommand(
+        device_id=device.id,
+        command_id="backup:claim-cancel-race",
+        kind=CommandKind.take_backup_now,
+        state=CommandState.queued,
+    )
+    db_session.add(command)
+    await db_session.commit()
+
+    start = asyncio.Event()
+    factory = get_session_factory()
+
+    async def claim() -> bool:
+        async with factory() as session:
+            await start.wait()
+            row = await AgentLinkServicer._claim_pending_command(
+                session, command.command_id, datetime.now(UTC)
+            )
+            await session.commit()
+            return row is not None
+
+    async def cancel() -> bool:
+        async with factory() as session:
+            await start.wait()
+            cancelled = await cancel_queued_command(
+                session, device.id, command.command_id, datetime.now(UTC)
+            )
+            await session.commit()
+            return cancelled
+
+    claim_task = asyncio.create_task(claim())
+    cancel_task = asyncio.create_task(cancel())
+    start.set()
+    claimed, cancelled = await asyncio.gather(claim_task, cancel_task)
+
+    assert claimed != cancelled
+    await db_session.refresh(command)
+    assert command.state == (
+        CommandState.delivering if claimed else CommandState.cancelled
+    )
+    assert command.attempt_count == int(claimed)
 
 
 async def test_telemetry_batch_persists_samples(gateway_stub, db_session):

@@ -64,6 +64,44 @@ async def test_device_name_search(client, db_session):
 
 
 @pytest.mark.asyncio
+async def test_admin_cancels_queued_command_but_not_delivering_command(client, db_session):
+    from app.models.enums import CommandKind, CommandState
+    from app.models.pending_command import PendingCommand
+
+    tenant = await make_tenant(db_session)
+    admin = await make_user(db_session, tenant, UserRole.admin)
+    device = Device(tenant_id=tenant.id, name="cancel-device")
+    db_session.add(device)
+    await db_session.flush()
+    queued = PendingCommand(
+        device_id=device.id,
+        command_id="cancel:queued",
+        kind=CommandKind.take_backup_now,
+        state=CommandState.queued,
+    )
+    delivering = PendingCommand(
+        device_id=device.id,
+        command_id="cancel:delivering",
+        kind=CommandKind.take_backup_now,
+        state=CommandState.delivering,
+    )
+    db_session.add_all([queued, delivering])
+    await db_session.commit()
+    await login_as(client, admin)
+
+    cancelled = await client.post(f"/devices/{device.id}/commands/{queued.command_id}/cancel")
+    assert cancelled.status_code == 200
+    assert cancelled.json()["state"] == "cancelled"
+    await db_session.refresh(queued)
+    assert queued.state is CommandState.cancelled
+    assert queued.completed_at is not None
+    assert queued.retryable is False
+
+    conflict = await client.post(f"/devices/{device.id}/commands/{delivering.command_id}/cancel")
+    assert conflict.status_code == 409
+
+
+@pytest.mark.asyncio
 async def test_ssh_keys_set_queues_command(client, db_session):
     """T-P11 (B05): POST /devices/{id}/ssh-keys queues a durable ssh_keys.set
     command with the authorized_keys payload, admin-gated."""

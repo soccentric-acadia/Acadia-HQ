@@ -32,6 +32,7 @@ async def test_valid_pairing_token_issues_credential_and_authorizes_device(
     assert response.pairing_result.success is True
     assert response.pairing_result.device_id == str(device.id)
     assert response.pairing_result.credential_token
+    assert response.pairing_result.credential_expires_at_unix_ms > int(time.time() * 1000)
 
     await db_session.refresh(device)
     assert device.pairing_state == PairingState.authorized
@@ -130,6 +131,75 @@ async def test_heartbeat_with_invalid_credential_is_rejected(gateway_stub, db_se
         async for _ in gateway_stub.Connect(frames()):
             pass
     assert exc_info.value.code() == grpc.StatusCode.UNAUTHENTICATED
+
+
+async def test_expired_device_credential_is_rejected(gateway_stub, db_session):
+    """Expired credentials fail closed even if the device has not reconnected."""
+    from datetime import UTC, datetime, timedelta
+
+    from app.models.device_credential import DeviceCredential
+
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+    await db_session.execute(
+        DeviceCredential.__table__.update()
+        .where(DeviceCredential.device_id == device.id)
+        .values(expires_at=datetime.now(UTC) - timedelta(seconds=1))
+    )
+    await db_session.commit()
+
+    async def frames():
+        yield AgentFrame(
+            heartbeat=Heartbeat(
+                device_id=str(device.id),
+                credential_token=credential,
+                sent_at_unix_ms=int(time.time() * 1000),
+            )
+        )
+
+    with pytest.raises(grpc.aio.AioRpcError) as exc_info:
+        async for _ in gateway_stub.Connect(frames()):
+            pass
+    assert exc_info.value.code() == grpc.StatusCode.UNAUTHENTICATED
+
+
+async def test_authenticated_heartbeat_renews_credential_before_expiry(
+    gateway_stub, db_session
+):
+    """Renewal is delivered only after the current credential authenticates."""
+    from sqlalchemy import select
+
+    from app.models.device_credential import DeviceCredential
+    from app.services.credentials import hash_token
+
+    tenant = await make_tenant(db_session)
+    device, credential = await make_authorized_device_with_credential(db_session, tenant)
+
+    async def frames():
+        yield AgentFrame(
+            heartbeat=Heartbeat(
+                device_id=str(device.id),
+                credential_token=credential,
+                sent_at_unix_ms=int(time.time() * 1000),
+            )
+        )
+
+    responses = [response async for response in gateway_stub.Connect(frames())]
+    ack = next(response.heartbeat_ack for response in responses if response.HasField("heartbeat_ack"))
+    assert ack.renewed_credential_token
+    assert ack.renewed_credential_token != credential
+    assert ack.credential_expires_at_unix_ms > int(time.time() * 1000)
+
+    credentials = (
+        await db_session.execute(
+            select(DeviceCredential).where(DeviceCredential.device_id == device.id)
+        )
+    ).scalars().all()
+    assert any(row.revoked_at is not None for row in credentials)
+    assert any(
+        row.revoked_at is None and row.token_hash == hash_token(ack.renewed_credential_token)
+        for row in credentials
+    )
 
 
 async def test_disabled_device_heartbeat_is_rejected(gateway_stub, db_session):

@@ -14,6 +14,7 @@ from app.services import audit
 from app.services.configuration import (
     CONFIGURATION_SCHEMA_VERSION,
     SIGNATURE_ALGORITHM,
+    signing_key_id,
     sign_payload,
 )
 from app.services.device_scope import get_tenant_device_or_404
@@ -47,6 +48,7 @@ async def _queue(
         "schema_version": CONFIGURATION_SCHEMA_VERSION,
         "origin": "hq",
         "config": values,
+        "signing_key_id": signing_key_id(),
     }
     signature = sign_payload(unsigned_payload)
     payload = {
@@ -76,6 +78,7 @@ async def _queue(
             "correlation_id": correlation_id,
             "signature": signature,
             "signature_algorithm": SIGNATURE_ALGORITHM,
+            "signing_key_id": payload["signing_key_id"],
             "integration_status": _STATUS,
         },
     )

@@ -10,7 +10,7 @@ from app.config import get_settings
 from app.db.deps import get_db
 from app.models.device import Device
 from app.models.device_credential import DeviceCredential
-from app.models.enums import CommandKind, CredentialKind, PairingState, UserRole
+from app.models.enums import CommandKind, CommandState, CredentialKind, PairingState, UserRole
 from app.models.pending_command import PendingCommand
 from app.schemas.common import Page
 from app.schemas.device import (
@@ -20,6 +20,7 @@ from app.schemas.device import (
     DeviceOut,
 )
 from app.services import audit
+from app.services.commands import cancel_queued_command
 from app.services.credentials import generate_token, hash_token
 from app.services.device_scope import get_tenant_device_or_404
 from app.services.tenant_repo import TenantContext, TenantRepo
@@ -124,6 +125,46 @@ async def get_command_status(
     if command.kind.value.startswith("configuration_"):
         response["integration_status"] = "contract_v1_device_integrated"
     return response
+
+
+@router.post("/{device_id}/commands/{command_id}/cancel")
+async def cancel_command(
+    device_id: UUID,
+    command_id: str,
+    db: AsyncSession = Depends(get_db),
+    ctx: TenantContext = Depends(require_role(UserRole.admin)),
+):
+    """Terminally cancel an undelivered command.
+
+    AgentLink v1 has no cancel frame.  A command already written to a live
+    stream may still finish; that protocol limitation is exposed as a
+    conflict instead of pretending an in-flight device action was stopped.
+    """
+    repo = TenantRepo(db, ctx)
+    await repo.get_or_404(Device, device_id)
+    now = datetime.now(UTC)
+    if await cancel_queued_command(db, device_id, command_id, now):
+        await db.commit()
+        return {"command_id": command_id, "state": CommandState.cancelled.value}
+
+    command = (
+        await db.execute(
+            select(PendingCommand).where(
+                PendingCommand.device_id == device_id,
+                PendingCommand.command_id == command_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if command is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "command not found")
+    if command.state == CommandState.delivering and command.completed_at is None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "command was claimed for delivery; AgentLink v1 cannot cancel in-flight work",
+        )
+    # Cancellation is idempotent for every terminal state: return the durable
+    # result rather than overwriting an acknowledgement or expiry.
+    return {"command_id": command.command_id, "state": command.state.value}
 
 
 @router.get("/{device_id}/health")

@@ -175,12 +175,19 @@ message PairingResult {
   // Long-lived credential the device must store and use for all future
   // connections. Only ever sent once, at successful pairing.
   string credential_token = 4;
+  // Authoritative UTC expiry for credential_token. Zero is the legacy,
+  // unspecified value and must not overwrite a locally recorded expiry.
+  int64 credential_expires_at_unix_ms = 5;
 }
 
 message HeartbeatAck {
   int64 server_time_unix_ms = 1;
   int32 next_heartbeat_interval_s = 2;
   uint32 protocol_version = 3;
+  // A replacement credential issued before expiry. Empty means unchanged.
+  string renewed_credential_token = 4;
+  // Authoritative UTC expiry for the replacement credential.
+  int64 credential_expires_at_unix_ms = 5;
 }
 
 // Fleet-management verbs pushed down to the device (IMPLEMENTATION_PLAN §4).

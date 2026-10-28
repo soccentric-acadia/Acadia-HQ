@@ -20,6 +20,13 @@ CONFIGURATION_SCHEMA_VERSION = 1
 SIGNATURE_ALGORITHM = "ed25519"
 
 
+def signing_key_id() -> str:
+    key_id = get_settings().configuration_signing_key_id
+    if not key_id or len(key_id) > 128 or not key_id.replace("-", "").replace("_", "").isalnum():
+        raise RuntimeError("configuration_signing_key_id must be 1..128 URL-safe characters")
+    return key_id
+
+
 def canonical_document(
     *, device_id: UUID, command_id: str, operation: str, values: dict[str, Any] | None = None
 ) -> bytes:
@@ -36,12 +43,14 @@ def canonical_document(
 
 
 def canonical_payload(payload: dict[str, Any]) -> bytes:
-    """The exact bytes HQ signs and the device verifies (T-P13, F09): the
-    envelope minus the signature fields, canonical JSON — sorted keys,
-    compact separators, UTF-8 (ensure_ascii=False matches serde_json's
-    output), and non-finite numbers rejected so the serialization is
-    unambiguous."""
-    doc = {k: v for k, v in payload.items() if k not in ("signature", "signature_algorithm")}
+    """Return the versioned configuration-signature field set.
+
+    Only contract fields are signed: ``schema_version``, ``origin``,
+    ``config``, and ``signing_key_id`` when present.  Transport metadata is
+    deliberately excluded.  This exact subset is mirrored by webconfigd.
+    """
+    fields = ("schema_version", "origin", "config", "signing_key_id")
+    doc = {field: payload[field] for field in fields if field in payload}
     return json.dumps(
         doc, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
     ).encode()
